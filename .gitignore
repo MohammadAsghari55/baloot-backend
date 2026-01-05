@@ -1,3 +1,44 @@
 # Windows system files
 desktop.ini
 *.ico
+
+
+
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# env files
+.env
+.env.*
+
+# logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# coverage
+coverage/
+
+# TypeScript
+*.tsbuildinfo
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# misc
+*.log

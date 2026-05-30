@@ -1,4 +1,7 @@
- function errorMiddleware(err: any, req: any, res: any, next: any) {
+import { Request, Response, NextFunction } from 'express';
+import { AppError } from '../shared/errors/app-error';
+
+ export function errorMiddleware(err: any, req: Request, res: Response, next: NextFunction) {
   if (err instanceof AppError) {
     const message =
       process.env.NODE_ENV === 'production'

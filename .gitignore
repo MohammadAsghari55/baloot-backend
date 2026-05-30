@@ -42,5 +42,3 @@ Thumbs.db
 
 # misc
 *.log
-
-/src/generated/prisma

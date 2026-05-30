@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { healthService } from "./health.service";
+import { healthService } from "../../domains/health/service/health.service";
 
 export const healthController = {
   check(req: Request, res: Response) {

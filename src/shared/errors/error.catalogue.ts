@@ -44,5 +44,10 @@ export const ErrorCodes = {
     message: "Could not connect to the database",
     status: 500,
   },
+  DUPLICATE_ENTRY: {
+    code: "DUPLICATE_ENTRY",
+    message: "Duplicate entry violates unique constraint",
+    status: 409,
+  },
 } as const;
 export type ErrorCode = keyof typeof ErrorCodes;

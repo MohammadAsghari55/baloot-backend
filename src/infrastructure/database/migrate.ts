@@ -30,7 +30,7 @@ async function runMigrations() {
       const alreadyExecuted = res.rowCount !== null && res.rowCount > 0;
 
       if (alreadyExecuted) {
-        console.log(`⏭️ Skipping already executed: ${file}`);
+        console.log(`Skipping already executed: ${file}`);
         continue;
       }
 
@@ -43,14 +43,14 @@ async function runMigrations() {
       }
       const upSql = upMatch[1].trim();
 
-      console.log(`📄 Running: ${file}`);
+      console.log(`Running: ${file}`);
       await pool.query(upSql);
       await pool.query(`INSERT INTO migration_history (name) VALUES ($1)`, [
         file,
       ]);
-      console.log(`✅ ${file} executed successfully.`);
+      console.log(`${file} executed successfully.`);
     }
-    console.log("🎉 All migrations completed.");
+    console.log("All migrations completed.");
   } catch (err) {
     if (err instanceof DatabaseError) {
       console.error(

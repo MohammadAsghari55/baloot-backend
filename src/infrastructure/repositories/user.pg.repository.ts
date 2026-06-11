@@ -1,8 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import User from "../../domains/user/entities/user.entity.js";
 import IUserRepository from "../../domains/user/repositories/user.repository.js";
-import InternalError from "../../shared/errors/internal.error.js";
-
+import DatabaseError from "../../shared/errors/database.error.js";
 class UserPgRepository implements IUserRepository {
   constructor(private pool: Pool) {}
   async findByEmail(email: string, client?: PoolClient): Promise<User | null> {
@@ -74,7 +73,7 @@ class UserPgRepository implements IUserRepository {
         user.updatedAt,
       ]);
     } catch (error) {
-      throw new InternalError("DB_SAVE_FAILD");
+      throw DatabaseError.fromPGError(error);
     }
   }
 }

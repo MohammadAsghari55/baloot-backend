@@ -1,1 +1,1 @@
-export { default as authController } from "./container.js";
+export { adminAuthController, userAuthController } from "./container.js";

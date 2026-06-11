@@ -49,5 +49,10 @@ export const ErrorCodes = {
     message: "Duplicate entry violates unique constraint",
     status: 409,
   },
+  INVALID_ROLE: {
+    code: "INVALID_ROLE",
+    message: "Invalid role for this endpoint",
+    status: 403,
+  },
 } as const;
 export type ErrorCode = keyof typeof ErrorCodes;

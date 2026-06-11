@@ -3,7 +3,7 @@ import UserService from "../../../domains/user/services/user.service.js";
 import pool from "../../../infrastructure/database/pg.client.js";
 import AppError from "../../../shared/errors/app.error.js";
 
-class RegisterUserUseCase {
+class RegisterAdminUseCase {
   constructor(private userService: UserService) {}
 
   async execute(dto: RegisterDto) {
@@ -18,7 +18,7 @@ class RegisterUserUseCase {
       await this.userService.checkUniqueness(
         dto.email,
         dto.username,
-        "user",
+        "admin",
         client,
       );
 
@@ -28,7 +28,7 @@ class RegisterUserUseCase {
         dto.email,
         dto.username,
         hashedPassword,
-        "user",
+        "admin",
       );
 
       await this.userService.saveUser(user, client);
@@ -50,4 +50,4 @@ class RegisterUserUseCase {
   }
 }
 
-export default RegisterUserUseCase;
+export default RegisterAdminUseCase;

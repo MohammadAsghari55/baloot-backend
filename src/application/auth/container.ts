@@ -5,9 +5,11 @@ import RegisterUserUseCase from "./usecases/register.user.usecase.js";
 import UserService from "../../domains/user/services/user.service.js";
 import UserPgRepository from "../../infrastructure/repositories/user.pg.repository.js";
 import pool from "../../infrastructure/database/pg.client.js";
+import BcryptService from "../../infrastructure/services/bcrypt.service.js";
 
 const userPgRepository = new UserPgRepository(pool);
-const userService = new UserService(userPgRepository);
+const bcryptService = new BcryptService();
+const userService = new UserService(userPgRepository, bcryptService);
 const registerAdminUseCase = new RegisterAdminUseCase(userService);
 const registerUserUseCase = new RegisterUserUseCase(userService);
 export const adminAuthController = new AdminAuthController(

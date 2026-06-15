@@ -1,12 +1,15 @@
 import { PoolClient } from "pg";
-import bcrypt from "bcrypt";
 import User from "../entities/user.entity.js";
 import UserRepository from "../repositories/user.repository.js";
 import ConflictError from "../../../shared/errors/conflict.error.js";
 import ForbiddenError from "../../../shared/errors/forbidden.error.js";
+import IPasswordHasher from "../Interfaces/ipassword.hasher.js";
 
 class UserService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private passwordHasher: IPasswordHasher,
+  ) {}
 
   async checkUniqueness(
     email: string,
@@ -34,7 +37,7 @@ class UserService {
   }
 
   async hashPassword(plainPassword: string): Promise<string> {
-    return bcrypt.hash(plainPassword, 10);
+    return this.passwordHasher.hash(plainPassword);
   }
 
   createUserEntity(
@@ -48,6 +51,20 @@ class UserService {
 
   async saveUser(user: User, client?: PoolClient): Promise<void> {
     await this.userRepository.save(user, client);
+  }
+
+  async comparePassword(
+    plainPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return this.passwordHasher.compare(plainPassword, hashedPassword);
+  }
+
+  async findUserByUsername(
+    username: string,
+    client?: PoolClient,
+  ): Promise<User | null> {
+    return this.userRepository.findByUsername(username, client);
   }
 }
 export default UserService;

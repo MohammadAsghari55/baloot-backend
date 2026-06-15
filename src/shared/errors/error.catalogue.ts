@@ -16,7 +16,7 @@ export const ErrorCodes = {
   },
   INVALID_CREDENTIALS: {
     code: "INVALID_CREDENTIALS",
-    message: "Invalid email or password",
+    message: "Invalid username or password",
     status: 401,
   },
   DB_SAVE_FAILD: {
@@ -53,6 +53,11 @@ export const ErrorCodes = {
     code: "INVALID_ROLE",
     message: "Invalid role for this endpoint",
     status: 403,
+  },
+  PASSWORD_MISMATCH: {
+    code: "PASSWORD_MISMATCH",
+    message: "Passwords do not match",
+    status: 400,
   },
 } as const;
 export type ErrorCode = keyof typeof ErrorCodes;

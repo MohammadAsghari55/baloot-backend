@@ -9,16 +9,35 @@ class RefreshTokenRepository implements IRefreshTokenRepository {
   async saveToken(
     tokenHash: string,
     userId: string,
+    deviceId: string,
     client?: PoolClient,
   ): Promise<void> {
     const dbClient = client || this.pool;
     const query = `
     INSERT INTO refresh_token (
-    id,user_id,token_hash,expires_at)
-    VALUES ($1, $2, $3, NOW() + INTERVAL '7 days')
+    id,user_id,token_hash,device_id,expires_at)
+    VALUES ($1, $2, $3, $4, NOW() + INTERVAL '7 days')
     `;
     try {
-      await dbClient.query(query, [randomUUID(), userId, tokenHash]);
+      await dbClient.query(query, [randomUUID(), userId, tokenHash, deviceId]);
+    } catch (error) {
+      throw DatabaseError.fromPGError(error);
+    }
+  }
+
+  async revokeByDeviceId(
+    userId: string,
+    deviceId: string,
+    client?: PoolClient,
+  ): Promise<void> {
+    const dbClient = client || this.pool;
+    const query = `
+    UPDATE refresh_token 
+    SET revoked_at = NOW()
+    WHERE user_id = $1 AND device_id = $2 AND revoked_at IS NULL
+    `;
+    try {
+      await dbClient.query(query, [userId, deviceId]);
     } catch (error) {
       throw DatabaseError.fromPGError(error);
     }

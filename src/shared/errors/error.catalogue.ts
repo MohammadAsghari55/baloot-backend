@@ -59,5 +59,10 @@ export const ErrorCodes = {
     message: "Passwords do not match",
     status: 400,
   },
+  MISSING_DEVICE_ID: {
+    code: "MISSING_DEVICE_ID",
+    message: "Device ID is required in X-Device-Id header",
+    status: 400,
+  },
 } as const;
 export type ErrorCode = keyof typeof ErrorCodes;

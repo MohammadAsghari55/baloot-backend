@@ -2,50 +2,33 @@ import { BoundClass } from "@hemia/autobind";
 import { Request, Response } from "express";
 import RegisterUserUseCase from "../../../../application/auth/usecases/register.user.usecase.js";
 import LoginUseCase from "../../../../application/auth/usecases/login.usecase.js";
-import ForbiddenError from "../../../../shared/errors/forbidden.error.js";
-import TokenService from "../../../../infrastructure/services/token.service.js";
-import IRefreshTokenRepository from "../../../../domains/user/repositories/refresh.token.repository.js";
+
 @BoundClass
 class UserAuthController {
   constructor(
     private registerUseCase: RegisterUserUseCase,
     private loginUseCase: LoginUseCase,
-    private tokenService: TokenService,
-    private refreshTokenRepository: IRefreshTokenRepository,
   ) {}
 
   async register(req: Request, res: Response) {
-    if (req.body.role && req.body.role !== "user") {
-      throw new ForbiddenError("INVALID_ROLE");
-    }
-    const result = await this.registerUseCase.execute(req.body);
+    const user = await this.registerUseCase.execute(req.body);
     res.status(201).json({
       success: true,
       message: "User registered successfully",
-      data: result,
+      data: user,
     });
   }
 
   async login(req: Request, res: Response) {
-    const userInfo = await this.loginUseCase.execute(req.body);
-    const accessToken = this.tokenService.generateAccessToken(
-      userInfo.userId,
-      userInfo.role,
-    );
-    const refreshToken = this.tokenService.generateRefreshToken();
-    const hashedRefreshToken =
-      await this.tokenService.hashRefreshToken(refreshToken);
+    const deviceId = req.headers["x-device-id"] as string;
+    const token = await this.loginUseCase.execute(req.body, deviceId);
 
-    await this.refreshTokenRepository.saveToken(
-      hashedRefreshToken,
-      userInfo.userId,
-    );
-    res.cookie("accessToken", accessToken, {
+    res.cookie("accessToken", token.accessToken, {
       httpOnly: true,
       sameSite: "strict",
       maxAge: 15 * 60 * 1000,
     });
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie("refreshToken", token.refreshToken, {
       httpOnly: true,
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,

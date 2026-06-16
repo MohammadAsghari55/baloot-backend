@@ -17,16 +17,16 @@ const userService = new UserService(userPgRepository, bcryptService);
 const registerAdminUseCase = new RegisterAdminUseCase(userService);
 const registerUserUseCase = new RegisterUserUseCase(userService);
 const refreshTokenRepository = new RefreshTokenRepository(pool);
-const loginUseCase = new LoginUseCase(userService);
+const loginUseCase = new LoginUseCase(
+  userService,
+  tokenService,
+  refreshTokenRepository,
+);
 export const adminAuthController = new AdminAuthController(
   registerAdminUseCase,
   loginUseCase,
-  tokenService,
-  refreshTokenRepository,
 );
 export const userAuthController = new UserAuthController(
   registerUserUseCase,
   loginUseCase,
-  tokenService,
-  refreshTokenRepository,
 );

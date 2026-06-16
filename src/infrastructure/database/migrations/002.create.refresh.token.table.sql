@@ -6,8 +6,11 @@ CREATE TABLE IF NOT EXISTS refresh_token (
     created_at              TIMESTAMP DEFAULT NOW(),
     expires_at              TIMESTAMP NOT NULL,
     revoked_at              TIMESTAMP,
+    device_id               VARCHAR(255) NOT NULL DEFAULT 'unknown'
 );
 
-CREATE INDEX idx_refresh_token_user_revoked ON refresh_token(user_id, revoked_at);
+CREATE UNIQUE INDEX idx_unique_active_refresh_token_device 
+ON refresh_token(user_id, device_id) 
+WHERE revoked_at IS NULL;
 -- DOWN
 DROP TABLE IF EXISTS refresh_token;

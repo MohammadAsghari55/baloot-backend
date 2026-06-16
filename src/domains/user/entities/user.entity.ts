@@ -74,27 +74,27 @@ class User {
     id: string;
     email: string;
     username: string;
-    passwordHash: string;
+    password_hash: string;
     role: "user" | "admin";
-    walletBalance: number;
-    isEmailVerified: boolean;
-    wrongPasswordNumber: number;
-    wrongPasswordUntil: Date | null;
-    createdAt: Date;
-    updatedAt: Date;
+    wallet_balance: number;
+    is_email_verified: boolean;
+    wrong_password_number: number;
+    wrong_password_until: Date | null;
+    created_at: Date;
+    updated_at: Date;
   }): User {
     return new User(
       data.id,
       data.email,
       data.username,
-      data.passwordHash,
+      data.password_hash,
       data.role,
-      data.walletBalance,
-      data.isEmailVerified,
-      data.wrongPasswordNumber,
-      data.wrongPasswordUntil,
-      data.createdAt,
-      data.updatedAt,
+      data.wallet_balance,
+      data.is_email_verified,
+      data.wrong_password_number,
+      data.wrong_password_until,
+      data.created_at,
+      data.updated_at,
     );
   }
 }

@@ -21,7 +21,7 @@ class LoginUseCase {
     try {
       await client.query("BEGIN");
 
-      const user = await this.userService.findUserByUsername(dto.username);
+      const user = await this.userService.findUserByIdentifier(dto.identifier);
 
       if (!user) {
         throw new UnauthorizedError("INVALID_CREDENTIALS");

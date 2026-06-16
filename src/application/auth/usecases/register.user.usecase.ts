@@ -1,14 +1,18 @@
 import { RegisterDto } from "../../../shared/validators/auth/register.schema.js";
 import UserService from "../../../domains/user/services/user.service.js";
 import pool from "../../../infrastructure/database/pg.client.js";
-import AppError from "../../../shared/errors/app.error.js";
+import ValidationError from "../../../shared/errors/validation.error.js";
+import ForbiddenError from "../../../shared/errors/forbidden.error.js";
 
 class RegisterUserUseCase {
   constructor(private userService: UserService) {}
 
   async execute(dto: RegisterDto) {
+    if (dto.role && dto.role !== "user") {
+      throw new ForbiddenError("INVALID_ROLE");
+    }
     if (dto.password !== dto.confirmPassword) {
-      throw new AppError("Passwords do not match", 400, "PASSWORD_MISMATCH");
+      throw new ValidationError("PASSWORD_MISMATCH");
     }
 
     const client = await pool.connect();

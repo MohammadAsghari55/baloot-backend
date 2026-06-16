@@ -2,11 +2,14 @@ import { RegisterDto } from "../../../shared/validators/auth/register.schema.js"
 import UserService from "../../../domains/user/services/user.service.js";
 import pool from "../../../infrastructure/database/pg.client.js";
 import ValidationError from "../../../shared/errors/validation.error.js";
-
+import ForbiddenError from "../../../shared/errors/forbidden.error.js";
 class RegisterAdminUseCase {
   constructor(private userService: UserService) {}
 
   async execute(dto: RegisterDto) {
+    if (dto.role && dto.role !== "admin") {
+      throw new ForbiddenError("INVALID_ROLE");
+    }
     if (dto.password !== dto.confirmPassword) {
       throw new ValidationError("PASSWORD_MISMATCH");
     }

@@ -76,6 +76,14 @@ class UserPgRepository implements IUserRepository {
       throw DatabaseError.fromPGError(error);
     }
   }
+
+  async countAdmins(client?: PoolClient): Promise<number> {
+    const dbClient = client || this.pool;
+    const adminsNumber = await dbClient.query(
+      "SELECT COUNT(*) FROM users WHERE role = 'admin'",
+    );
+    return parseInt(adminsNumber.rows[0].count, 10);
+  }
 }
 
 export default UserPgRepository;

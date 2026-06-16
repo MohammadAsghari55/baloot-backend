@@ -5,11 +5,14 @@ import pool from "../../../infrastructure/database/pg.client.js";
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import IRefreshTokenRepository from "../../../domains/user/repositories/refresh.token.repository.js";
 import BadRequestError from "../../../shared/errors/bad-request.error.js";
+import IPasswordHasher from "../../../domains/user/Interfaces/ipassword.hasher.js";
+
 class LoginUseCase {
   constructor(
     private userService: UserService,
     private tokenService: ITokenService,
     private refreshTokenRepository: IRefreshTokenRepository,
+    private passwordHasher: IPasswordHasher,
   ) {}
 
   async execute(dto: LoginDto, deviceId: string) {
@@ -27,7 +30,7 @@ class LoginUseCase {
         throw new UnauthorizedError("INVALID_CREDENTIALS");
       }
 
-      const isMatch = await this.userService.comparePassword(
+      const isMatch = await this.passwordHasher.compare(
         dto.password,
         user.passwordHash,
       );

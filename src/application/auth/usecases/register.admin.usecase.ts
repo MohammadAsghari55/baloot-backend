@@ -18,6 +18,8 @@ class RegisterAdminUseCase {
     try {
       await client.query("BEGIN");
 
+      await this.userService.checkAdminLimit(client);
+
       await this.userService.checkUniqueness(
         dto.email,
         dto.username,

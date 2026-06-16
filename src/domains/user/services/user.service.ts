@@ -53,13 +53,6 @@ class UserService {
     await this.userRepository.save(user, client);
   }
 
-  async comparePassword(
-    plainPassword: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
-    return this.passwordHasher.compare(plainPassword, hashedPassword);
-  }
-
   async findUserByUsername(
     username: string,
     client?: PoolClient,
@@ -77,6 +70,14 @@ class UserService {
       return this.userRepository.findByEmail(identifier, client);
     } else {
       return this.userRepository.findByUsername(identifier, client);
+    }
+  }
+
+  async checkAdminLimit(client?: PoolClient): Promise<void> {
+    const adminsNumber = await this.userRepository.countAdmins(client);
+    const maxAdmins = parseInt(process.env.MAX_ADMINS || "1", 10);
+    if (adminsNumber >= maxAdmins) {
+      throw new ForbiddenError("MAX_ADMINS_EXCEEDED");
     }
   }
 }

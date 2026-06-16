@@ -64,5 +64,10 @@ export const ErrorCodes = {
     message: "Device ID is required in X-Device-Id header",
     status: 400,
   },
+  MAX_ADMINS_EXCEEDED: {
+    code: "MAX_ADMINS_EXCEEDED",
+    message: "Maximum number of admins reached",
+    status: 403,
+  },
 } as const;
 export type ErrorCode = keyof typeof ErrorCodes;

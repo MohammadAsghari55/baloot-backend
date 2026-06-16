@@ -21,6 +21,7 @@ const loginUseCase = new LoginUseCase(
   userService,
   tokenService,
   refreshTokenRepository,
+  bcryptService,
 );
 export const adminAuthController = new AdminAuthController(
   registerAdminUseCase,

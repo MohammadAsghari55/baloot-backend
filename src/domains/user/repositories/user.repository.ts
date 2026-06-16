@@ -8,6 +8,8 @@ interface IUserRepository {
   findAdmin(client?: PoolClient): Promise<User | null>;
 
   save(user: User, client?: PoolClient): Promise<void>;
+
+  countAdmins(client?: PoolClient): Promise<number>;
 }
 
 export default IUserRepository;

@@ -36,7 +36,7 @@ async function runMigrations() {
 
       const fullPath = path.join(migrationsDir, file);
       const sql = fs.readFileSync(fullPath, "utf-8");
-      const upMatch = sql.match(/-- UP\n([\s\S]*?)\n-- DOWN/);
+      const upMatch = sql.match(/-- UP\r?\n([\s\S]*?)\r?\n-- DOWN/);
 
       if (!upMatch) {
         throw new DatabaseError("MIGRATION_FILE_INVALID", `File: ${file}`);

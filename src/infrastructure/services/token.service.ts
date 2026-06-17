@@ -19,6 +19,37 @@ class TokenService implements ITokenService {
   async hashRefreshToken(token: string): Promise<string> {
     return this.passwordHasher.hash(token);
   }
+
+  async generateTokenPair(
+    userId: string,
+    role: string,
+  ): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    hashedRefreshToken: string;
+  }> {
+    const accessToken = this.generateAccessToken(userId, role);
+    const refreshToken = this.generateRefreshToken();
+    const hashedRefreshToken = await this.hashRefreshToken(refreshToken);
+
+    return {
+      accessToken,
+      refreshToken,
+      hashedRefreshToken,
+    };
+  }
+
+  verifyAccessToken(token: string): { userId: string; role: string } {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as {
+        userId: string;
+        role: string;
+      };
+      return decoded;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default TokenService;

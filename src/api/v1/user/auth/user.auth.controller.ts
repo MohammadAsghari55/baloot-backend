@@ -25,16 +25,8 @@ class UserAuthController {
     const deviceId = req.headers["x-device-id"] as string;
     const token = await this.loginUseCase.execute(req.body, deviceId);
 
-    res.cookie("accessToken", token.accessToken, {
-      httpOnly: true,
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000,
-    });
-    res.cookie("refreshToken", token.refreshToken, {
-      httpOnly: true,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie("accessToken", token.accessToken, this.accessCookieOptions);
+    res.cookie("refreshToken", token.refreshToken, this.refreshCookieOptions);
     res.status(200).json({
       success: true,
       message: "User logged in successfully",
@@ -49,21 +41,25 @@ class UserAuthController {
       deviceId,
     );
 
-    res.cookie("accessToken", token.accessToken, {
-      httpOnly: true,
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000,
-    });
-    res.cookie("refreshToken", token.refreshToken, {
-      httpOnly: true,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie("accessToken", token.accessToken, this.accessCookieOptions);
+    res.cookie("refreshToken", token.refreshToken, this.refreshCookieOptions);
     res.status(200).json({
       success: true,
-      message: "Create Token successfully",
+      message: "Token refreshed successfully",
     });
   }
+
+  private readonly accessCookieOptions = {
+    httpOnly: true,
+    sameSite: "strict" as const,
+    maxAge: 15 * 60 * 1000,
+  };
+
+  private readonly refreshCookieOptions = {
+    httpOnly: true,
+    sameSite: "strict" as const,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  };
 }
 
 export default UserAuthController;

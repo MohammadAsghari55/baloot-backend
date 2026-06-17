@@ -39,15 +39,10 @@ class LoginUseCase {
         throw new UnauthorizedError("INVALID_CREDENTIALS");
       }
 
-      const accessToken = this.tokenService.generateAccessToken(
+      const tokens = await this.tokenService.generateTokenPair(
         user.id,
         user.role,
       );
-
-      const refreshToken = this.tokenService.generateRefreshToken();
-
-      const hashedRefreshToken =
-        await this.tokenService.hashRefreshToken(refreshToken);
 
       await this.refreshTokenRepository.revokeByDeviceId(
         user.id,
@@ -56,7 +51,7 @@ class LoginUseCase {
       );
 
       await this.refreshTokenRepository.saveToken(
-        hashedRefreshToken,
+        tokens.hashedRefreshToken,
         user.id,
         deviceId,
         client,
@@ -65,8 +60,8 @@ class LoginUseCase {
       await client.query("COMMIT");
 
       return {
-        accessToken,
-        refreshToken,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
       };
     } catch (error) {
       await client.query("ROLLBACK");

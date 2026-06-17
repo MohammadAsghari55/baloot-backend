@@ -13,6 +13,16 @@ interface IRefreshTokenRepository {
     deviceId: string,
     client?: PoolClient,
   ): Promise<void>;
+
+  findTokenByDeviceId(
+    deviceId: string,
+    client?: PoolClient,
+  ): Promise<{
+    userId: string;
+    tokenHash: string;
+    expiresAt: Date;
+    revokedAt: Date | null;
+  } | null>;
 }
 
 export default IRefreshTokenRepository;

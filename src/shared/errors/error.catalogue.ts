@@ -69,5 +69,10 @@ export const ErrorCodes = {
     message: "Maximum number of admins reached",
     status: 403,
   },
+  INVALID_REFRESH_TOKEN: {
+    code: "INVALID_REFRESH_TOKEN",
+    message: "Invalid refresh token",
+    status: 401,
+  },
 } as const;
 export type ErrorCode = keyof typeof ErrorCodes;

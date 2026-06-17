@@ -74,5 +74,15 @@ export const ErrorCodes = {
     message: "Invalid refresh token",
     status: 401,
   },
+  INVALID_ACCESS_TOKEN: {
+    code: "INVALID_ACCESS_TOKEN",
+    message: "Invalid access token",
+    status: 401,
+  },
+  ACCESS_TOKEN_EXPIRED: {
+    code: "ACCESS_TOKEN_EXPIRED",
+    message: "Access token has expired",
+    status: 401,
+  },
 } as const;
 export type ErrorCode = keyof typeof ErrorCodes;

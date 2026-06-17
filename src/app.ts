@@ -3,9 +3,11 @@ import healthRouter from "./api/health/health.route.js";
 import adminAuthRouter from "./api/v1/admin/auth/admin.auth.routes.js";
 import userAuthRouter from "./api/v1/user/auth/user.auth.routes.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
+import cookieParser from "cookie-parser";
 
 export const app = express();
 
+app.use(cookieParser());
 app.use(express.json());
 
 app.use("/health", healthRouter);

@@ -19,4 +19,6 @@ router.post(
   asyncHandler(adminAuthController.login),
 );
 
+router.post("/refresh", asyncHandler(adminAuthController.refresh));
+
 export default router;

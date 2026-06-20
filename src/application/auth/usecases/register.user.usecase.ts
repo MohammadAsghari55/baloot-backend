@@ -1,11 +1,14 @@
 import { RegisterDto } from "../../../shared/validators/auth/register.schema.js";
 import UserService from "../../../domains/user/services/user.service.js";
-import pool from "../../../infrastructure/database/pg.client.js";
 import ValidationError from "../../../shared/errors/validation.error.js";
 import ForbiddenError from "../../../shared/errors/forbidden.error.js";
+import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 
 class RegisterUserUseCase {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private transactionManager: ITransactionManager,
+  ) {}
 
   async execute(dto: RegisterDto) {
     if (dto.role && dto.role !== "user") {
@@ -15,10 +18,7 @@ class RegisterUserUseCase {
       throw new ValidationError("PASSWORD_MISMATCH");
     }
 
-    const client = await pool.connect();
-    try {
-      await client.query("BEGIN");
-
+    return this.transactionManager.runInTransaction(async (client) => {
       await this.userService.checkUniqueness(
         dto.email,
         dto.username,
@@ -37,20 +37,13 @@ class RegisterUserUseCase {
 
       await this.userService.saveUser(user, client);
 
-      await client.query("COMMIT");
-
       return {
         id: user.id,
         email: user.email,
         username: user.username,
         role: user.role,
       };
-    } catch (error) {
-      await client.query("ROLLBACK");
-      throw error;
-    } finally {
-      client.release();
-    }
+    });
   }
 }
 

@@ -10,24 +10,34 @@ import TokenService from "../../infrastructure/services/token.service.js";
 import UserPgRepository from "../../infrastructure/repositories/user.pg.repository.js";
 import RefreshTokenRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
 import pool from "../../infrastructure/database/pg.client.js";
+import PgTransactionManager from "../../infrastructure/database/pg.transaction.manager.js";
 
 const userPgRepository = new UserPgRepository(pool);
 const refreshTokenRepository = new RefreshTokenRepository(pool);
 const bcryptService = new BcryptService();
 const tokenService = new TokenService(bcryptService);
 const userService = new UserService(userPgRepository, bcryptService);
-const registerAdminUseCase = new RegisterAdminUseCase(userService);
-const registerUserUseCase = new RegisterUserUseCase(userService);
+const transactionManager = new PgTransactionManager(pool);
+const registerAdminUseCase = new RegisterAdminUseCase(
+  userService,
+  transactionManager,
+);
+const registerUserUseCase = new RegisterUserUseCase(
+  userService,
+  transactionManager,
+);
 const loginUseCase = new LoginUseCase(
   userService,
   tokenService,
   refreshTokenRepository,
   bcryptService,
+  transactionManager,
 );
 const refreshTokenUseCase = new RefreshTokenUseCase(
   tokenService,
   refreshTokenRepository,
   bcryptService,
+  transactionManager,
 );
 export const adminAuthController = new AdminAuthController(
   registerAdminUseCase,

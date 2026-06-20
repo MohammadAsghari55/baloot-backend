@@ -1,11 +1,11 @@
 import { LoginDto } from "../dtos/login.dto.js";
 import UserService from "../../../domains/user/services/user.service.js";
 import UnauthorizedError from "../../../shared/errors/unauthorized.error.js";
-import pool from "../../../infrastructure/database/pg.client.js";
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import IRefreshTokenRepository from "../../../domains/user/repositories/refresh.token.repository.js";
 import BadRequestError from "../../../shared/errors/bad-request.error.js";
 import IPasswordHasher from "../../../domains/user/Interfaces/ipassword.hasher.js";
+import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 
 class LoginUseCase {
   constructor(
@@ -13,17 +13,15 @@ class LoginUseCase {
     private tokenService: ITokenService,
     private refreshTokenRepository: IRefreshTokenRepository,
     private passwordHasher: IPasswordHasher,
+    private transactionManager: ITransactionManager,
   ) {}
 
   async execute(dto: LoginDto, deviceId: string) {
     if (!deviceId) {
       throw new BadRequestError("MISSING_DEVICE_ID");
     }
-    const client = await pool.connect();
 
-    try {
-      await client.query("BEGIN");
-
+    return this.transactionManager.runInTransaction(async (client) => {
       const user = await this.userService.findUserByIdentifier(dto.identifier);
 
       if (!user) {
@@ -57,18 +55,11 @@ class LoginUseCase {
         client,
       );
 
-      await client.query("COMMIT");
-
       return {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
       };
-    } catch (error) {
-      await client.query("ROLLBACK");
-      throw error;
-    } finally {
-      client.release();
-    }
+    });
   }
 }
 

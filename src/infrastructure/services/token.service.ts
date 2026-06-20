@@ -2,12 +2,13 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import type IPasswordHasher from "../../domains/user/Interfaces/ipassword.hasher.js";
 import ITokenService from "../../domains/user/Interfaces/itoken.service.js";
+import { config } from "../config/index.js";
 
 class TokenService implements ITokenService {
   constructor(private readonly passwordHasher: IPasswordHasher) {}
 
   generateAccessToken(userId: string, role: string): string {
-    return jwt.sign({ userId, role }, process.env.JWT_ACCESS_SECRET!, {
+    return jwt.sign({ userId, role }, config.JWT_ACCESS_SECRET, {
       expiresIn: "15m",
     });
   }
@@ -41,7 +42,7 @@ class TokenService implements ITokenService {
 
   verifyAccessToken(token: string): { userId: string; role: string } {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as {
+      const decoded = jwt.verify(token, config.JWT_ACCESS_SECRET) as {
         userId: string;
         role: string;
       };

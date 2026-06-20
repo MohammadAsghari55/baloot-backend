@@ -4,6 +4,7 @@ import UserRepository from "../repositories/user.repository.js";
 import ConflictError from "../../../shared/errors/conflict.error.js";
 import ForbiddenError from "../../../shared/errors/forbidden.error.js";
 import IPasswordHasher from "../Interfaces/ipassword.hasher.js";
+import { config } from "../../../infrastructure/config/index.js";
 
 class UserService {
   constructor(
@@ -75,7 +76,8 @@ class UserService {
 
   async checkAdminLimit(client?: PoolClient): Promise<void> {
     const adminsNumber = await this.userRepository.countAdmins(client);
-    const maxAdmins = parseInt(process.env.MAX_ADMINS || "1", 10);
+    const maxAdmins = config.MAX_ADMINS;
+
     if (adminsNumber >= maxAdmins) {
       throw new ForbiddenError("MAX_ADMINS_EXCEEDED");
     }

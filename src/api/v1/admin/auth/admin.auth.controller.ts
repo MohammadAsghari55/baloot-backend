@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import RegisterAdminUseCase from "../../../../application/auth/usecases/register.admin.usecase.js";
 import LoginUseCase from "../../../../application/auth/usecases/login.usecase.js";
 import RefreshTokenUseCase from "../../../../application/auth/usecases/refresh.token.usecase.js";
+import { config } from "../../../../infrastructure/config/index.js";
 
 @BoundClass
 class AdminAuthController {
@@ -52,12 +53,14 @@ class AdminAuthController {
   private readonly accessCookieOptions = {
     httpOnly: true,
     sameSite: "strict" as const,
+    secure: config.NODE_ENV === "production",
     maxAge: 15 * 60 * 1000,
   };
 
   private readonly refreshCookieOptions = {
     httpOnly: true,
     sameSite: "strict" as const,
+    secure: config.NODE_ENV === "production",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   };
 }

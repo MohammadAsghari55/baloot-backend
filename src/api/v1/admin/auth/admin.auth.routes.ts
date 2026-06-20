@@ -3,7 +3,7 @@ import { registerSchema } from "../../../../shared/validators/auth/register.sche
 import { loginSchema } from "../../../../shared/validators/auth/login.schema.js";
 import asyncHandler from "../../../../shared/utils/async.handler.js";
 import validateBody from "../../../../middlewares/validation.middleware.js";
-import { adminAuthController } from "../../../../application/auth/index.js";
+import { adminAuthController } from "../../../../container.js";
 
 const router = Router();
 

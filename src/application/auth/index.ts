@@ -1,1 +1,1 @@
-export { adminAuthController, userAuthController } from "./container.js";
+export { default as buildAuthModule } from "./auth.module.js";

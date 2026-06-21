@@ -42,7 +42,6 @@ class UserPgRepository implements IUserRepository {
       username = EXCLUDED.username,
       password_hash = EXCLUDED.password_hash,
       role = EXCLUDED.role,
-      wallet_balance = EXCLUDED.wallet_balance,
       is_email_verified = EXCLUDED.is_email_verified,
       wrong_password_number = EXCLUDED.wrong_password_number,
       wrong_password_until = EXCLUDED.wrong_password_until,

@@ -56,7 +56,7 @@ class RefreshTokenRepository implements IRefreshTokenRepository {
     const query = `
     SELECT user_id, token_hash, expires_at, revoked_at 
     FROM refresh_token 
-    WHERE device_id = $1
+    WHERE device_id = $1 AND revoked_at IS NULL
     `;
     try {
       const token = await dbClient.query(query, [deviceId]);

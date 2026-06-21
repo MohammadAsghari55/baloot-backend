@@ -1,13 +1,13 @@
 import { ZodError } from "zod";
-import ValidationError from "./validation.error.js";
+import AppError from "./app.error.js";
 
-class ZodValidationError extends ValidationError {
+class ZodValidationError extends AppError {
   constructor(zodError: ZodError) {
     const details = zodError.issues.map((issue) => ({
       path: issue.path.join("."),
       message: issue.message,
     }));
-    super("Validation failed", details);
+    super("Validation failed", 400, "VALIDATION_ERROR", { details });
   }
 }
 

@@ -1,9 +1,8 @@
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import IRefreshTokenRepository from "../../../domains/user/repositories/refresh.token.repository.js";
 import IPasswordHasher from "../../../domains/user/Interfaces/ipassword.hasher.js";
-import UnauthorizedError from "../../../shared/errors/unauthorized.error.js";
-import BadRequestError from "../../../shared/errors/bad-request.error.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
+import AppError from "../../../shared/errors/app.error.js";
 
 class RefreshTokenUseCase {
   constructor(
@@ -15,10 +14,10 @@ class RefreshTokenUseCase {
 
   async execute(role: string, refreshToken: string, deviceId: string) {
     if (!deviceId) {
-      throw new BadRequestError("MISSING_DEVICE_ID");
+      throw AppError.badRequest("MISSING_DEVICE_ID");
     }
     if (!refreshToken) {
-      throw new BadRequestError("INVALID_REFRESH_TOKEN");
+      throw AppError.badRequest("INVALID_REFRESH_TOKEN");
     }
 
     return this.transactionManager.runInTransaction(async (client) => {
@@ -28,7 +27,7 @@ class RefreshTokenUseCase {
       );
 
       if (!storedToken) {
-        throw new UnauthorizedError("INVALID_REFRESH_TOKEN");
+        throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
       }
 
       const compare = await this.passwordHasher.compare(
@@ -37,14 +36,14 @@ class RefreshTokenUseCase {
       );
 
       if (!compare) {
-        throw new UnauthorizedError("INVALID_REFRESH_TOKEN");
+        throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
       }
 
       if (
         storedToken.revokedAt !== null ||
         storedToken.expiresAt < new Date()
       ) {
-        throw new UnauthorizedError("INVALID_REFRESH_TOKEN");
+        throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
       }
 
       const tokens = await this.tokenService.generateTokenPair(

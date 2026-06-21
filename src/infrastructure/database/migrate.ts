@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import DatabaseError from "../../shared/errors/database.error.js";
+import AppError from "../../shared/errors/app.error.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,7 +40,12 @@ async function runMigrations() {
       const upMatch = sql.match(/-- UP\r?\n([\s\S]*?)\r?\n-- DOWN/);
 
       if (!upMatch) {
-        throw new DatabaseError("MIGRATION_FILE_INVALID", `File: ${file}`);
+        throw new AppError(
+          "Migration file is missing UP/DOWN sections",
+          500,
+          "MIGRATION_FILE_INVALID",
+          { publicMessage: `File: ${file}` },
+        );
       }
       const upSql = upMatch[1].trim();
 
@@ -52,13 +58,13 @@ async function runMigrations() {
     }
     console.log("All migrations completed.");
   } catch (err) {
-    if (err instanceof DatabaseError) {
+    if (err instanceof DatabaseError || err instanceof AppError) {
       console.error(
-        `❌ ${err.message}`,
+        `${err.message}`,
         err.publicMessage ? ` (${err.publicMessage})` : "",
       );
     } else {
-      console.error("❌ Unexpected error:", err);
+      console.error("Unexpected error:", err);
     }
     process.exit(1);
   } finally {

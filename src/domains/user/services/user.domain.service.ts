@@ -1,19 +1,18 @@
 import User from "../entities/user.entity.js";
-import ConflictError from "../../../shared/errors/conflict.error.js";
-import ForbiddenError from "../../../shared/errors/forbidden.error.js";
+import AppError from "../../../shared/errors/app.error.js";
 
 class UserDomainService {
   checkUniqueness(
     existingEmail: User | null,
     existingUsername: User | null,
   ): void {
-    if (existingEmail) throw new ConflictError("EMAIL_EXISTS");
-    if (existingUsername) throw new ConflictError("USERNAME_EXISTS");
+    if (existingEmail) throw AppError.conflict("EMAIL_EXISTS");
+    if (existingUsername) throw AppError.conflict("USERNAME_EXISTS");
   }
 
   checkAdminLimit(currentAdminCount: number, maxAdmins: number): void {
     if (currentAdminCount >= maxAdmins) {
-      throw new ForbiddenError("MAX_ADMINS_EXCEEDED");
+      throw AppError.forbidden("MAX_ADMINS_EXCEEDED");
     }
   }
 

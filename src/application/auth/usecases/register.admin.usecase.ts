@@ -1,10 +1,9 @@
 import { RegisterDto } from "../../../shared/validators/auth/register.schema.js";
-import ValidationError from "../../../shared/errors/validation.error.js";
-import ForbiddenError from "../../../shared/errors/forbidden.error.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import IPasswordHasher from "../../../domains/user/Interfaces/ipassword.hasher.js";
 import UserApplicationService from "../../../application/auth/services/user.application.service.js";
 import UserDomainService from "../../../domains/user/services/user.domain.service.js";
+import AppError from "../../../shared/errors/app.error.js";
 
 class RegisterAdminUseCase {
   constructor(
@@ -16,10 +15,10 @@ class RegisterAdminUseCase {
 
   async execute(dto: RegisterDto) {
     if (dto.role && dto.role !== "admin") {
-      throw new ForbiddenError("INVALID_ROLE");
+      throw AppError.forbidden("INVALID_ROLE");
     }
     if (dto.password !== dto.confirmPassword) {
-      throw new ValidationError("PASSWORD_MISMATCH");
+      throw AppError.validation("PASSWORD_MISMATCH");
     }
 
     return this.transactionManager.runInTransaction(async (client) => {

@@ -21,11 +21,12 @@ function errorMiddleware(
   }
 
   if (err instanceof AppError) {
-    const message = config.NODE_ENV
-      ? err.isPublic
-        ? (err.publicMessage ?? err.message)
-        : "Something went wrong"
-      : err.message;
+    const message =
+      config.NODE_ENV === "production"
+        ? err.isPublic
+          ? (err.publicMessage ?? err.message)
+          : "Something went wrong"
+        : err.message;
 
     return res.status(err.statusCode).json({
       success: false,
@@ -42,7 +43,8 @@ function errorMiddleware(
   return res.status(500).json({
     success: false,
     error: {
-      message: config.NODE_ENV ? "Something went wrong" : err.message,
+      message:
+        config.NODE_ENV === "production" ? "Something went wrong" : err.message,
       code: "INTERNAL_ERROR",
       statusCode: 500,
     },

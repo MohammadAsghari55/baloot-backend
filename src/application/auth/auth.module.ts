@@ -14,7 +14,7 @@ import AdminAuthController from "../../api/v1/admin/auth/admin.auth.controller.j
 import UserAuthController from "../../api/v1/user/auth/user.auth.controller.js";
 
 function buildAuthModule() {
-  const { userService } = buildUserModule();
+  const { userApplicationService, userDomainService } = buildUserModule();
 
   const bcryptService = new BcryptService();
   const refreshTokenRepository = new RefreshTokenRepository(pool);
@@ -22,17 +22,19 @@ function buildAuthModule() {
   const transactionManager = new PgTransactionManager(pool);
 
   const registerAdminUseCase = new RegisterAdminUseCase(
-    userService,
+    userApplicationService,
+    userDomainService,
     transactionManager,
     bcryptService,
   );
   const registerUserUseCase = new RegisterUserUseCase(
-    userService,
+    userApplicationService,
+    userDomainService,
     transactionManager,
     bcryptService,
   );
   const loginUseCase = new LoginUseCase(
-    userService,
+    userApplicationService,
     tokenService,
     refreshTokenRepository,
     bcryptService,

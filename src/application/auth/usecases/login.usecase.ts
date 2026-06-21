@@ -1,15 +1,15 @@
 import { LoginDto } from "../dtos/login.dto.js";
-import UserService from "../../../domains/user/services/user.service.js";
 import UnauthorizedError from "../../../shared/errors/unauthorized.error.js";
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import IRefreshTokenRepository from "../../../domains/user/repositories/refresh.token.repository.js";
 import BadRequestError from "../../../shared/errors/bad-request.error.js";
 import IPasswordHasher from "../../../domains/user/Interfaces/ipassword.hasher.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
+import UserApplicationService from "../../../application/auth/services/user.application.service.js";
 
 class LoginUseCase {
   constructor(
-    private userService: UserService,
+    private userApplicationService: UserApplicationService,
     private tokenService: ITokenService,
     private refreshTokenRepository: IRefreshTokenRepository,
     private passwordHasher: IPasswordHasher,
@@ -22,7 +22,10 @@ class LoginUseCase {
     }
 
     return this.transactionManager.runInTransaction(async (client) => {
-      const user = await this.userService.findUserByIdentifier(dto.identifier);
+      const user = await this.userApplicationService.findUserByIdentifier(
+        dto.identifier,
+        client,
+      );
 
       if (!user) {
         throw new UnauthorizedError("INVALID_CREDENTIALS");

@@ -3,8 +3,6 @@ interface ITokenService {
 
   generateRefreshToken(): string;
 
-  hashRefreshToken(token: string): Promise<string>;
-
   generateTokenPair(
     userId: string,
     role: string,

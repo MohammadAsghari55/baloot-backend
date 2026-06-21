@@ -17,10 +17,6 @@ class TokenService implements ITokenService {
     return crypto.randomUUID();
   }
 
-  async hashRefreshToken(token: string): Promise<string> {
-    return this.passwordHasher.hash(token);
-  }
-
   async generateTokenPair(
     userId: string,
     role: string,
@@ -31,7 +27,7 @@ class TokenService implements ITokenService {
   }> {
     const accessToken = this.generateAccessToken(userId, role);
     const refreshToken = this.generateRefreshToken();
-    const hashedRefreshToken = await this.hashRefreshToken(refreshToken);
+    const hashedRefreshToken = await this.passwordHasher.hash(refreshToken);
 
     return {
       accessToken,

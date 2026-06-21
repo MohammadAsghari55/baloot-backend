@@ -3,8 +3,10 @@ import { Request, Response } from "express";
 import RegisterUserUseCase from "../../../../application/auth/usecases/register.user.usecase.js";
 import LoginUseCase from "../../../../application/auth/usecases/login.usecase.js";
 import RefreshTokenUseCase from "../../../../application/auth/usecases/refresh.token.usecase.js";
-import { config } from "../../../../infrastructure/config/index.js";
-
+import {
+  accessCookieOptions,
+  refreshCookieOptions,
+} from "../../../../infrastructure/config/cookie.config.js";
 @BoundClass
 class UserAuthController {
   constructor(
@@ -25,8 +27,8 @@ class UserAuthController {
   async login(req: Request, res: Response) {
     const token = await this.loginUseCase.execute(req.body, req.deviceId!);
 
-    res.cookie("accessToken", token.accessToken, this.accessCookieOptions);
-    res.cookie("refreshToken", token.refreshToken, this.refreshCookieOptions);
+    res.cookie("accessToken", token.accessToken, accessCookieOptions);
+    res.cookie("refreshToken", token.refreshToken, refreshCookieOptions);
     res.status(200).json({
       success: true,
       message: "User logged in successfully",
@@ -40,27 +42,13 @@ class UserAuthController {
       req.deviceId!,
     );
 
-    res.cookie("accessToken", token.accessToken, this.accessCookieOptions);
-    res.cookie("refreshToken", token.refreshToken, this.refreshCookieOptions);
+    res.cookie("accessToken", token.accessToken, accessCookieOptions);
+    res.cookie("refreshToken", token.refreshToken, refreshCookieOptions);
     res.status(200).json({
       success: true,
       message: "Token refreshed successfully",
     });
   }
-
-  private readonly accessCookieOptions = {
-    httpOnly: true,
-    sameSite: "strict" as const,
-    secure: config.NODE_ENV === "production",
-    maxAge: 15 * 60 * 1000,
-  };
-
-  private readonly refreshCookieOptions = {
-    httpOnly: true,
-    sameSite: "strict" as const,
-    secure: config.NODE_ENV === "production",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  };
 }
 
 export default UserAuthController;

@@ -3,11 +3,13 @@ import UserService from "../../../domains/user/services/user.service.js";
 import ValidationError from "../../../shared/errors/validation.error.js";
 import ForbiddenError from "../../../shared/errors/forbidden.error.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
+import IPasswordHasher from "../../../domains/user/Interfaces/ipassword.hasher.js";
 
 class RegisterUserUseCase {
   constructor(
     private userService: UserService,
     private transactionManager: ITransactionManager,
+    private passwordHasher: IPasswordHasher,
   ) {}
 
   async execute(dto: RegisterDto) {
@@ -26,7 +28,7 @@ class RegisterUserUseCase {
         client,
       );
 
-      const hashedPassword = await this.userService.hashPassword(dto.password);
+      const hashedPassword = await this.passwordHasher.hash(dto.password);
 
       const user = this.userService.createUserEntity(
         dto.email,

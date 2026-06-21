@@ -3,6 +3,7 @@ import RefreshTokenRepository from "../../infrastructure/repositories/refresh.to
 import TokenService from "../../infrastructure/services/token.service.js";
 import PgTransactionManager from "../../infrastructure/database/pg.transaction.manager.js";
 import pool from "../../infrastructure/database/pg.client.js";
+import BcryptService from "../../infrastructure/services/bcrypt.service.js";
 
 import LoginUseCase from "./usecases/login.usecase.js";
 import RefreshTokenUseCase from "./usecases/refresh.token.usecase.js";
@@ -13,8 +14,9 @@ import AdminAuthController from "../../api/v1/admin/auth/admin.auth.controller.j
 import UserAuthController from "../../api/v1/user/auth/user.auth.controller.js";
 
 function buildAuthModule() {
-  const { userService, bcryptService } = buildUserModule();
+  const { userService } = buildUserModule();
 
+  const bcryptService = new BcryptService();
   const refreshTokenRepository = new RefreshTokenRepository(pool);
   const tokenService = new TokenService(bcryptService);
   const transactionManager = new PgTransactionManager(pool);
@@ -22,10 +24,12 @@ function buildAuthModule() {
   const registerAdminUseCase = new RegisterAdminUseCase(
     userService,
     transactionManager,
+    bcryptService,
   );
   const registerUserUseCase = new RegisterUserUseCase(
     userService,
     transactionManager,
+    bcryptService,
   );
   const loginUseCase = new LoginUseCase(
     userService,

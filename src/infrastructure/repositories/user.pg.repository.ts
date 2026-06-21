@@ -29,16 +29,6 @@ class UserPgRepository implements IUserRepository {
     return User.fromDB(row);
   }
 
-  async findAdmin(client?: PoolClient): Promise<User | null> {
-    const dbClient = client || this.pool;
-    const result = await dbClient.query(
-      "SELECT * FROM users WHERE role = 'admin'",
-    );
-    if (result.rows.length === 0) return null;
-    const row = result.rows[0];
-    return User.fromDB(row);
-  }
-
   async save(user: User, client?: PoolClient): Promise<void> {
     const dbClient = client || this.pool;
     const query = `

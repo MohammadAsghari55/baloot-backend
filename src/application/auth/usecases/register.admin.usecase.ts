@@ -44,9 +44,6 @@ class RegisterAdminUseCase {
         existingEmail,
         existingUsername,
       );
-      const existingAdmin = await this.userApplicationService.findAdmin(client);
-
-      await this.userDomainService.checkAdminExistence(existingAdmin);
 
       const hashedPassword = await this.passwordHasher.hash(dto.password);
 

@@ -9,11 +9,6 @@ export const ErrorCodes = {
     message: "Username already taken",
     status: 409,
   },
-  ADMIN_EXISTS: {
-    code: "ADMIN_EXISTS",
-    message: "Admin already exists",
-    status: 403,
-  },
   INVALID_CREDENTIALS: {
     code: "INVALID_CREDENTIALS",
     message: "Invalid username or password",

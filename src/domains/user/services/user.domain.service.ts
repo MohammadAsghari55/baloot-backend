@@ -11,10 +11,6 @@ class UserDomainService {
     if (existingUsername) throw new ConflictError("USERNAME_EXISTS");
   }
 
-  checkAdminExistence(existingAdmin: User | null): void {
-    if (existingAdmin) throw new ForbiddenError("ADMIN_EXISTS");
-  }
-
   checkAdminLimit(currentAdminCount: number, maxAdmins: number): void {
     if (currentAdminCount >= maxAdmins) {
       throw new ForbiddenError("MAX_ADMINS_EXCEEDED");

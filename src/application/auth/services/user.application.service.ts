@@ -31,10 +31,6 @@ class UserApplicationService {
     return this.userRepository.findByUsername(identifier, client);
   }
 
-  async findAdmin(client?: PoolClient): Promise<User | null> {
-    return this.userRepository.findAdmin(client);
-  }
-
   async countAdmins(client?: PoolClient): Promise<number> {
     return this.userRepository.countAdmins(client);
   }

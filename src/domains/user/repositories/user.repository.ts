@@ -5,8 +5,6 @@ interface IUserRepository {
 
   findByUsername(username: string, client?: PoolClient): Promise<User | null>;
 
-  findAdmin(client?: PoolClient): Promise<User | null>;
-
   save(user: User, client?: PoolClient): Promise<void>;
 
   countAdmins(client?: PoolClient): Promise<number>;

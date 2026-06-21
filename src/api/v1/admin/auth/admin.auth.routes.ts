@@ -4,6 +4,7 @@ import { loginSchema } from "../../../../shared/validators/auth/login.schema.js"
 import asyncHandler from "../../../../shared/utils/async.handler.js";
 import validateBody from "../../../../middlewares/validation.middleware.js";
 import { adminAuthController } from "../../../../container.js";
+import deviceIdMiddleware from "../../../../middlewares/device-id.middleware.js";
 
 const router = Router();
 
@@ -15,10 +16,15 @@ router.post(
 
 router.post(
   "/login",
+  deviceIdMiddleware,
   validateBody(loginSchema),
   asyncHandler(adminAuthController.login),
 );
 
-router.post("/refresh", asyncHandler(adminAuthController.refresh));
+router.post(
+  "/refresh",
+  deviceIdMiddleware,
+  asyncHandler(adminAuthController.refresh),
+);
 
 export default router;

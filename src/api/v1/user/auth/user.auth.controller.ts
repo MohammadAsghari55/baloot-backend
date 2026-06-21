@@ -23,8 +23,7 @@ class UserAuthController {
   }
 
   async login(req: Request, res: Response) {
-    const deviceId = req.headers["x-device-id"] as string;
-    const token = await this.loginUseCase.execute(req.body, deviceId);
+    const token = await this.loginUseCase.execute(req.body, req.deviceId!);
 
     res.cookie("accessToken", token.accessToken, this.accessCookieOptions);
     res.cookie("refreshToken", token.refreshToken, this.refreshCookieOptions);
@@ -35,11 +34,10 @@ class UserAuthController {
   }
 
   async refresh(req: Request, res: Response) {
-    const deviceId = req.headers["x-device-id"] as string;
     const token = await this.refreshTokenUseCase.execute(
       "user",
       req.cookies.refreshToken,
-      deviceId,
+      req.deviceId!,
     );
 
     res.cookie("accessToken", token.accessToken, this.accessCookieOptions);

@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import type IPasswordHasher from "../../domains/user/Interfaces/ipassword.hasher.js";
 import ITokenService from "../../domains/user/Interfaces/itoken.service.js";
-import { config } from "../config/index.js";
+import { config } from "../config/env.index.js";
 
 class TokenService implements ITokenService {
   constructor(private readonly passwordHasher: IPasswordHasher) {}

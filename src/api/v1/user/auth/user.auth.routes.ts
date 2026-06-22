@@ -6,7 +6,7 @@ import validateBody from "../../../../middlewares/validation.middleware.js";
 import { userAuthController } from "../../../../container.js";
 import deviceIdMiddleware from "../../../../middlewares/device-id.middleware.js";
 import accessCheckerMiddleware from "../../../../middlewares/accessChecker.middleware.js";
-import { tokenService } from "../../../../infrastructure/services/index.js";
+import { tokenService } from "../../../../infrastructure/services/services.index.js";
 
 const router = Router();
 

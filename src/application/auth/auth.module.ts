@@ -1,11 +1,11 @@
-import { buildUserModule } from "../../domains/user/index.js";
+import { buildUserModule } from "../../domains/user/user.index.js";
 import RefreshTokenRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
 import PgTransactionManager from "../../infrastructure/database/pg.transaction.manager.js";
 import pool from "../../infrastructure/database/pg.client.js";
 import {
   bcryptService,
   tokenService,
-} from "../../infrastructure/services/index.js";
+} from "../../infrastructure/services/services.index.js";
 
 import LoginUseCase from "./usecases/login.usecase.js";
 import RefreshTokenUseCase from "./usecases/refresh.token.usecase.js";

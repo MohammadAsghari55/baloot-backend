@@ -1,4 +1,4 @@
-import { buildAuthModule } from "./application/auth/index.js";
+import { buildAuthModule } from "./application/auth/auth.index.js";
 
 const { adminAuthController, userAuthController } = buildAuthModule();
 

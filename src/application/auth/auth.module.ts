@@ -1,9 +1,11 @@
 import { buildUserModule } from "../../domains/user/index.js";
 import RefreshTokenRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
-import TokenService from "../../infrastructure/services/token.service.js";
 import PgTransactionManager from "../../infrastructure/database/pg.transaction.manager.js";
 import pool from "../../infrastructure/database/pg.client.js";
-import BcryptService from "../../infrastructure/services/bcrypt.service.js";
+import {
+  bcryptService,
+  tokenService,
+} from "../../infrastructure/services/index.js";
 
 import LoginUseCase from "./usecases/login.usecase.js";
 import RefreshTokenUseCase from "./usecases/refresh.token.usecase.js";
@@ -16,9 +18,7 @@ import UserAuthController from "../../api/v1/user/auth/user.auth.controller.js";
 function buildAuthModule() {
   const { userApplicationService, userDomainService } = buildUserModule();
 
-  const bcryptService = new BcryptService();
   const refreshTokenRepository = new RefreshTokenRepository(pool);
-  const tokenService = new TokenService(bcryptService);
   const transactionManager = new PgTransactionManager(pool);
 
   const registerAdminUseCase = new RegisterAdminUseCase(

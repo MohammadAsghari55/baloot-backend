@@ -40,6 +40,7 @@ class AdminAuthController {
     const token = await this.refreshTokenUseCase.execute(
       "admin",
       req.cookies.refreshToken,
+      req.user!.userId,
       req.deviceId!,
     );
 

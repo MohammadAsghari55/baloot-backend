@@ -43,7 +43,8 @@ class RefreshTokenRepository implements IRefreshTokenRepository {
     }
   }
 
-  async findTokenByDeviceId(
+  async findTokenByDeviceIdAndUserId(
+    userId: string,
     deviceId: string,
     client?: PoolClient,
   ): Promise<{
@@ -56,10 +57,12 @@ class RefreshTokenRepository implements IRefreshTokenRepository {
     const query = `
     SELECT user_id, token_hash, expires_at, revoked_at 
     FROM refresh_token 
-    WHERE device_id = $1 AND revoked_at IS NULL
+    WHERE user_id = $1 AND device_id = $2 AND revoked_at IS NULL
+    ORDER BY created_at DESC
+    LIMIT 1
     `;
     try {
-      const token = await dbClient.query(query, [deviceId]);
+      const token = await dbClient.query(query, [userId, deviceId]);
 
       if (token.rows.length === 0) {
         return null;

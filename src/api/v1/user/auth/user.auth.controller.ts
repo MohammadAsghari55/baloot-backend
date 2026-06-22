@@ -7,6 +7,7 @@ import {
   accessCookieOptions,
   refreshCookieOptions,
 } from "../../../../infrastructure/config/cookie.config.js";
+
 @BoundClass
 class UserAuthController {
   constructor(
@@ -39,6 +40,7 @@ class UserAuthController {
     const token = await this.refreshTokenUseCase.execute(
       "user",
       req.cookies.refreshToken,
+      req.user!.userId,
       req.deviceId!,
     );
 

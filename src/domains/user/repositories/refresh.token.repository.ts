@@ -14,7 +14,8 @@ interface IRefreshTokenRepository {
     client?: PoolClient,
   ): Promise<void>;
 
-  findTokenByDeviceId(
+  findTokenByDeviceIdAndUserId(
+    userId: string,
     deviceId: string,
     client?: PoolClient,
   ): Promise<{

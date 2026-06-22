@@ -12,7 +12,12 @@ class RefreshTokenUseCase {
     private transactionManager: ITransactionManager,
   ) {}
 
-  async execute(role: string, refreshToken: string, deviceId: string) {
+  async execute(
+    role: string,
+    refreshToken: string,
+    userId: string,
+    deviceId: string,
+  ) {
     if (!deviceId) {
       throw AppError.badRequest("MISSING_DEVICE_ID");
     }
@@ -21,10 +26,12 @@ class RefreshTokenUseCase {
     }
 
     return this.transactionManager.runInTransaction(async (client) => {
-      const storedToken = await this.refreshTokenRepository.findTokenByDeviceId(
-        deviceId,
-        client,
-      );
+      const storedToken =
+        await this.refreshTokenRepository.findTokenByDeviceIdAndUserId(
+          userId,
+          deviceId,
+          client,
+        );
 
       if (!storedToken) {
         throw AppError.unauthorized("INVALID_REFRESH_TOKEN");

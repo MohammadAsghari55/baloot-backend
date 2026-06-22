@@ -5,6 +5,8 @@ import asyncHandler from "../../../../shared/utils/async.handler.js";
 import validateBody from "../../../../middlewares/validation.middleware.js";
 import { adminAuthController } from "../../../../container.js";
 import deviceIdMiddleware from "../../../../middlewares/device-id.middleware.js";
+import accessCheckerMiddleware from "../../../../middlewares/accessChecker.middleware.js";
+import { tokenService } from "../../../../infrastructure/services/index.js";
 
 const router = Router();
 
@@ -23,6 +25,7 @@ router.post(
 
 router.post(
   "/refresh",
+  accessCheckerMiddleware(tokenService, true, true),
   deviceIdMiddleware,
   asyncHandler(adminAuthController.refresh),
 );

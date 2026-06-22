@@ -6,6 +6,7 @@ import AppError from "../shared/errors/app.error.js";
 const accessCheckerMiddleware = (
   tokenService: ITokenService,
   extractUser: boolean,
+  allowExpired: boolean = false,
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -15,7 +16,19 @@ const accessCheckerMiddleware = (
         throw AppError.unauthorized("INVALID_ACCESS_TOKEN");
       }
 
-      const payload = tokenService.verifyAccessToken(accessToken);
+      let payload;
+      try {
+        payload = tokenService.verifyAccessToken(accessToken);
+      } catch (error) {
+        if (error instanceof jwt.TokenExpiredError && allowExpired) {
+          payload = jwt.decode(accessToken) as { userId: string; role: string };
+          if (!payload?.userId)
+            throw AppError.unauthorized("INVALID_ACCESS_TOKEN");
+        } else {
+          throw AppError.unauthorized("INVALID_ACCESS_TOKEN");
+        }
+      }
+
       if (extractUser) {
         req.user = {
           userId: payload.userId,

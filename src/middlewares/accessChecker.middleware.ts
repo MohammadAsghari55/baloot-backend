@@ -16,14 +16,15 @@ const accessCheckerMiddleware = (
         throw AppError.unauthorized("INVALID_ACCESS_TOKEN");
       }
 
-      let payload;
+      let payload: { userId: string; role: string };
+
       try {
         payload = tokenService.verifyAccessToken(accessToken);
       } catch (error) {
         if (error instanceof jwt.TokenExpiredError && allowExpired) {
-          payload = jwt.decode(accessToken) as { userId: string; role: string };
-          if (!payload?.userId)
-            throw AppError.unauthorized("INVALID_ACCESS_TOKEN");
+          const decoded = tokenService.decodeAccessToken(accessToken);
+          if (!decoded) throw AppError.unauthorized("INVALID_ACCESS_TOKEN");
+          payload = decoded;
         } else {
           throw AppError.unauthorized("INVALID_ACCESS_TOKEN");
         }

@@ -47,6 +47,14 @@ class TokenService implements ITokenService {
       throw error;
     }
   }
+
+  decodeAccessToken(token: string): { userId: string; role: string } | null {
+    try {
+      return jwt.decode(token) as { userId: string; role: string };
+    } catch {
+      return null;
+    }
+  }
 }
 
 export default TokenService;

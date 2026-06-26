@@ -13,6 +13,8 @@ interface ITokenService {
   }>;
 
   verifyAccessToken(token: string): { userId: string; role: string };
+
+  decodeAccessToken(token: string): { userId: string; role: string } | null;
 }
 
 export default ITokenService;

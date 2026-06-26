@@ -12,7 +12,7 @@ class EmailVerificationPgRepository implements IEmailVerificationRepository {
   ): Promise<EmailVerification | null> {
     const dbClient = client || this.pool;
     const result = await dbClient.query(
-      "SELECT * FROM email_verifications WHERE user_id = $1",
+      "SELECT * FROM email_verifications WHERE user_id = $1 FOR UPDATE",
       [userId],
     );
     if (result.rows.length === 0) return null;

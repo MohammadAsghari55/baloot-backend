@@ -60,6 +60,7 @@ class RefreshTokenRepository implements IRefreshTokenRepository {
     WHERE user_id = $1 AND device_id = $2 AND revoked_at IS NULL
     ORDER BY created_at DESC
     LIMIT 1
+    FOR UPDATE
     `;
     try {
       const token = await dbClient.query(query, [userId, deviceId]);

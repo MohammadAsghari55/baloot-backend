@@ -10,6 +10,17 @@ const envSchema = z.object({
   JWT_ACCESS_SECRET: z.string().min(32),
 
   MAX_ADMINS: z.coerce.number().positive().default(1),
+
+  SMTP_HOST: z.string().min(1).default("localhost"),
+  SMTP_PORT: z.coerce.number().positive().default(1025),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_SECURE: z.preprocess((val) => {
+    if (typeof val === "string") {
+      return val.toLowerCase() === "true";
+    }
+    return val;
+  }, z.boolean().default(false)),
 });
 
 export default envSchema;

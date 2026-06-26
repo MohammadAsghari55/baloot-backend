@@ -20,7 +20,7 @@ class AdminAuthController {
     const user = await this.registerUseCase.execute(req.body);
     res.status(201).json({
       success: true,
-      message: "User registered successfully",
+      message: "User registered successfully, please login",
       data: user,
     });
   }

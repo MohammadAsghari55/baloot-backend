@@ -1,5 +1,5 @@
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
-import IRefreshTokenRepository from "../../../domains/user/repositories/refresh.token.repository.js";
+import IRefreshTokenRepository from "../../../domains/user/repositories/irefresh.token.repository.js";
 import IPasswordHasher from "../../../domains/user/Interfaces/ipassword.hasher.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import AppError from "../../../shared/errors/app.error.js";

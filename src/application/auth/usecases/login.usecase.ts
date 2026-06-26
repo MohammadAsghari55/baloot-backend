@@ -1,11 +1,11 @@
 import { LoginDto } from "../../../application/auth/dtos/login.dto.js";
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
-import IRefreshTokenRepository from "../../../domains/user/repositories/refresh.token.repository.js";
+import IRefreshTokenRepository from "../../../domains/user/repositories/irefresh.token.repository.js";
 import IPasswordHasher from "../../../domains/user/Interfaces/ipassword.hasher.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import UserApplicationService from "../../../application/auth/services/user.application.service.js";
 import AppError from "../../../shared/errors/app.error.js";
-import IEmailVerificationRepository from "../../../domains/user/repositories/email.verification.repository.js";
+import IEmailVerificationRepository from "../../../domains/user/repositories/iemail.verification.repository.js";
 
 class LoginUseCase {
   constructor(

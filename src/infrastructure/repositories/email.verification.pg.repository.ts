@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import EmailVerification from "../../domains/user/entities/email.verification.entity.js";
-import IEmailVerificationRepository from "../../domains/user/repositories/email.verification.repository.js";
+import IEmailVerificationRepository from "../../domains/user/repositories/iemail.verification.repository.js";
 import DatabaseError from "../../shared/errors/database.error.js";
 
 class EmailVerificationPgRepository implements IEmailVerificationRepository {

@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import IRefreshTokenRepository from "../../domains/user/repositories/refresh.token.repository.js";
+import IRefreshTokenRepository from "../../domains/user/repositories/irefresh.token.repository.js";
 import DatabaseError from "../../shared/errors/database.error.js";
 import { randomUUID } from "crypto";
 

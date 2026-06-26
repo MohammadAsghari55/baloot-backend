@@ -6,7 +6,7 @@ import UserDomainService from "../../../domains/user/services/user.domain.servic
 import AppError from "../../../shared/errors/app.error.js";
 import EmailVerification from "../../../domains/user/entities/email.verification.entity.js";
 import IVerificationService from "../../../domains/user/Interfaces/iverification.service.js";
-import IEmailVerificationRepository from "../../../domains/user/repositories/email.verification.repository.js";
+import IEmailVerificationRepository from "../../../domains/user/repositories/iemail.verification.repository.js";
 
 class RegisterUserUseCase {
   constructor(

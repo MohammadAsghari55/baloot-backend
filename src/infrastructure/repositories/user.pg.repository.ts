@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import User from "../../domains/user/entities/user.entity.js";
-import IUserRepository from "../../domains/user/repositories/user.repository.js";
+import IUserRepository from "../../domains/user/repositories/iuser.repository.js";
 import DatabaseError from "../../shared/errors/database.error.js";
 class UserPgRepository implements IUserRepository {
   constructor(private pool: Pool) {}

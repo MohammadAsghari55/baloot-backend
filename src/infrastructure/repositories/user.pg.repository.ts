@@ -73,6 +73,20 @@ class UserPgRepository implements IUserRepository {
     );
     return parseInt(adminsNumber.rows[0].count, 10);
   }
+
+  async updateEmailVerified(
+    userId: string,
+    verified: boolean,
+    client?: PoolClient,
+  ): Promise<void> {
+    const dbClient = client || this.pool;
+    const query = `
+    UPDATE users 
+    SET is_email_verified = $1, updated_at = NOW()
+    WHERE id = $2
+  `;
+    await dbClient.query(query, [verified, userId]);
+  }
 }
 
 export default UserPgRepository;

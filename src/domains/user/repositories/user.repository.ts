@@ -8,6 +8,12 @@ interface IUserRepository {
   save(user: User, client?: PoolClient): Promise<void>;
 
   countAdmins(client?: PoolClient): Promise<number>;
+
+  updateEmailVerified(
+    userId: string,
+    verified: boolean,
+    client?: PoolClient,
+  ): Promise<void>;
 }
 
 export default IUserRepository;

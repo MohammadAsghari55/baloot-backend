@@ -42,6 +42,13 @@ class UserApplicationService {
   async getMaxAdmins(): Promise<number> {
     return config.MAX_ADMINS;
   }
+  async updateEmailVerified(
+    userId: string,
+    verified: boolean,
+    client?: PoolClient,
+  ): Promise<void> {
+    await this.userRepository.updateEmailVerified(userId, verified, client);
+  }
 }
 
 export default UserApplicationService;

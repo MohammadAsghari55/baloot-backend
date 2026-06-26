@@ -4,6 +4,9 @@ import IPasswordHasher from "../../../domains/user/Interfaces/ipassword.hasher.j
 import UserApplicationService from "../../../application/auth/services/user.application.service.js";
 import UserDomainService from "../../../domains/user/services/user.domain.service.js";
 import AppError from "../../../shared/errors/app.error.js";
+import EmailVerification from "../../../domains/user/entities/email.verification.entity.js";
+import IVerificationService from "../../../domains/user/Interfaces/iverification.service.js";
+import IEmailVerificationRepository from "../../../domains/user/repositories/email.verification.repository.js";
 
 class RegisterAdminUseCase {
   constructor(
@@ -11,6 +14,8 @@ class RegisterAdminUseCase {
     private userDomainService: UserDomainService,
     private transactionManager: ITransactionManager,
     private passwordHasher: IPasswordHasher,
+    private verificationService: IVerificationService,
+    private emailVerificationRepository: IEmailVerificationRepository,
   ) {}
 
   async execute(dto: RegisterDto) {
@@ -21,47 +26,82 @@ class RegisterAdminUseCase {
       throw AppError.validation("PASSWORD_MISMATCH");
     }
 
-    return this.transactionManager.runInTransaction(async (client) => {
-      const adminsNumber =
-        await this.userApplicationService.countAdmins(client);
-      const maxAdmins = await this.userApplicationService.getMaxAdmins();
+    const { user, code, response } =
+      await this.transactionManager.runInTransaction(async (client) => {
+        const adminsNumber =
+          await this.userApplicationService.countAdmins(client);
+        const maxAdmins = await this.userApplicationService.getMaxAdmins();
 
-      await this.userDomainService.checkAdminLimit(adminsNumber, maxAdmins);
+        await this.userDomainService.checkAdminLimit(adminsNumber, maxAdmins);
 
-      const existingEmail = await this.userApplicationService.findUserByEmail(
-        dto.email,
-        client,
-      );
-
-      const existingUsername =
-        await this.userApplicationService.findUserByUsername(
-          dto.username,
+        const existingEmail = await this.userApplicationService.findUserByEmail(
+          dto.email,
           client,
         );
 
-      await this.userDomainService.checkUniqueness(
-        existingEmail,
-        existingUsername,
+        const existingUsername =
+          await this.userApplicationService.findUserByUsername(
+            dto.username,
+            client,
+          );
+
+        await this.userDomainService.checkUniqueness(
+          existingEmail,
+          existingUsername,
+        );
+
+        const hashedPassword = await this.passwordHasher.hash(dto.password);
+
+        const user = this.userDomainService.createUser(
+          dto.email,
+          dto.username,
+          hashedPassword,
+          "admin",
+        );
+
+        await this.userApplicationService.saveUser(user, client);
+
+        const code = this.verificationService.generateVerificationCode();
+        const emailVerification = EmailVerification.createNew(user.id, code);
+
+        await this.emailVerificationRepository.save(emailVerification, client);
+
+        return {
+          user,
+          code,
+          response: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            role: user.role,
+          },
+        };
+      });
+
+    let warning: string | undefined;
+
+    try {
+      await this.verificationService.emailSender(user.email, code);
+    } catch (error) {
+      warning =
+        "User registered, but verification email could not be sent. Please request a new code.";
+      const appError = AppError.internalWithOptions("EMAIL_SEND_FAILED", {
+        publicMessage:
+          "Failed to send verification email. Please request a new code later.",
+        cause: error,
+      });
+
+      console.error(
+        JSON.stringify({
+          code: appError.code,
+          message: appError.message,
+          publicMessage: appError.publicMessage,
+          cause: appError.cause,
+        }),
       );
+    }
 
-      const hashedPassword = await this.passwordHasher.hash(dto.password);
-
-      const user = this.userDomainService.createUser(
-        dto.email,
-        dto.username,
-        hashedPassword,
-        "admin",
-      );
-
-      await this.userApplicationService.saveUser(user, client);
-
-      return {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        role: user.role,
-      };
-    });
+    return { response, warning };
   }
 }
 

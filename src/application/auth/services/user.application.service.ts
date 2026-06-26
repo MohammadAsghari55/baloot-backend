@@ -1,7 +1,7 @@
 import { PoolClient } from "pg";
 import User from "../../../domains/user/entities/user.entity.js";
 import UserRepository from "../../../domains/user/repositories/iuser.repository.js";
-import { config } from "../../../infrastructure/config/env.index.js";
+import config from "../../../infrastructure/config/env.index.js";
 
 class UserApplicationService {
   constructor(private userRepository: UserRepository) {}

@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import type IBcryptService from "../../domains/user/Interfaces/ibcrypt.service.js";
 import ITokenService from "../../domains/user/Interfaces/itoken.service.js";
-import { config } from "../config/env.index.js";
+import config from "../config/env.index.js";
 
 class TokenService implements ITokenService {
   constructor(private readonly bcryptService: IBcryptService) {}

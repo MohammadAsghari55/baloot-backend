@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import AppError from "../shared/errors/app.error.js";
 import ZodValidationError from "../shared/errors/zod.validation.error.js";
-import { config } from "../infrastructure/config/env.index.js";
+import config from "../infrastructure/config/env.index.js";
 
 function errorMiddleware(
   err: any,

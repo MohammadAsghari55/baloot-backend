@@ -23,4 +23,6 @@ if (!result.success) {
   process.exit(1);
 }
 
-export const config = result.data;
+const config = result.data;
+
+export default config;

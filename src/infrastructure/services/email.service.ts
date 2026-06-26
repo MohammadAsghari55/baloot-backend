@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { config } from "../config/env.index.js";
+import config from "../config/env.index.js";
 import IEmailService from "../../domains/user/Interfaces/iemail.service.js";
 
 class EmailService implements IEmailService {

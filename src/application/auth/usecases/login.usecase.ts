@@ -1,7 +1,7 @@
 import { LoginDto } from "../../../application/auth/dtos/login.dto.js";
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import IRefreshTokenRepository from "../../../domains/user/repositories/irefresh.token.repository.js";
-import IPasswordHasher from "../../../domains/user/Interfaces/ipassword.hasher.js";
+import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import UserApplicationService from "../../../application/auth/services/user.application.service.js";
 import AppError from "../../../shared/errors/app.error.js";
@@ -12,7 +12,7 @@ class LoginUseCase {
     private userApplicationService: UserApplicationService,
     private tokenService: ITokenService,
     private refreshTokenRepository: IRefreshTokenRepository,
-    private passwordHasher: IPasswordHasher,
+    private bcryptService: IBcryptService,
     private transactionManager: ITransactionManager,
     private emailVerificationRepository: IEmailVerificationRepository,
   ) {}
@@ -38,7 +38,7 @@ class LoginUseCase {
         throw AppError.badRequest("EMAIL_NOT_VERIFIED");
       }
 
-      const isMatch = await this.passwordHasher.compare(
+      const isMatch = await this.bcryptService.compare(
         password,
         user.passwordHash,
       );

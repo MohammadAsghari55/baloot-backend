@@ -1,6 +1,6 @@
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import IRefreshTokenRepository from "../../../domains/user/repositories/irefresh.token.repository.js";
-import IPasswordHasher from "../../../domains/user/Interfaces/ipassword.hasher.js";
+import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import AppError from "../../../shared/errors/app.error.js";
 
@@ -8,7 +8,7 @@ class RefreshTokenUseCase {
   constructor(
     private tokenService: ITokenService,
     private refreshTokenRepository: IRefreshTokenRepository,
-    private passwordHasher: IPasswordHasher,
+    private bcryptService: IBcryptService,
     private transactionManager: ITransactionManager,
   ) {}
 
@@ -37,7 +37,7 @@ class RefreshTokenUseCase {
         throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
       }
 
-      const compare = await this.passwordHasher.compare(
+      const compare = await this.bcryptService.compare(
         refreshToken,
         storedToken.tokenHash,
       );

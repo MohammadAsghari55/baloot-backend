@@ -1,6 +1,6 @@
 import { RegisterDto } from "../../../shared/validators/auth/register.schema.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
-import IPasswordHasher from "../../../domains/user/Interfaces/ipassword.hasher.js";
+import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import UserApplicationService from "../../../application/auth/services/user.application.service.js";
 import UserDomainService from "../../../domains/user/services/user.domain.service.js";
 import AppError from "../../../shared/errors/app.error.js";
@@ -13,7 +13,7 @@ class RegisterAdminUseCase {
     private userApplicationService: UserApplicationService,
     private userDomainService: UserDomainService,
     private transactionManager: ITransactionManager,
-    private passwordHasher: IPasswordHasher,
+    private bcryptService: IBcryptService,
     private verificationService: IVerificationService,
     private emailVerificationRepository: IEmailVerificationRepository,
   ) {}
@@ -50,7 +50,7 @@ class RegisterAdminUseCase {
           existingUsername,
         );
 
-        const hashedPassword = await this.passwordHasher.hash(dto.password);
+        const hashedPassword = await this.bcryptService.hash(dto.password);
 
         const user = this.userDomainService.createUser(
           dto.email,

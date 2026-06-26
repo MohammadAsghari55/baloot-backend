@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
-import IPasswordHasher from "../../domains/user/Interfaces/ipassword.hasher.js";
+import IBcryptService from "../../domains/user/Interfaces/ibcrypt.service.js";
 
-class BcryptService implements IPasswordHasher {
+class BcryptService implements IBcryptService {
   async hash(plain: string): Promise<string> {
     return bcrypt.hash(plain, 10);
   }

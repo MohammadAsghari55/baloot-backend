@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import type IPasswordHasher from "../../domains/user/Interfaces/ipassword.hasher.js";
+import type IBcryptService from "../../domains/user/Interfaces/ibcrypt.service.js";
 import ITokenService from "../../domains/user/Interfaces/itoken.service.js";
 import { config } from "../config/env.index.js";
 
 class TokenService implements ITokenService {
-  constructor(private readonly passwordHasher: IPasswordHasher) {}
+  constructor(private readonly bcryptService: IBcryptService) {}
 
   generateAccessToken(userId: string, role: string): string {
     return jwt.sign({ userId, role }, config.JWT_ACCESS_SECRET, {
@@ -27,7 +27,7 @@ class TokenService implements ITokenService {
   }> {
     const accessToken = this.generateAccessToken(userId, role);
     const refreshToken = this.generateRefreshToken();
-    const hashedRefreshToken = await this.passwordHasher.hash(refreshToken);
+    const hashedRefreshToken = await this.bcryptService.hash(refreshToken);
 
     return {
       accessToken,

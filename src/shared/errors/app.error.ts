@@ -7,6 +7,7 @@ class AppError extends Error {
   isPublic: boolean;
   publicMessage?: string;
   details?: { path: string; message: string }[];
+  cause?: unknown;
 
   constructor(
     message: string,
@@ -16,6 +17,7 @@ class AppError extends Error {
       isPublic?: boolean;
       publicMessage?: string;
       details?: { path: string; message: string }[];
+      cause?: unknown;
     },
   ) {
     super(message);
@@ -25,6 +27,7 @@ class AppError extends Error {
     this.isPublic = options?.isPublic ?? true;
     this.publicMessage = options?.publicMessage;
     this.details = options?.details;
+    this.cause = options?.cause;
 
     Error.captureStackTrace(this, this.constructor);
   }
@@ -68,6 +71,19 @@ class AppError extends Error {
     details?: { path: string; message: string }[],
   ): AppError {
     return new AppError(message, 400, "VALIDATION_ERROR", { details });
+  }
+
+  static internalWithOptions(
+    code: ErrorCode,
+    options?: {
+      publicMessage?: string;
+      isPublic?: boolean;
+      details?: { path: string; message: string }[];
+      cause?: unknown;
+    },
+  ): AppError {
+    const error = ErrorCodes[code];
+    return new AppError(error.message, 500, error.code, options);
   }
 }
 export default AppError;

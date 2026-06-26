@@ -4,8 +4,11 @@ import PgTransactionManager from "../../infrastructure/database/pg.transaction.m
 import pool from "../../infrastructure/database/pg.client.js";
 import {
   bcryptService,
+  emailService,
   tokenService,
 } from "../../infrastructure/services/services.index.js";
+import VerificationService from "../../application/auth/services/verification.service.js";
+import EmailVerificationRepository from "../../infrastructure/repositories/email.verification.pg.repository.js";
 
 import LoginUseCase from "./usecases/login.usecase.js";
 import RefreshTokenUseCase from "./usecases/refresh.token.usecase.js";
@@ -20,18 +23,24 @@ function buildAuthModule() {
 
   const refreshTokenRepository = new RefreshTokenRepository(pool);
   const transactionManager = new PgTransactionManager(pool);
+  const verificationService = new VerificationService(emailService);
+  const emailVerificationRepository = new EmailVerificationRepository(pool);
 
   const registerAdminUseCase = new RegisterAdminUseCase(
     userApplicationService,
     userDomainService,
     transactionManager,
     bcryptService,
+    verificationService,
+    emailVerificationRepository,
   );
   const registerUserUseCase = new RegisterUserUseCase(
     userApplicationService,
     userDomainService,
     transactionManager,
     bcryptService,
+    verificationService,
+    emailVerificationRepository,
   );
   const loginUseCase = new LoginUseCase(
     userApplicationService,
@@ -39,6 +48,7 @@ function buildAuthModule() {
     refreshTokenRepository,
     bcryptService,
     transactionManager,
+    emailVerificationRepository,
   );
   const refreshTokenUseCase = new RefreshTokenUseCase(
     tokenService,

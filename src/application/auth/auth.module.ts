@@ -27,34 +27,34 @@ function buildAuthModule() {
   const emailVerificationRepository = new EmailVerificationRepository(pool);
 
   const registerAdminUseCase = new RegisterAdminUseCase(
-    userApplicationService,
-    userDomainService,
     transactionManager,
+    userDomainService,
+    userApplicationService,
     bcryptService,
     verificationService,
     emailVerificationRepository,
   );
   const registerUserUseCase = new RegisterUserUseCase(
-    userApplicationService,
-    userDomainService,
     transactionManager,
+    userDomainService,
+    userApplicationService,
     bcryptService,
     verificationService,
     emailVerificationRepository,
   );
   const loginUseCase = new LoginUseCase(
+    transactionManager,
     userApplicationService,
+    bcryptService,
     tokenService,
     refreshTokenRepository,
-    bcryptService,
-    transactionManager,
     emailVerificationRepository,
   );
   const refreshTokenUseCase = new RefreshTokenUseCase(
+    transactionManager,
+    bcryptService,
     tokenService,
     refreshTokenRepository,
-    bcryptService,
-    transactionManager,
   );
 
   const adminAuthController = new AdminAuthController(

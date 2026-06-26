@@ -1,15 +1,15 @@
+import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
+import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import IRefreshTokenRepository from "../../../domains/user/repositories/irefresh.token.repository.js";
-import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
-import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import AppError from "../../../shared/errors/app.error.js";
 
 class RefreshTokenUseCase {
   constructor(
+    private transactionManager: ITransactionManager,
+    private bcryptService: IBcryptService,
     private tokenService: ITokenService,
     private refreshTokenRepository: IRefreshTokenRepository,
-    private bcryptService: IBcryptService,
-    private transactionManager: ITransactionManager,
   ) {}
 
   async execute(

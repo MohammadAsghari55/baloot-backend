@@ -103,5 +103,11 @@ export const ErrorCodes = {
     message: "Failed to send verification email. Please try again later.",
     status: 500,
   },
+
+  TOO_MANY_REQUESTS: {
+    code: "TOO_MANY_REQUESTS",
+    message: "Too many requests. Please try again later.",
+    status: 429,
+  },
 } as const;
 export type ErrorCode = keyof typeof ErrorCodes;

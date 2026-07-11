@@ -40,11 +40,22 @@ class ResendVerificationUseCase {
         ) {
           code = tableEmailVerification.code;
         } else {
+          let canSend = true;
+
           if (tableEmailVerification) {
             await this.emailVerificationRepository.deleteByUserId(
               user.id,
               client,
             );
+
+            const timeSinceCreation =
+              Date.now() - tableEmailVerification.createdAt.getTime();
+            if (timeSinceCreation < 4 * 60 * 60 * 1000) {
+              canSend = false;
+            }
+          }
+          if (!canSend) {
+            throw AppError.fromCode("TOO_MANY_REQUESTS");
           }
           code = this.verificationService.generateVerificationCode();
           const emailVerification = EmailVerification.createNew(user.id, code);

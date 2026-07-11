@@ -7,9 +7,7 @@ CREATE TABLE IF NOT EXISTS email_verifications (
     expires_at              TIMESTAMP NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_email_verifications_user_active 
-ON email_verifications(user_id) 
-WHERE expires_at > NOW();
+CREATE INDEX idx_email_verifications_user_id ON email_verifications(user_id);
 
 -- DOWN
 DROP TABLE IF EXISTS email_verifications;

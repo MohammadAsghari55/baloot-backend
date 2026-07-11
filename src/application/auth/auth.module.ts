@@ -14,9 +14,11 @@ import LoginUseCase from "./usecases/login.usecase.js";
 import RefreshTokenUseCase from "./usecases/refresh.token.usecase.js";
 import RegisterAdminUseCase from "./usecases/register.admin.usecase.js";
 import RegisterUserUseCase from "./usecases/register.user.usecase.js";
+import ResendVerificationUseCase from "./usecases/resend.verification.usecase.js";
 
 import AdminAuthController from "../../api/v1/admin/auth/admin.auth.controller.js";
 import UserAuthController from "../../api/v1/user/auth/user.auth.controller.js";
+import ResendVerificationController from "../../api/v1/common/resend.verification.controller.js";
 
 function buildAuthModule() {
   const { userApplicationService, userDomainService } = buildUserModule();
@@ -34,6 +36,7 @@ function buildAuthModule() {
     verificationService,
     emailVerificationRepository,
   );
+
   const registerUserUseCase = new RegisterUserUseCase(
     transactionManager,
     userDomainService,
@@ -42,6 +45,7 @@ function buildAuthModule() {
     verificationService,
     emailVerificationRepository,
   );
+
   const loginUseCase = new LoginUseCase(
     transactionManager,
     userApplicationService,
@@ -50,6 +54,7 @@ function buildAuthModule() {
     refreshTokenRepository,
     emailVerificationRepository,
   );
+
   const refreshTokenUseCase = new RefreshTokenUseCase(
     transactionManager,
     bcryptService,
@@ -57,20 +62,33 @@ function buildAuthModule() {
     refreshTokenRepository,
   );
 
+  const resendVerificationUseCase = new ResendVerificationUseCase(
+    transactionManager,
+    userApplicationService,
+    verificationService,
+    emailVerificationRepository,
+  );
+
   const adminAuthController = new AdminAuthController(
     registerAdminUseCase,
     loginUseCase,
     refreshTokenUseCase,
   );
+
   const userAuthController = new UserAuthController(
     registerUserUseCase,
     loginUseCase,
     refreshTokenUseCase,
   );
 
+  const resendVerificationController = new ResendVerificationController(
+    resendVerificationUseCase,
+  );
+
   return {
     adminAuthController,
     userAuthController,
+    resendVerificationController,
   };
 }
 

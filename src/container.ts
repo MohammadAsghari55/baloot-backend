@@ -1,5 +1,13 @@
 import { buildAuthModule } from "./application/auth/auth.index.js";
 
-const { adminAuthController, userAuthController } = buildAuthModule();
+const {
+  adminAuthController,
+  userAuthController,
+  resendVerificationController,
+} = buildAuthModule();
 
-export { adminAuthController, userAuthController };
+export {
+  adminAuthController,
+  userAuthController,
+  resendVerificationController,
+};

@@ -5,6 +5,7 @@ import IVerificationService from "../../../domains/user/Interfaces/iverification
 import IEmailVerificationRepository from "../../../domains/user/repositories/iemail.verification.repository.js";
 import EmailVerification from "../../../domains/user/entities/email.verification.entity.js";
 import AppError from "../../../shared/errors/app.error.js";
+import config from "../../../infrastructure/config/env.index.js";
 
 class ResendVerificationUseCase {
   constructor(
@@ -33,15 +34,17 @@ class ResendVerificationUseCase {
         const tableEmailVerification =
           await this.emailVerificationRepository.findByUserId(user.id, client);
         let code: string;
-
         if (
           tableEmailVerification &&
           tableEmailVerification.expiresAt > new Date()
         ) {
+          const timeSinceCreation =
+            Date.now() - tableEmailVerification.createdAt.getTime();
+          if (timeSinceCreation < config.RESEND_LIMIT_VALID) {
+            throw AppError.fromCode("TOO_MANY_REQUESTS");
+          }
           code = tableEmailVerification.code;
         } else {
-          let canSend = true;
-
           if (tableEmailVerification) {
             await this.emailVerificationRepository.deleteByUserId(
               user.id,
@@ -50,13 +53,11 @@ class ResendVerificationUseCase {
 
             const timeSinceCreation =
               Date.now() - tableEmailVerification.createdAt.getTime();
-            if (timeSinceCreation < 4 * 60 * 60 * 1000) {
-              canSend = false;
+            if (timeSinceCreation < config.RESEND_LIMIT_EXPIRED) {
+              throw AppError.fromCode("TOO_MANY_REQUESTS");
             }
           }
-          if (!canSend) {
-            throw AppError.fromCode("TOO_MANY_REQUESTS");
-          }
+
           code = this.verificationService.generateVerificationCode();
           const emailVerification = EmailVerification.createNew(user.id, code);
           await this.emailVerificationRepository.save(

@@ -1,6 +1,6 @@
 import { BoundClass } from "@hemia/autobind";
 import { Request, Response } from "express";
-import ResendVerificationUseCase from "../../../application/auth/usecases/resend.verification.usecase.js";
+import ResendVerificationUseCase from "../../../../application/auth/usecases/resend.verification.usecase.js";
 
 @BoundClass
 class ResendVerificationController {

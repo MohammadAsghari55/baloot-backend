@@ -38,6 +38,16 @@ class LoginUseCase {
         throw AppError.badRequest("EMAIL_NOT_VERIFIED");
       }
 
+      const existingToken =
+        await this.refreshTokenRepository.findTokenByDeviceIdAndUserId(
+          user.id,
+          deviceId,
+          client,
+        );
+      if (existingToken && existingToken.expiresAt > new Date()) {
+        throw AppError.badRequest("YOU_ARE_LOGGED_IN");
+      }
+
       const isMatch = await this.bcryptService.compare(
         password,
         user.passwordHash,

@@ -109,5 +109,11 @@ export const ErrorCodes = {
     message: "Too many requests. Please try again later.",
     status: 429,
   },
+  YOU_ARE_LOGGED_IN: {
+    code: "YOU_ARE_LOGGED_IN",
+    message:
+      "You are already logged in on this device. Please log out first if you want to login again.",
+    status: 409,
+  },
 } as const;
 export type ErrorCode = keyof typeof ErrorCodes;

@@ -79,6 +79,20 @@ class RefreshTokenRepository implements IRefreshTokenRepository {
       throw DatabaseError.fromPGError(error);
     }
   }
+
+  async revokeAllByUserId(userId: string, client?: PoolClient): Promise<void> {
+    const dbClient = client || this.pool;
+    const query = `
+    UPDATE refresh_token 
+    SET revoked_at = NOW()
+    WHERE user_id = $1 AND revoked_at IS NULL
+    `;
+    try {
+      await dbClient.query(query, [userId]);
+    } catch (error) {
+      throw DatabaseError.fromPGError(error);
+    }
+  }
 }
 
 export default RefreshTokenRepository;

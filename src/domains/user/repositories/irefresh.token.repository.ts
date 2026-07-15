@@ -24,6 +24,8 @@ interface IRefreshTokenRepository {
     expiresAt: Date;
     revokedAt: Date | null;
   } | null>;
+
+  revokeAllByUserId(userId: string, client?: PoolClient): Promise<void>;
 }
 
 export default IRefreshTokenRepository;

@@ -21,6 +21,14 @@ const envSchema = z.object({
     }
     return val;
   }, z.boolean().default(false)),
+  RESEND_LIMIT_VALID: z.coerce
+    .number()
+    .positive()
+    .default(20 * 60 * 1000),
+  RESEND_LIMIT_EXPIRED: z.coerce
+    .number()
+    .positive()
+    .default(4 * 60 * 60 * 1000),
 });
 
 export default envSchema;

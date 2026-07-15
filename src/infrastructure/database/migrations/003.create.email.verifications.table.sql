@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS email_verifications (
     user_id                 UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     code                    VARCHAR(6) NOT NULL ,
     created_at              TIMESTAMP DEFAULT NOW(),
+    updated_at              TIMESTAMP DEFAULT NULL,
     expires_at              TIMESTAMP NOT NULL
 );
 

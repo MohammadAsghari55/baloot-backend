@@ -27,14 +27,15 @@ class EmailVerificationPgRepository implements IEmailVerificationRepository {
     const dbClient = client || this.pool;
     const query = `
     INSERT INTO email_verifications (
-    id,user_id,code, expires_at)
-    VALUES ($1, $2, $3, $4)
+    id, user_id, code, updated_at, expires_at)
+    VALUES ($1, $2, $3, $4, $5)
     `;
     try {
       await dbClient.query(query, [
         emailVerification.id,
         emailVerification.userId,
         emailVerification.code,
+        null,
         emailVerification.expiresAt,
       ]);
     } catch (error) {
@@ -53,6 +54,14 @@ class EmailVerificationPgRepository implements IEmailVerificationRepository {
     } catch (error) {
       throw DatabaseError.fromPGError(error);
     }
+  }
+
+  async updateUpdatedAt(userId: string, client?: PoolClient): Promise<void> {
+    const dbClient = client || this.pool;
+    await dbClient.query(
+      `UPDATE email_verifications SET updated_at = NOW() WHERE user_id = $1`,
+      [userId],
+    );
   }
 }
 export default EmailVerificationPgRepository;

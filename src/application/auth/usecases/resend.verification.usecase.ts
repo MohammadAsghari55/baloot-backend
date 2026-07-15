@@ -31,31 +31,37 @@ class ResendVerificationUseCase {
           throw AppError.badRequest("ALREADY_VERIFIED");
         }
 
-        const tableEmailVerification =
-          await this.emailVerificationRepository.findByUserId(user.id, client);
+        const existEmail = await this.emailVerificationRepository.findByUserId(
+          user.id,
+          client,
+        );
+
         let code: string;
-        if (
-          tableEmailVerification &&
-          tableEmailVerification.expiresAt > new Date()
-        ) {
-          const timeSinceCreation =
-            Date.now() - tableEmailVerification.createdAt.getTime();
-          if (timeSinceCreation < config.RESEND_LIMIT_VALID) {
-            throw AppError.fromCode("TOO_MANY_REQUESTS");
+
+        if (existEmail && existEmail.expiresAt > new Date()) {
+          if (existEmail.updatedAt) {
+            const lastResend = Date.now() - existEmail.updatedAt.getTime();
+
+            if (lastResend < config.RESEND_LIMIT_VALID) {
+              throw AppError.fromCode("TOO_MANY_REQUESTS");
+            }
           }
-          code = tableEmailVerification.code;
+          code = existEmail.code;
+          await this.emailVerificationRepository.updateUpdatedAt(
+            user.id,
+            client,
+          );
         } else {
-          if (tableEmailVerification) {
+          if (existEmail) {
+            const creationEmail = Date.now() - existEmail.createdAt.getTime();
+            if (creationEmail < config.RESEND_LIMIT_EXPIRED) {
+              throw AppError.fromCode("TOO_MANY_REQUESTS");
+            }
+
             await this.emailVerificationRepository.deleteByUserId(
               user.id,
               client,
             );
-
-            const timeSinceCreation =
-              Date.now() - tableEmailVerification.createdAt.getTime();
-            if (timeSinceCreation < config.RESEND_LIMIT_EXPIRED) {
-              throw AppError.fromCode("TOO_MANY_REQUESTS");
-            }
           }
 
           code = this.verificationService.generateVerificationCode();

@@ -5,6 +5,7 @@ class EmailVerification {
     private readonly _userId: string,
     private readonly _code: string,
     private readonly _createdAt: Date,
+    private readonly _updatedAt: Date | null,
     private readonly _expiresAt: Date,
   ) {}
 
@@ -20,6 +21,9 @@ class EmailVerification {
   get createdAt(): Date {
     return this._createdAt;
   }
+  get updatedAt(): Date | null {
+    return this._updatedAt;
+  }
   get expiresAt(): Date {
     return this._expiresAt;
   }
@@ -30,6 +34,7 @@ class EmailVerification {
       userId,
       code,
       new Date(),
+      null,
       new Date(Date.now() + 24 * 60 * 60 * 1000),
     );
   }
@@ -39,6 +44,7 @@ class EmailVerification {
     user_id: string;
     code: string;
     created_at: Date;
+    updated_at: Date;
     expires_at: Date;
   }): EmailVerification {
     return new EmailVerification(
@@ -46,6 +52,7 @@ class EmailVerification {
       data.user_id,
       data.code,
       data.created_at,
+      data.updated_at,
       data.expires_at,
     );
   }

@@ -21,6 +21,10 @@ const envSchema = z.object({
     }
     return val;
   }, z.boolean().default(false)),
+  EXPIRE_TIME: z.coerce
+    .number()
+    .positive()
+    .default(24 * 60 * 60 * 1000),
   RESEND_LIMIT_VALID: z.coerce
     .number()
     .positive()

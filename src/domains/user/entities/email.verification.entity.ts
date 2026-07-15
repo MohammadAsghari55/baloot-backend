@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import config from "../../../infrastructure/config/env.index.js";
 class EmailVerification {
   private constructor(
     private readonly _id: string,
@@ -35,7 +36,7 @@ class EmailVerification {
       code,
       new Date(),
       null,
-      new Date(Date.now() + 24 * 60 * 60 * 1000),
+      new Date(Date.now() + config.EXPIRE_TIME),
     );
   }
 

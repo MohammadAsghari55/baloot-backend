@@ -47,24 +47,26 @@ class LoginUseCase {
         throw AppError.unauthorized("INVALID_CREDENTIALS");
       }
 
-      const emailVerification =
-        await this.emailVerificationRepository.findByUserId(user.id, client);
+      if (!user.isEmailVerified) {
+        const emailVerification =
+          await this.emailVerificationRepository.findByUserId(user.id, client);
 
-      if (!emailVerification) {
-        throw AppError.badRequest("INVALID_VERIFICATION_CODE");
+        if (!emailVerification) {
+          throw AppError.badRequest("INVALID_VERIFICATION_CODE");
+        }
+
+        if (code !== emailVerification.code) {
+          throw AppError.badRequest("INVALID_VERIFICATION_CODE");
+        }
+
+        await this.userApplicationService.updateEmailVerified(
+          user.id,
+          true,
+          client,
+        );
+
+        await this.emailVerificationRepository.deleteByUserId(user.id, client);
       }
-
-      if (code !== emailVerification.code) {
-        throw AppError.badRequest("INVALID_VERIFICATION_CODE");
-      }
-
-      await this.userApplicationService.updateEmailVerified(
-        user.id,
-        true,
-        client,
-      );
-
-      await this.emailVerificationRepository.deleteByUserId(user.id, client);
 
       const tokens = await this.tokenService.generateTokenPair(
         user.id,

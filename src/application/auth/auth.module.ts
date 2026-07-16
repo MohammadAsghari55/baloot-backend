@@ -15,10 +15,11 @@ import RefreshTokenUseCase from "./usecases/refresh.token.usecase.js";
 import RegisterAdminUseCase from "./usecases/register.admin.usecase.js";
 import RegisterUserUseCase from "./usecases/register.user.usecase.js";
 import ResendVerificationUseCase from "./usecases/resend.verification.usecase.js";
+import LogoutUseCase from "./usecases/logout.usecase.js";
 
 import AdminAuthController from "../../api/v1/admin/auth/admin.auth.controller.js";
 import UserAuthController from "../../api/v1/user/auth/user.auth.controller.js";
-import ResendVerificationController from "../../api/v1/common/resend.verification.controller.js";
+import ResendVerificationController from "../../api/v1/common/resendVerification/resend.verification.controller.js";
 
 function buildAuthModule() {
   const { userApplicationService, userDomainService } = buildUserModule();
@@ -69,16 +70,23 @@ function buildAuthModule() {
     emailVerificationRepository,
   );
 
+  const logoutUseCase = new LogoutUseCase(
+    transactionManager,
+    refreshTokenRepository,
+  );
+
   const adminAuthController = new AdminAuthController(
     registerAdminUseCase,
     loginUseCase,
     refreshTokenUseCase,
+    logoutUseCase,
   );
 
   const userAuthController = new UserAuthController(
     registerUserUseCase,
     loginUseCase,
     refreshTokenUseCase,
+    logoutUseCase,
   );
 
   const resendVerificationController = new ResendVerificationController(

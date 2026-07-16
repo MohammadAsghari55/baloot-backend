@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import RegisterAdminUseCase from "../../../../application/auth/usecases/register.admin.usecase.js";
 import LoginUseCase from "../../../../application/auth/usecases/login.usecase.js";
 import RefreshTokenUseCase from "../../../../application/auth/usecases/refresh.token.usecase.js";
+import LogoutUseCase from "../../../../application/auth/usecases/logout.usecase.js";
 import {
   accessCookieOptions,
   refreshCookieOptions,
@@ -14,6 +15,7 @@ class AdminAuthController {
     private registerUseCase: RegisterAdminUseCase,
     private loginUseCase: LoginUseCase,
     private refreshTokenUseCase: RefreshTokenUseCase,
+    private logoutUseCase: LogoutUseCase,
   ) {}
 
   async register(req: Request, res: Response) {
@@ -49,6 +51,25 @@ class AdminAuthController {
     res.status(200).json({
       success: true,
       message: "Token refreshed successfully",
+    });
+  }
+
+  async logout(req: Request, res: Response) {
+    const logoutAll = req.query.all === "true";
+
+    await this.logoutUseCase.execute(
+      req.user!.userId,
+      req.deviceId!,
+      logoutAll,
+    );
+
+    res.clearCookie("accessToken", accessCookieOptions);
+    res.clearCookie("refreshToken", refreshCookieOptions);
+    res.status(200).json({
+      success: true,
+      message: logoutAll
+        ? "Logged out from all devices"
+        : "Logged out successfully",
     });
   }
 }

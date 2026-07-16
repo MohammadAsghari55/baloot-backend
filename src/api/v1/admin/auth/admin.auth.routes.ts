@@ -30,4 +30,11 @@ router.post(
   asyncHandler(adminAuthController.refresh),
 );
 
+router.post(
+  "/logout",
+  accessCheckerMiddleware(tokenService, true, true),
+  deviceIdMiddleware,
+  asyncHandler(adminAuthController.logout),
+);
+
 export default router;

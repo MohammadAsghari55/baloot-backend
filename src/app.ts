@@ -1,8 +1,8 @@
 import express from "express";
 import healthRouter from "./api/health/health.route.js";
-import adminAuthRouter from "./api/v1/admin/auth/admin.auth.routes.js";
-import userAuthRouter from "./api/v1/user/auth/user.auth.routes.js";
-import resendVerificationRouter from "./api/v1/common/resendVerification/resend.verification.routes.js";
+import adminRouter from "./api/v1/admin/admin.routes.js";
+import userRouter from "./api/v1/user/user.routes.js";
+import authRouter from "./api/v1/common/auth/auth.routes.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 import cookieParser from "cookie-parser";
 
@@ -12,8 +12,8 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use("/health", healthRouter);
-app.use("/api/v1/admin/auth", adminAuthRouter);
-app.use("/api/v1/user/auth", userAuthRouter);
-app.use("/api/v1/common/resendVerification", resendVerificationRouter);
+app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/common/auth", authRouter);
 
 app.use(errorMiddleware);

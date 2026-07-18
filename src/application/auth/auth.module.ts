@@ -6,7 +6,7 @@ import {
   emailService,
   tokenService,
 } from "../../infrastructure/services/services.index.js";
-import VerificationService from "../../application/auth/services/verification.service.js";
+import VerificationService from "./services/verification.service.js";
 import RefreshTokenRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
 import TokenManagementApplicationService from "./services/token.management.application.service.js";
 import EmailVerificationRepository from "../../infrastructure/repositories/email.verification.pg.repository.js";
@@ -19,9 +19,9 @@ import RegisterUserUseCase from "./usecases/register.user.usecase.js";
 import ResendVerificationUseCase from "./usecases/resend.verification.usecase.js";
 import LogoutUseCase from "./usecases/logout.usecase.js";
 
-import AdminAuthController from "../../api/v1/admin/auth/admin.auth.controller.js";
-import UserAuthController from "../../api/v1/user/auth/user.auth.controller.js";
-import ResendVerificationController from "../../api/v1/common/resendVerification/resend.verification.controller.js";
+import AdminController from "../../api/v1/admin/admin.controller.js";
+import UserController from "../../api/v1/user/user.controller.js";
+import AuthController from "../../api/v1/common/auth/auth.controller.js";
 
 function buildAuthModule() {
   const { userApplicationService, userDomainService } = buildUserModule();
@@ -83,28 +83,26 @@ function buildAuthModule() {
     tokenManagementApplicationService,
   );
 
-  const adminAuthController = new AdminAuthController(
+  const adminController = new AdminController(
     registerAdminUseCase,
-    loginUseCase,
     refreshTokenUseCase,
-    logoutUseCase,
   );
 
-  const userAuthController = new UserAuthController(
+  const userController = new UserController(
     registerUserUseCase,
-    loginUseCase,
     refreshTokenUseCase,
-    logoutUseCase,
   );
 
-  const resendVerificationController = new ResendVerificationController(
+  const authController = new AuthController(
+    loginUseCase,
+    logoutUseCase,
     resendVerificationUseCase,
   );
 
   return {
-    adminAuthController,
-    userAuthController,
-    resendVerificationController,
+    adminController,
+    userController,
+    authController,
   };
 }
 

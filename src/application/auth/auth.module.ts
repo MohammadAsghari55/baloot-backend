@@ -1,5 +1,4 @@
 import { buildUserModule } from "../../domains/user/user.index.js";
-import RefreshTokenRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
 import PgTransactionManager from "../../infrastructure/database/pg.transaction.manager.js";
 import pool from "../../infrastructure/database/pg.client.js";
 import {
@@ -8,6 +7,8 @@ import {
   tokenService,
 } from "../../infrastructure/services/services.index.js";
 import VerificationService from "../../application/auth/services/verification.service.js";
+import RefreshTokenRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
+import TokenManagementApplicationService from "./services/token.management.application.service.js";
 import EmailVerificationRepository from "../../infrastructure/repositories/email.verification.pg.repository.js";
 
 import LoginUseCase from "./usecases/login.usecase.js";
@@ -24,9 +25,11 @@ import ResendVerificationController from "../../api/v1/common/resendVerification
 function buildAuthModule() {
   const { userApplicationService, userDomainService } = buildUserModule();
 
-  const refreshTokenRepository = new RefreshTokenRepository(pool);
   const transactionManager = new PgTransactionManager(pool);
   const verificationService = new VerificationService(emailService);
+  const refreshTokenRepository = new RefreshTokenRepository(pool);
+  const tokenManagementApplicationService =
+    new TokenManagementApplicationService(refreshTokenRepository);
   const emailVerificationRepository = new EmailVerificationRepository(pool);
 
   const registerAdminUseCase = new RegisterAdminUseCase(
@@ -52,7 +55,7 @@ function buildAuthModule() {
     userApplicationService,
     bcryptService,
     tokenService,
-    refreshTokenRepository,
+    tokenManagementApplicationService,
     emailVerificationRepository,
   );
 
@@ -60,7 +63,7 @@ function buildAuthModule() {
     transactionManager,
     bcryptService,
     tokenService,
-    refreshTokenRepository,
+    tokenManagementApplicationService,
   );
 
   const resendVerificationUseCase = new ResendVerificationUseCase(
@@ -72,7 +75,7 @@ function buildAuthModule() {
 
   const logoutUseCase = new LogoutUseCase(
     transactionManager,
-    refreshTokenRepository,
+    tokenManagementApplicationService,
   );
 
   const adminAuthController = new AdminAuthController(

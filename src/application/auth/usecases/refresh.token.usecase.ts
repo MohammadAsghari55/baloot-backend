@@ -1,7 +1,7 @@
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
-import IRefreshTokenRepository from "../../../domains/user/repositories/irefresh.token.repository.js";
+import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
 import AppError from "../../../shared/errors/app.error.js";
 
 class RefreshTokenUseCase {
@@ -9,7 +9,7 @@ class RefreshTokenUseCase {
     private transactionManager: ITransactionManager,
     private bcryptService: IBcryptService,
     private tokenService: ITokenService,
-    private refreshTokenRepository: IRefreshTokenRepository,
+    private tokenManagementApplicationService: ITokenManagementApplicationService,
   ) {}
 
   async execute(
@@ -27,7 +27,7 @@ class RefreshTokenUseCase {
 
     return this.transactionManager.runInTransaction(async (client) => {
       const storedToken =
-        await this.refreshTokenRepository.findTokenByDeviceIdAndUserId(
+        await this.tokenManagementApplicationService.findToken(
           userId,
           deviceId,
           client,
@@ -58,13 +58,13 @@ class RefreshTokenUseCase {
         role,
       );
 
-      await this.refreshTokenRepository.revokeByDeviceId(
+      await this.tokenManagementApplicationService.revokeByDevice(
         storedToken.userId,
         deviceId,
         client,
       );
 
-      await this.refreshTokenRepository.saveToken(
+      await this.tokenManagementApplicationService.saveToken(
         tokens.hashedRefreshToken,
         storedToken.userId,
         deviceId,

@@ -3,7 +3,7 @@ import ITransactionManager from "../../../shared/interfaces/itransaction.manager
 import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
 import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
-import IRefreshTokenRepository from "../../../domains/user/repositories/irefresh.token.repository.js";
+import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
 import IEmailVerificationRepository from "../../../domains/user/repositories/iemail.verification.repository.js";
 import AppError from "../../../shared/errors/app.error.js";
 
@@ -13,7 +13,7 @@ class LoginUseCase {
     private userApplicationService: IUserApplicationService,
     private bcryptService: IBcryptService,
     private tokenService: ITokenService,
-    private refreshTokenRepository: IRefreshTokenRepository,
+    private tokenManagementApplicationService: ITokenManagementApplicationService,
     private emailVerificationRepository: IEmailVerificationRepository,
   ) {}
 
@@ -39,7 +39,7 @@ class LoginUseCase {
       }
 
       const existingToken =
-        await this.refreshTokenRepository.findTokenByDeviceIdAndUserId(
+        await this.tokenManagementApplicationService.findToken(
           user.id,
           deviceId,
           client,
@@ -83,13 +83,13 @@ class LoginUseCase {
         user.role,
       );
 
-      await this.refreshTokenRepository.revokeByDeviceId(
+      await this.tokenManagementApplicationService.revokeByDevice(
         user.id,
         deviceId,
         client,
       );
 
-      await this.refreshTokenRepository.saveToken(
+      await this.tokenManagementApplicationService.saveToken(
         tokens.hashedRefreshToken,
         user.id,
         deviceId,

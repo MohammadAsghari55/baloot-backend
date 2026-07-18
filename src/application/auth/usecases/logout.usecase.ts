@@ -1,10 +1,10 @@
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
-import IRefreshTokenRepository from "../../../domains/user/repositories/irefresh.token.repository.js";
+import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
 
 class LogoutUseCase {
   constructor(
     private transactionManager: ITransactionManager,
-    private refreshTokenRepository: IRefreshTokenRepository,
+    private tokenManagementApplicationService: ITokenManagementApplicationService,
   ) {}
 
   async execute(
@@ -14,9 +14,9 @@ class LogoutUseCase {
   ): Promise<void> {
     await this.transactionManager.runInTransaction(async (client) => {
       if (allDevice) {
-        await this.refreshTokenRepository.revokeAllByUserId(userId, client);
+        await this.tokenManagementApplicationService.revokeAll(userId, client);
       } else {
-        await this.refreshTokenRepository.revokeByDeviceId(
+        await this.tokenManagementApplicationService.revokeByDevice(
           userId,
           deviceId,
           client,

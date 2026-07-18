@@ -1,6 +1,6 @@
 import { ResendVerificationDto } from "../../../application/auth/dtos/resend.verification.dto.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
-import UserApplicationService from "../../../application/auth/services/user.application.service.js";
+import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
 import IVerificationService from "../../../domains/user/Interfaces/iverification.service.js";
 import IEmailVerificationRepository from "../../../domains/user/repositories/iemail.verification.repository.js";
 import EmailVerification from "../../../domains/user/entities/email.verification.entity.js";
@@ -10,7 +10,7 @@ import config from "../../../infrastructure/config/env.index.js";
 class ResendVerificationUseCase {
   constructor(
     private transactionManager: ITransactionManager,
-    private userApplicationService: UserApplicationService,
+    private userApplicationService: IUserApplicationService,
     private verificationService: IVerificationService,
     private emailVerificationRepository: IEmailVerificationRepository,
   ) {}

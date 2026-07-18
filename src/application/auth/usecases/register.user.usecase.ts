@@ -1,7 +1,7 @@
 import { RegisterDto } from "../../../shared/validators/auth/register.schema.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import UserDomainService from "../../../domains/user/services/user.domain.service.js";
-import UserApplicationService from "../../../application/auth/services/user.application.service.js";
+import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
 import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import IVerificationService from "../../../domains/user/Interfaces/iverification.service.js";
 import IEmailVerificationRepository from "../../../domains/user/repositories/iemail.verification.repository.js";
@@ -12,7 +12,7 @@ class RegisterUserUseCase {
   constructor(
     private transactionManager: ITransactionManager,
     private userDomainService: UserDomainService,
-    private userApplicationService: UserApplicationService,
+    private userApplicationService: IUserApplicationService,
     private bcryptService: IBcryptService,
     private verificationService: IVerificationService,
     private emailVerificationRepository: IEmailVerificationRepository,

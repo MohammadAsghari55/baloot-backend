@@ -2,8 +2,9 @@ import { PoolClient } from "pg";
 import User from "../../../domains/user/entities/user.entity.js";
 import IUserRepository from "../../../domains/user/repositories/iuser.repository.js";
 import config from "../../../infrastructure/config/env.index.js";
+import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
 
-class UserApplicationService {
+class UserApplicationService implements IUserApplicationService {
   constructor(private userRepository: IUserRepository) {}
 
   async findUserByEmail(

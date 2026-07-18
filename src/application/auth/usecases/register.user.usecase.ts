@@ -4,7 +4,7 @@ import UserDomainService from "../../../domains/user/services/user.domain.servic
 import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
 import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import IVerificationService from "../../../domains/user/Interfaces/iverification.service.js";
-import IEmailVerificationRepository from "../../../domains/user/repositories/iemail.verification.repository.js";
+import IEmailVerificationApplicationService from "../../../domains/user/Interfaces/iemail.verification.application.service.js";
 import EmailVerification from "../../../domains/user/entities/email.verification.entity.js";
 import AppError from "../../../shared/errors/app.error.js";
 
@@ -15,7 +15,7 @@ class RegisterUserUseCase {
     private userApplicationService: IUserApplicationService,
     private bcryptService: IBcryptService,
     private verificationService: IVerificationService,
-    private emailVerificationRepository: IEmailVerificationRepository,
+    private emailVerificationApplicationService: IEmailVerificationApplicationService,
   ) {}
 
   async execute(dto: RegisterDto) {
@@ -58,7 +58,10 @@ class RegisterUserUseCase {
         const code = this.verificationService.generateVerificationCode();
         const emailVerification = EmailVerification.createNew(user.id, code);
 
-        await this.emailVerificationRepository.save(emailVerification, client);
+        await this.emailVerificationApplicationService.save(
+          emailVerification,
+          client,
+        );
 
         return {
           user,

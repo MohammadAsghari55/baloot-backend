@@ -10,6 +10,7 @@ import VerificationService from "../../application/auth/services/verification.se
 import RefreshTokenRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
 import TokenManagementApplicationService from "./services/token.management.application.service.js";
 import EmailVerificationRepository from "../../infrastructure/repositories/email.verification.pg.repository.js";
+import EmailVerificationApplicationService from "./services/email.verification.application.service.js";
 
 import LoginUseCase from "./usecases/login.usecase.js";
 import RefreshTokenUseCase from "./usecases/refresh.token.usecase.js";
@@ -27,10 +28,14 @@ function buildAuthModule() {
 
   const transactionManager = new PgTransactionManager(pool);
   const verificationService = new VerificationService(emailService);
+
   const refreshTokenRepository = new RefreshTokenRepository(pool);
   const tokenManagementApplicationService =
     new TokenManagementApplicationService(refreshTokenRepository);
+
   const emailVerificationRepository = new EmailVerificationRepository(pool);
+  const emailVerificationApplicationService =
+    new EmailVerificationApplicationService(emailVerificationRepository);
 
   const registerAdminUseCase = new RegisterAdminUseCase(
     transactionManager,
@@ -38,7 +43,7 @@ function buildAuthModule() {
     userApplicationService,
     bcryptService,
     verificationService,
-    emailVerificationRepository,
+    emailVerificationApplicationService,
   );
 
   const registerUserUseCase = new RegisterUserUseCase(
@@ -47,7 +52,7 @@ function buildAuthModule() {
     userApplicationService,
     bcryptService,
     verificationService,
-    emailVerificationRepository,
+    emailVerificationApplicationService,
   );
 
   const loginUseCase = new LoginUseCase(
@@ -56,7 +61,7 @@ function buildAuthModule() {
     bcryptService,
     tokenService,
     tokenManagementApplicationService,
-    emailVerificationRepository,
+    emailVerificationApplicationService,
   );
 
   const refreshTokenUseCase = new RefreshTokenUseCase(
@@ -70,7 +75,7 @@ function buildAuthModule() {
     transactionManager,
     userApplicationService,
     verificationService,
-    emailVerificationRepository,
+    emailVerificationApplicationService,
   );
 
   const logoutUseCase = new LogoutUseCase(

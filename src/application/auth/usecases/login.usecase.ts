@@ -4,7 +4,7 @@ import IUserApplicationService from "../../../domains/user/Interfaces/iuser.appl
 import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
-import IEmailVerificationRepository from "../../../domains/user/repositories/iemail.verification.repository.js";
+import IEmailVerificationApplicationService from "../../../domains/user/Interfaces/iemail.verification.application.service.js";
 import AppError from "../../../shared/errors/app.error.js";
 
 class LoginUseCase {
@@ -14,7 +14,7 @@ class LoginUseCase {
     private bcryptService: IBcryptService,
     private tokenService: ITokenService,
     private tokenManagementApplicationService: ITokenManagementApplicationService,
-    private emailVerificationRepository: IEmailVerificationRepository,
+    private emailVerificationApplicationService: IEmailVerificationApplicationService,
   ) {}
 
   async execute(dto: LoginDto, deviceId: string) {
@@ -59,7 +59,10 @@ class LoginUseCase {
 
       if (!user.isEmailVerified) {
         const emailVerification =
-          await this.emailVerificationRepository.findByUserId(user.id, client);
+          await this.emailVerificationApplicationService.findByUserId(
+            user.id,
+            client,
+          );
 
         if (!emailVerification) {
           throw AppError.badRequest("INVALID_VERIFICATION_CODE");
@@ -75,7 +78,7 @@ class LoginUseCase {
           client,
         );
 
-        await this.emailVerificationRepository.deleteByUserId(user.id, client);
+        await this.emailVerificationApplicationService.delete(user.id, client);
       }
 
       const tokens = await this.tokenService.generateTokenPair(

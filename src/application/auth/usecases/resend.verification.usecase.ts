@@ -2,7 +2,7 @@ import { ResendVerificationDto } from "../../../application/auth/dtos/resend.ver
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
 import IVerificationService from "../../../domains/user/Interfaces/iverification.service.js";
-import IEmailVerificationRepository from "../../../domains/user/repositories/iemail.verification.repository.js";
+import IEmailVerificationApplicationService from "../../../domains/user/Interfaces/iemail.verification.application.service.js";
 import EmailVerification from "../../../domains/user/entities/email.verification.entity.js";
 import AppError from "../../../shared/errors/app.error.js";
 import config from "../../../infrastructure/config/env.index.js";
@@ -12,7 +12,7 @@ class ResendVerificationUseCase {
     private transactionManager: ITransactionManager,
     private userApplicationService: IUserApplicationService,
     private verificationService: IVerificationService,
-    private emailVerificationRepository: IEmailVerificationRepository,
+    private emailVerificationApplicationService: IEmailVerificationApplicationService,
   ) {}
 
   async execute(dto: ResendVerificationDto) {
@@ -31,10 +31,11 @@ class ResendVerificationUseCase {
           throw AppError.badRequest("ALREADY_VERIFIED");
         }
 
-        const existEmail = await this.emailVerificationRepository.findByUserId(
-          user.id,
-          client,
-        );
+        const existEmail =
+          await this.emailVerificationApplicationService.findByUserId(
+            user.id,
+            client,
+          );
 
         let code: string;
 
@@ -47,7 +48,7 @@ class ResendVerificationUseCase {
             }
           }
           code = existEmail.code;
-          await this.emailVerificationRepository.updateUpdatedAt(
+          await this.emailVerificationApplicationService.update(
             user.id,
             client,
           );
@@ -58,7 +59,7 @@ class ResendVerificationUseCase {
               throw AppError.fromCode("TOO_MANY_REQUESTS");
             }
 
-            await this.emailVerificationRepository.deleteByUserId(
+            await this.emailVerificationApplicationService.delete(
               user.id,
               client,
             );
@@ -66,7 +67,7 @@ class ResendVerificationUseCase {
 
           code = this.verificationService.generateVerificationCode();
           const emailVerification = EmailVerification.createNew(user.id, code);
-          await this.emailVerificationRepository.save(
+          await this.emailVerificationApplicationService.save(
             emailVerification,
             client,
           );

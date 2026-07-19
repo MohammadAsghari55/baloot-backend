@@ -30,4 +30,9 @@ router.post(
   asyncHandler(authController.resend),
 );
 
+router.post(
+  "/changePassword",
+  accessCheckerMiddleware(tokenService, true),
+  asyncHandler(authController.changePassword),
+);
 export default router;

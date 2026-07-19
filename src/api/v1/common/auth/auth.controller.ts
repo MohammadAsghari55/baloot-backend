@@ -2,6 +2,7 @@ import { BoundClass } from "@hemia/autobind";
 import { Request, Response } from "express";
 import LoginUseCase from "../../../../application/auth/usecases/login.usecase.js";
 import LogoutUseCase from "../../../../application/auth/usecases/logout.usecase.js";
+import ChangePasswordUseCase from "../../../../application/auth/usecases/change.password.usecase.js";
 import {
   accessCookieOptions,
   refreshCookieOptions,
@@ -14,6 +15,7 @@ class AuthController {
     private loginUseCase: LoginUseCase,
     private logoutUseCase: LogoutUseCase,
     private resendVerificationUseCase: ResendVerificationUseCase,
+    private changePasswordUseCase: ChangePasswordUseCase,
   ) {}
 
   async login(req: Request, res: Response) {
@@ -38,6 +40,7 @@ class AuthController {
 
     res.clearCookie("accessToken", accessCookieOptions);
     res.clearCookie("refreshToken", refreshCookieOptions);
+
     res.status(200).json({
       success: true,
       message: logoutAll
@@ -57,6 +60,18 @@ class AuthController {
     };
 
     res.status(200).json(responseBody);
+  }
+
+  async changePassword(req: Request, res: Response) {
+    await this.changePasswordUseCase.execute(req.body);
+
+    res.clearCookie("accessToken", accessCookieOptions);
+    res.clearCookie("refreshToken", refreshCookieOptions);
+
+    res.status(200).json({
+      success: true,
+      message: "Your Password Changed successfully. Please Login Again",
+    });
   }
 }
 

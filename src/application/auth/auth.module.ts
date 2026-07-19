@@ -18,6 +18,7 @@ import RegisterAdminUseCase from "./usecases/register.admin.usecase.js";
 import RegisterUserUseCase from "./usecases/register.user.usecase.js";
 import ResendVerificationUseCase from "./usecases/resend.verification.usecase.js";
 import LogoutUseCase from "./usecases/logout.usecase.js";
+import ChangePasswordUseCase from "./usecases/change.password.usecase.js";
 
 import AdminController from "../../api/v1/admin/admin.controller.js";
 import UserController from "../../api/v1/user/user.controller.js";
@@ -83,6 +84,14 @@ function buildAuthModule() {
     tokenManagementApplicationService,
   );
 
+  const changePasswordUseCase = new ChangePasswordUseCase(
+    transactionManager,
+    userApplicationService,
+    bcryptService,
+    verificationService,
+    tokenManagementApplicationService,
+  );
+
   const adminController = new AdminController(
     registerAdminUseCase,
     refreshTokenUseCase,
@@ -97,6 +106,7 @@ function buildAuthModule() {
     loginUseCase,
     logoutUseCase,
     resendVerificationUseCase,
+    changePasswordUseCase,
   );
 
   return {

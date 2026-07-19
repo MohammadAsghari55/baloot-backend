@@ -20,6 +20,19 @@ class VerificationService implements IVerificationService {
       });
     }
   }
+
+  async notifEmailSender(email: string): Promise<void> {
+    try {
+      await this.emailService.verify();
+      await this.emailService.sendPasswordChangeNotification(email);
+    } catch (error) {
+      throw AppError.internalWithOptions("EMAIL_SEND_FAILED", {
+        publicMessage:
+          "Failed to send password change notification email. Please try again later.",
+        cause: error,
+      });
+    }
+  }
 }
 
 export default VerificationService;

@@ -49,6 +49,27 @@ class EmailService implements IEmailService {
       `,
     });
   }
+
+  async sendPasswordChangeNotification(to: string): Promise<void> {
+    await this.transporter.sendMail({
+      from: "noreply@baloot.local",
+      to,
+      subject: "Your Password Has Been Changed",
+      html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+        <h2 style="color: #d9534f;">⚠️ Security Alert</h2>
+        <p>Your password has been successfully changed.</p>
+        <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #d9534f; margin: 20px 0;">
+          <p style="margin: 0; font-size: 16px;">
+            <strong>If you did not perform this action, please contact our support team immediately.</strong>
+          </p>
+        </div>
+        <p style="color: #666; font-size: 14px;">This is an automated notification. No further action is required if you initiated this change.</p>
+        <p style="color: #999; font-size: 12px;">If you didn't request this, please ignore this email.</p>
+      </div>
+    `,
+    });
+  }
 }
 
 export default EmailService;

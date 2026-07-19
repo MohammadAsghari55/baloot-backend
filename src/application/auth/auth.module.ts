@@ -6,7 +6,7 @@ import {
   emailService,
   tokenService,
 } from "../../infrastructure/services/services.index.js";
-import VerificationService from "./services/verification.service.js";
+import EmailOrchestrationService from "./services/email.orchestration.service.js";
 import RefreshTokenRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
 import TokenManagementApplicationService from "./services/token.management.application.service.js";
 import EmailVerificationRepository from "../../infrastructure/repositories/email.verification.pg.repository.js";
@@ -28,7 +28,7 @@ function buildAuthModule() {
   const { userApplicationService, userDomainService } = buildUserModule();
 
   const transactionManager = new PgTransactionManager(pool);
-  const verificationService = new VerificationService(emailService);
+  const emailOrchestrationService = new EmailOrchestrationService(emailService);
 
   const refreshTokenRepository = new RefreshTokenRepository(pool);
   const tokenManagementApplicationService =
@@ -43,7 +43,7 @@ function buildAuthModule() {
     userDomainService,
     userApplicationService,
     bcryptService,
-    verificationService,
+    emailOrchestrationService,
     emailVerificationApplicationService,
   );
 
@@ -52,7 +52,7 @@ function buildAuthModule() {
     userDomainService,
     userApplicationService,
     bcryptService,
-    verificationService,
+    emailOrchestrationService,
     emailVerificationApplicationService,
   );
 
@@ -75,7 +75,7 @@ function buildAuthModule() {
   const resendVerificationUseCase = new ResendVerificationUseCase(
     transactionManager,
     userApplicationService,
-    verificationService,
+    emailOrchestrationService,
     emailVerificationApplicationService,
   );
 
@@ -88,7 +88,7 @@ function buildAuthModule() {
     transactionManager,
     userApplicationService,
     bcryptService,
-    verificationService,
+    emailOrchestrationService,
     tokenManagementApplicationService,
   );
 

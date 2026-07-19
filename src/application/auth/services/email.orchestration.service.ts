@@ -1,9 +1,9 @@
-import IVerificationService from "../../../domains/user/Interfaces/iverification.service.js";
+import IEmailOrchestrationService from "../../../domains/user/Interfaces/iemail.orchestration.service.js";
 import IEmailService from "../../../domains/user/Interfaces/iemail.service.js";
 import AppError from "../../../shared/errors/app.error.js";
 import { randomInt } from "crypto";
 
-class VerificationService implements IVerificationService {
+class EmailOrchestrationService implements IEmailOrchestrationService {
   constructor(private emailService: IEmailService) {}
   generateVerificationCode(): string {
     return randomInt(100000, 999999).toString();
@@ -35,4 +35,4 @@ class VerificationService implements IVerificationService {
   }
 }
 
-export default VerificationService;
+export default EmailOrchestrationService;

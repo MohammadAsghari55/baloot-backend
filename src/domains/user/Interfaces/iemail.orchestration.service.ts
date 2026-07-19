@@ -1,4 +1,4 @@
-interface IVerificationService {
+interface IEmailOrchestrationService {
   generateVerificationCode(): string;
 
   emailSender(email: string, code: string): Promise<void>;
@@ -6,4 +6,4 @@ interface IVerificationService {
   notifEmailSender(email: string): Promise<void>;
 }
 
-export default IVerificationService;
+export default IEmailOrchestrationService;

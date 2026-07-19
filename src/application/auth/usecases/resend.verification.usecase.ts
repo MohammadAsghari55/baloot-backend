@@ -1,7 +1,7 @@
 import { ResendVerificationDto } from "../../../application/auth/dtos/resend.verification.dto.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
-import IVerificationService from "../../../domains/user/Interfaces/iverification.service.js";
+import IEmailOrchestrationService from "../../../domains/user/Interfaces/iemail.orchestration.service.js";
 import IEmailVerificationApplicationService from "../../../domains/user/Interfaces/iemail.verification.application.service.js";
 import EmailVerification from "../../../domains/user/entities/email.verification.entity.js";
 import AppError from "../../../shared/errors/app.error.js";
@@ -11,7 +11,7 @@ class ResendVerificationUseCase {
   constructor(
     private transactionManager: ITransactionManager,
     private userApplicationService: IUserApplicationService,
-    private verificationService: IVerificationService,
+    private emailOrchestrationService: IEmailOrchestrationService,
     private emailVerificationApplicationService: IEmailVerificationApplicationService,
   ) {}
 
@@ -65,7 +65,7 @@ class ResendVerificationUseCase {
             );
           }
 
-          code = this.verificationService.generateVerificationCode();
+          code = this.emailOrchestrationService.generateVerificationCode();
           const emailVerification = EmailVerification.createNew(user.id, code);
           await this.emailVerificationApplicationService.save(
             emailVerification,
@@ -87,7 +87,7 @@ class ResendVerificationUseCase {
     let warning: string | undefined;
 
     try {
-      await this.verificationService.emailSender(user.email, code);
+      await this.emailOrchestrationService.emailSender(user.email, code);
     } catch (error) {
       warning =
         "User registered, but verification email could not be sent. Please request a new code.";

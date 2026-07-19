@@ -43,12 +43,21 @@ class UserApplicationService implements IUserApplicationService {
   async getMaxAdmins(): Promise<number> {
     return config.MAX_ADMINS;
   }
+
   async updateEmailVerified(
     userId: string,
     verified: boolean,
     client?: PoolClient,
   ): Promise<void> {
     await this.userRepository.updateEmailVerified(userId, verified, client);
+  }
+
+  async updatePassword(
+    userId: string,
+    hashedPassword: string,
+    client?: PoolClient,
+  ): Promise<void> {
+    await this.userRepository.updatePassword(userId, hashedPassword, client);
   }
 }
 

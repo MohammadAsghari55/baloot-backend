@@ -87,6 +87,20 @@ class UserPgRepository implements IUserRepository {
   `;
     await dbClient.query(query, [verified, userId]);
   }
+
+  async updatePassword(
+    userId: string,
+    hashedPassword: string,
+    client?: PoolClient,
+  ): Promise<void> {
+    const dbClient = client || this.pool;
+    const query = `
+    UPDATE users 
+    SET password_hash = $1, updated_at = NOW()
+    WHERE id = $2
+  `;
+    await dbClient.query(query, [hashedPassword, userId]);
+  }
 }
 
 export default UserPgRepository;

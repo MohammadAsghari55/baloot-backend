@@ -19,6 +19,11 @@ interface IUserApplicationService {
     verified: boolean,
     client?: PoolClient,
   ): Promise<void>;
+  updatePassword(
+    userId: string,
+    hashedPassword: string,
+    client?: PoolClient,
+  ): Promise<void>;
 }
 
 export default IUserApplicationService;

@@ -2,9 +2,6 @@ import { z } from "zod";
 
 export const changePasswordSchema = z
   .object({
-    identifier: z
-      .string()
-      .min(5, { message: "identifier must be at least 5 characters" }),
     oldPassword: z.string().min(8, { message: "Old password is required" }),
     newPassword: z
       .string()

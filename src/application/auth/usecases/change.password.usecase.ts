@@ -15,13 +15,13 @@ class ChangePasswordUseCase {
     private tokenManagementApplicationService: ITokenManagementApplicationService,
   ) {}
 
-  async execute(dto: ChangePasswordDto): Promise<void> {
-    const { identifier, oldPassword, newPassword } = dto;
+  async execute(dto: ChangePasswordDto, userId: string): Promise<void> {
+    const { oldPassword, newPassword } = dto;
 
     const userEmail = await this.transactionManager.runInTransaction(
       async (client) => {
-        const user = await this.userApplicationService.findUserByIdentifier(
-          identifier,
+        const user = await this.userApplicationService.findUserById(
+          userId,
           client,
         );
 
@@ -36,6 +36,10 @@ class ChangePasswordUseCase {
 
         if (!isMatch) {
           throw AppError.unauthorized("INVALID_CREDENTIALS");
+        }
+
+        if (oldPassword === newPassword) {
+          throw AppError.badRequest("SAME_PASSWORD");
         }
 
         const hashedPassword = await this.bcryptService.hash(newPassword);

@@ -59,6 +59,13 @@ class UserApplicationService implements IUserApplicationService {
   ): Promise<void> {
     await this.userRepository.updatePassword(userId, hashedPassword, client);
   }
+
+  async findUserById(
+    userId: string,
+    client?: PoolClient,
+  ): Promise<User | null> {
+    return this.userRepository.findById(userId, client);
+  }
 }
 
 export default UserApplicationService;

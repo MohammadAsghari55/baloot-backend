@@ -29,6 +29,17 @@ class UserPgRepository implements IUserRepository {
     return User.fromDB(row);
   }
 
+  async findById(userId: string, client?: PoolClient): Promise<User | null> {
+    const dbClient = client || this.pool;
+    const result = await dbClient.query(
+      "SELECT * FROM users WHERE id = $1 FOR UPDATE",
+      [userId],
+    );
+    if (result.rows.length === 0) return null;
+    const row = result.rows[0];
+    return User.fromDB(row);
+  }
+
   async save(user: User, client?: PoolClient): Promise<void> {
     const dbClient = client || this.pool;
     const query = `
@@ -46,7 +57,7 @@ class UserPgRepository implements IUserRepository {
       wrong_password_number = EXCLUDED.wrong_password_number,
       wrong_password_until = EXCLUDED.wrong_password_until,
       updated_at = EXCLUDED.updated_at
-  `;
+      `;
     try {
       await dbClient.query(query, [
         user.id,

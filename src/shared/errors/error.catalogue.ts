@@ -115,5 +115,10 @@ export const ErrorCodes = {
       "You are already logged in on this device. Please log out first if you want to login again.",
     status: 409,
   },
+  SAME_PASSWORD: {
+    code: "SAME_PASSWORD",
+    message: "New password cannot be the same as the old password.",
+    status: 400,
+  },
 } as const;
 export type ErrorCode = keyof typeof ErrorCodes;

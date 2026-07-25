@@ -4,6 +4,7 @@ import IUserApplicationService from "../../../domains/user/Interfaces/iuser.appl
 import IEmailOrchestrationService from "../../../domains/user/Interfaces/iemail.orchestration.service.js";
 import IEmailVerificationApplicationService from "../../../domains/user/Interfaces/iemail.verification.application.service.js";
 import EmailVerification from "../../../domains/user/entities/email.verification.entity.js";
+import UserResponseDto from "../dtos/user.response.dto.js";
 import AppError from "../../../shared/errors/app.error.js";
 import config from "../../../infrastructure/config/env.index.js";
 
@@ -72,15 +73,18 @@ class ResendVerificationUseCase {
             client,
           );
         }
+
+        const userDto: UserResponseDto = {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+        };
+
         return {
           user,
           code,
-          response: {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            role: user.role,
-          },
+          response: userDto,
         };
       });
 

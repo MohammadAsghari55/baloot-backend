@@ -6,6 +6,7 @@ import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js"
 import IEmailOrchestrationService from "../../../domains/user/Interfaces/iemail.orchestration.service.js";
 import IEmailVerificationApplicationService from "../../../domains/user/Interfaces/iemail.verification.application.service.js";
 import EmailVerification from "../../../domains/user/entities/email.verification.entity.js";
+import UserResponseDto from "../dtos/user.response.dto.js";
 import AppError from "../../../shared/errors/app.error.js";
 
 class RegisterAdminUseCase {
@@ -69,15 +70,17 @@ class RegisterAdminUseCase {
           client,
         );
 
+        const userDto: UserResponseDto = {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+        };
+
         return {
           user,
           code,
-          response: {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            role: user.role,
-          },
+          response: userDto,
         };
       });
 

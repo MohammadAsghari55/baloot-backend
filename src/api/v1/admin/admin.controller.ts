@@ -15,11 +15,11 @@ class AdminController {
   ) {}
 
   async register(req: Request, res: Response) {
-    const user = await this.registerUseCase.execute(req.body);
+    const userDto = await this.registerUseCase.execute(req.body);
     res.status(201).json({
       success: true,
       message: "User registered successfully, please login",
-      data: user,
+      data: userDto,
     });
   }
 

@@ -1,38 +1,41 @@
-import { PoolClient } from "pg";
+import IDatabaseClient from "../../shared/interfaces/idatabase.client.js";
 import User from "../../../domains/user/entities/user.entity.js";
 
 interface IUserApplicationService {
-  findUserByEmail(email: string, client?: PoolClient): Promise<User | null>;
+  findUserByEmail(
+    email: string,
+    client?: IDatabaseClient,
+  ): Promise<User | null>;
 
   findUserByUsername(
     username: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<User | null>;
 
   findUserByIdentifier(
     identifier: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<User | null>;
 
-  countAdmins(client?: PoolClient): Promise<number>;
+  countAdmins(client?: IDatabaseClient): Promise<number>;
 
-  saveUser(user: User, client?: PoolClient): Promise<void>;
+  saveUser(user: User, client?: IDatabaseClient): Promise<void>;
 
   getMaxAdmins(): Promise<number>;
 
   updateEmailVerified(
     userId: string,
     verified: boolean,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<void>;
 
   updatePassword(
     userId: string,
     hashedPassword: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<void>;
 
-  findUserById(userId: string, client?: PoolClient): Promise<User | null>;
+  findUserById(userId: string, client?: IDatabaseClient): Promise<User | null>;
 }
 
 export default IUserApplicationService;

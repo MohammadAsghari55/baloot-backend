@@ -1,26 +1,29 @@
-import { PoolClient } from "pg";
+import IDatabaseClient from "../../shared/interfaces/idatabase.client.js";
 import User from "../entities/user.entity.js";
 interface IUserRepository {
-  findByEmail(email: string, client?: PoolClient): Promise<User | null>;
+  findByEmail(email: string, client?: IDatabaseClient): Promise<User | null>;
 
-  findByUsername(username: string, client?: PoolClient): Promise<User | null>;
+  findByUsername(
+    username: string,
+    client?: IDatabaseClient,
+  ): Promise<User | null>;
 
-  findById(userId: string, client?: PoolClient): Promise<User | null>;
+  findById(userId: string, client?: IDatabaseClient): Promise<User | null>;
 
-  save(user: User, client?: PoolClient): Promise<void>;
+  save(user: User, client?: IDatabaseClient): Promise<void>;
 
-  countAdmins(client?: PoolClient): Promise<number>;
+  countAdmins(client?: IDatabaseClient): Promise<number>;
 
   updateEmailVerified(
     userId: string,
     verified: boolean,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<void>;
 
   updatePassword(
     userId: string,
     hashedPassword: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<void>;
 }
 

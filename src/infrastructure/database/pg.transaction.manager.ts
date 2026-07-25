@@ -1,27 +1,30 @@
 import { Pool, PoolClient } from "pg";
+import IDatabaseClient from "../../domains/shared/interfaces/idatabase.client.js";
+import PgDatabaseClient from "./pg.database.client.js";
 import ITransactionManager from "../../shared/interfaces/itransaction.manager.js";
 
 class PgTransactionManager implements ITransactionManager {
   constructor(private pool: Pool) {}
 
   async runInTransaction<T>(
-    callback: (client: PoolClient) => Promise<T>,
+    callback: (client: IDatabaseClient) => Promise<T>,
   ): Promise<T> {
-    const client = await this.pool.connect();
+    const poolclient = await this.pool.connect();
+    const dbClient = new PgDatabaseClient(poolclient);
 
     try {
-      await client.query("BEGIN");
+      await poolclient.query("BEGIN");
 
-      const result = await callback(client);
+      const result = await callback(dbClient);
 
-      await client.query("COMMIT");
+      await poolclient.query("COMMIT");
 
       return result;
     } catch (error) {
-      await client.query("ROLLBACK");
+      await poolclient.query("ROLLBACK");
       throw error;
     } finally {
-      client.release();
+      poolclient.release();
     }
   }
 }

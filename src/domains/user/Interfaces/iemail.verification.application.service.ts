@@ -1,19 +1,19 @@
-import { PoolClient } from "pg";
+import IDatabaseClient from "../../shared/interfaces/idatabase.client.js";
 import EmailVerification from "../entities/email.verification.entity.js";
 interface IEmailVerificationApplicationService {
   findByUserId(
     userId: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<EmailVerification | null>;
 
   save(
     emailVerification: EmailVerification,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<void>;
 
-  delete(userId: string, client?: PoolClient): Promise<void>;
+  delete(userId: string, client?: IDatabaseClient): Promise<void>;
 
-  update(userId: string, client?: PoolClient): Promise<void>;
+  update(userId: string, client?: IDatabaseClient): Promise<void>;
 }
 
 export default IEmailVerificationApplicationService;

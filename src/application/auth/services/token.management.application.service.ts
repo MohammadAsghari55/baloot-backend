@@ -1,4 +1,4 @@
-import { PoolClient } from "pg";
+import IDatabaseClient from "../../../domains/shared/interfaces/idatabase.client.js";
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
 import IRefreshTokenRepository from "../../../domains/user/repositories/irefresh.token.repository.js";
 
@@ -9,7 +9,7 @@ class TokenManagementApplicationService implements ITokenManagementApplicationSe
     tokenHash: string,
     userId: string,
     deviceId: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<void> {
     return this.refreshTokenRepository.saveToken(
       tokenHash,
@@ -22,7 +22,7 @@ class TokenManagementApplicationService implements ITokenManagementApplicationSe
   async revokeByDevice(
     userId: string,
     deviceId: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<void> {
     return this.refreshTokenRepository.revokeByDeviceId(
       userId,
@@ -31,13 +31,13 @@ class TokenManagementApplicationService implements ITokenManagementApplicationSe
     );
   }
 
-  async revokeAll(userId: string, client?: PoolClient): Promise<void> {
+  async revokeAll(userId: string, client?: IDatabaseClient): Promise<void> {
     return this.refreshTokenRepository.revokeAllByUserId(userId, client);
   }
   async findToken(
     userId: string,
     deviceId: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<{
     userId: string;
     tokenHash: string;

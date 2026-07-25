@@ -1,25 +1,25 @@
-import { PoolClient } from "pg";
+import IDatabaseClient from "../../shared/interfaces/idatabase.client.js";
 
 interface ITokenManagementApplicationService {
   saveToken(
     tokenHash: string,
     userId: string,
     deviceId: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<void>;
 
   revokeByDevice(
     userId: string,
     deviceId: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<void>;
 
-  revokeAll(userId: string, client?: PoolClient): Promise<void>;
+  revokeAll(userId: string, client?: IDatabaseClient): Promise<void>;
 
   findToken(
     userId: string,
     deviceId: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<{
     userId: string;
     tokenHash: string;

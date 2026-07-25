@@ -32,12 +32,19 @@ class UserApplicationService implements IUserApplicationService {
     return this.userRepository.findByUsername(identifier, client);
   }
 
+  async findUserById(
+    userId: string,
+    client?: IDatabaseClient,
+  ): Promise<User | null> {
+    return this.userRepository.findById(userId, client);
+  }
+
   async countAdmins(client?: IDatabaseClient): Promise<number> {
     return this.userRepository.countAdmins(client);
   }
 
   async saveUser(user: User, client?: IDatabaseClient): Promise<void> {
-    await this.userRepository.save(user, client);
+    await this.userRepository.insertUser(user, client);
   }
 
   async getMaxAdmins(): Promise<number> {
@@ -58,13 +65,6 @@ class UserApplicationService implements IUserApplicationService {
     client?: IDatabaseClient,
   ): Promise<void> {
     await this.userRepository.updatePassword(userId, hashedPassword, client);
-  }
-
-  async findUserById(
-    userId: string,
-    client?: IDatabaseClient,
-  ): Promise<User | null> {
-    return this.userRepository.findById(userId, client);
   }
 }
 

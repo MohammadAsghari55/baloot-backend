@@ -17,6 +17,8 @@ interface IUserApplicationService {
     client?: IDatabaseClient,
   ): Promise<User | null>;
 
+  findUserById(userId: string, client?: IDatabaseClient): Promise<User | null>;
+
   countAdmins(client?: IDatabaseClient): Promise<number>;
 
   saveUser(user: User, client?: IDatabaseClient): Promise<void>;
@@ -34,8 +36,6 @@ interface IUserApplicationService {
     hashedPassword: string,
     client?: IDatabaseClient,
   ): Promise<void>;
-
-  findUserById(userId: string, client?: IDatabaseClient): Promise<User | null>;
 }
 
 export default IUserApplicationService;

@@ -54,7 +54,7 @@ class UserPgRepository implements IUserRepository {
     return User.fromDB(row);
   }
 
-  async save(user: User, client?: IDatabaseClient): Promise<void> {
+  async insertUser(user: User, client?: IDatabaseClient): Promise<void> {
     const dbClient = await this.getClient(client);
     const query = `
     INSERT INTO users (
@@ -62,15 +62,6 @@ class UserPgRepository implements IUserRepository {
       is_email_verified, wrong_password_number, wrong_password_until,
       created_at, updated_at
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-    ON CONFLICT (id) DO UPDATE SET
-      email = EXCLUDED.email,
-      username = EXCLUDED.username,
-      password_hash = EXCLUDED.password_hash,
-      role = EXCLUDED.role,
-      is_email_verified = EXCLUDED.is_email_verified,
-      wrong_password_number = EXCLUDED.wrong_password_number,
-      wrong_password_until = EXCLUDED.wrong_password_until,
-      updated_at = EXCLUDED.updated_at
       `;
     try {
       await dbClient.query(query, [

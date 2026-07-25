@@ -1,11 +1,22 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import User from "../../domains/user/entities/user.entity.js";
 import IUserRepository from "../../domains/user/repositories/iuser.repository.js";
+import IDatabaseClient from "../../domains/shared/interfaces/idatabase.client.js";
+import PgDatabaseClient from "../database/pg.database.client.js";
 import DatabaseError from "../../shared/errors/database.error.js";
+
 class UserPgRepository implements IUserRepository {
   constructor(private pool: Pool) {}
-  async findByEmail(email: string, client?: PoolClient): Promise<User | null> {
-    const dbClient = client || this.pool;
+
+  private async getClient(client?: IDatabaseClient): Promise<IDatabaseClient> {
+    return client || new PgDatabaseClient(await this.pool.connect());
+  }
+
+  async findByEmail(
+    email: string,
+    client?: IDatabaseClient,
+  ): Promise<User | null> {
+    const dbClient = await this.getClient(client);
     const result = await dbClient.query(
       "SELECT * FROM users WHERE email = $1",
       [email],
@@ -17,9 +28,9 @@ class UserPgRepository implements IUserRepository {
 
   async findByUsername(
     username: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<User | null> {
-    const dbClient = client || this.pool;
+    const dbClient = await this.getClient(client);
     const result = await dbClient.query(
       "SELECT * FROM users WHERE username = $1",
       [username],
@@ -29,8 +40,11 @@ class UserPgRepository implements IUserRepository {
     return User.fromDB(row);
   }
 
-  async findById(userId: string, client?: PoolClient): Promise<User | null> {
-    const dbClient = client || this.pool;
+  async findById(
+    userId: string,
+    client?: IDatabaseClient,
+  ): Promise<User | null> {
+    const dbClient = await this.getClient(client);
     const result = await dbClient.query(
       "SELECT * FROM users WHERE id = $1 FOR UPDATE",
       [userId],
@@ -40,8 +54,8 @@ class UserPgRepository implements IUserRepository {
     return User.fromDB(row);
   }
 
-  async save(user: User, client?: PoolClient): Promise<void> {
-    const dbClient = client || this.pool;
+  async save(user: User, client?: IDatabaseClient): Promise<void> {
+    const dbClient = await this.getClient(client);
     const query = `
     INSERT INTO users (
       id, email, username, password_hash, role, wallet_balance,
@@ -77,8 +91,8 @@ class UserPgRepository implements IUserRepository {
     }
   }
 
-  async countAdmins(client?: PoolClient): Promise<number> {
-    const dbClient = client || this.pool;
+  async countAdmins(client?: IDatabaseClient): Promise<number> {
+    const dbClient = await this.getClient(client);
     const adminsNumber = await dbClient.query(
       "SELECT COUNT(*) FROM users WHERE role = 'admin'",
     );
@@ -88,9 +102,9 @@ class UserPgRepository implements IUserRepository {
   async updateEmailVerified(
     userId: string,
     verified: boolean,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<void> {
-    const dbClient = client || this.pool;
+    const dbClient = await this.getClient(client);
     const query = `
     UPDATE users 
     SET is_email_verified = $1, updated_at = NOW()
@@ -102,9 +116,9 @@ class UserPgRepository implements IUserRepository {
   async updatePassword(
     userId: string,
     hashedPassword: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<void> {
-    const dbClient = client || this.pool;
+    const dbClient = await this.getClient(client);
     const query = `
     UPDATE users 
     SET password_hash = $1, updated_at = NOW()

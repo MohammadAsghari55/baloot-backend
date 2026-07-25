@@ -1,18 +1,24 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import IRefreshTokenRepository from "../../domains/user/repositories/irefresh.token.repository.js";
+import IDatabaseClient from "../../domains/shared/interfaces/idatabase.client.js";
+import PgDatabaseClient from "../database/pg.database.client.js";
 import DatabaseError from "../../shared/errors/database.error.js";
 import { randomUUID } from "crypto";
 
 class RefreshTokenRepository implements IRefreshTokenRepository {
   constructor(private pool: Pool) {}
 
+  private async getClient(client?: IDatabaseClient): Promise<IDatabaseClient> {
+    return client || new PgDatabaseClient(await this.pool.connect());
+  }
+
   async saveToken(
     tokenHash: string,
     userId: string,
     deviceId: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<void> {
-    const dbClient = client || this.pool;
+    const dbClient = await this.getClient(client);
     const query = `
     INSERT INTO refresh_token (
     id,user_id,token_hash,device_id,expires_at)
@@ -28,9 +34,9 @@ class RefreshTokenRepository implements IRefreshTokenRepository {
   async revokeByDeviceId(
     userId: string,
     deviceId: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<void> {
-    const dbClient = client || this.pool;
+    const dbClient = await this.getClient(client);
     const query = `
     UPDATE refresh_token 
     SET revoked_at = NOW()
@@ -46,14 +52,14 @@ class RefreshTokenRepository implements IRefreshTokenRepository {
   async findTokenByDeviceIdAndUserId(
     userId: string,
     deviceId: string,
-    client?: PoolClient,
+    client?: IDatabaseClient,
   ): Promise<{
     userId: string;
     tokenHash: string;
     expiresAt: Date;
     revokedAt: Date | null;
   } | null> {
-    const dbClient = client || this.pool;
+    const dbClient = await this.getClient(client);
     const query = `
     SELECT user_id, token_hash, expires_at, revoked_at 
     FROM refresh_token 
@@ -80,8 +86,11 @@ class RefreshTokenRepository implements IRefreshTokenRepository {
     }
   }
 
-  async revokeAllByUserId(userId: string, client?: PoolClient): Promise<void> {
-    const dbClient = client || this.pool;
+  async revokeAllByUserId(
+    userId: string,
+    client?: IDatabaseClient,
+  ): Promise<void> {
+    const dbClient = await this.getClient(client);
     const query = `
     UPDATE refresh_token 
     SET revoked_at = NOW()

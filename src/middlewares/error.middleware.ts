@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import AppError from "../shared/errors/app.error.js";
 import ZodValidationError from "../shared/errors/zod.validation.error.js";
+import zodErrorMapper from "../shared/utils/zod.error.mapper.js";
 import config from "../infrastructure/config/env.index.js";
 
 function errorMiddleware(
@@ -10,12 +11,13 @@ function errorMiddleware(
   next: NextFunction,
 ) {
   if (err instanceof ZodValidationError) {
+    const mappedDetails = zodErrorMapper(err.details || []);
     return res.status(err.statusCode).json({
       success: false,
       error: {
         code: err.code,
         message: err.message,
-        details: err.details,
+        details: mappedDetails,
       },
     });
   }

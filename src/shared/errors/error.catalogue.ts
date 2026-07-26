@@ -120,5 +120,16 @@ export const ErrorCodes = {
     message: "New password cannot be the same as the old password.",
     status: 400,
   },
+
+  REDIS_CONNECTION_FAILED: {
+    code: "REDIS_CONNECTION_FAILED",
+    message: "Redis connection failed. Please check your Redis server.",
+    status: 500,
+  },
+  REDIS_OPERATION_FAILED: {
+    code: "REDIS_OPERATION_FAILED",
+    message: "Redis operation failed.",
+    status: 500,
+  },
 } as const;
 export type ErrorCode = keyof typeof ErrorCodes;

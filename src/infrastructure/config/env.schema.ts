@@ -33,6 +33,10 @@ const envSchema = z.object({
     .number()
     .positive()
     .default(4 * 60 * 60 * 1000),
+  REDIS_HOST: z.string().min(1).default("localhost"),
+  REDIS_PORT: z.coerce.number().positive().default(6379),
+  REDIS_PASSWORD: z.string().optional().default(""),
+  REDIS_DB: z.coerce.number().min(0).default(0),
 });
 
 export default envSchema;

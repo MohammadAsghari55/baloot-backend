@@ -131,5 +131,25 @@ export const ErrorCodes = {
     message: "Redis operation failed.",
     status: 500,
   },
+  SESSION_INACTIVE: {
+    code: "SESSION_INACTIVE",
+    message: "Your session is no longer active. Please log in again.",
+    status: 401,
+  },
+  VERSION_NOT_FOUND: {
+    code: "VERSION_NOT_FOUND",
+    message: "User version not found. Please log in again.",
+    status: 401,
+  },
+  VERSION_MISMATCH: {
+    code: "VERSION_MISMATCH",
+    message: "Session version mismatch. Please log in again.",
+    status: 401,
+  },
+  REFRESH_TOKEN_EXPIRED: {
+    code: "REFRESH_TOKEN_EXPIRED",
+    message: "Refresh token has expired",
+    status: 401,
+  },
 } as const;
 export type ErrorCode = keyof typeof ErrorCodes;

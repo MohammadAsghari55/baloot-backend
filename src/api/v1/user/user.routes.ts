@@ -1,25 +1,15 @@
 import { Router } from "express";
-import deviceIdMiddleware from "../../../middlewares/device-id.middleware.js";
-import accessCheckerMiddleware from "../../../middlewares/accessChecker.middleware.js";
+import validateBodyMiddleware from "../../../middlewares/validation.body.middleware.js";
 import { registerSchema } from "../../../shared/validators/auth/register.schema.js";
-import { tokenService } from "../../../infrastructure/services/services.index.js";
 import { userController } from "../../../container.js";
-import validateBody from "../../../middlewares/validation.middleware.js";
 import asyncHandler from "../../../shared/utils/async.handler.js";
 
 const router = Router();
 
 router.post(
   "/register",
-  validateBody(registerSchema),
+  validateBodyMiddleware(registerSchema),
   asyncHandler(userController.register),
-);
-
-router.post(
-  "/refresh",
-  accessCheckerMiddleware(tokenService, true, true),
-  deviceIdMiddleware,
-  asyncHandler(userController.refresh),
 );
 
 export default router;

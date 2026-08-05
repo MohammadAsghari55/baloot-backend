@@ -8,6 +8,7 @@ import {
   refreshCookieOptions,
 } from "../../../../infrastructure/config/cookie.config.js";
 import ResendVerificationUseCase from "../../../../application/auth/usecases/resend.verification.usecase.js";
+import RefreshTokenUseCase from "../../../../application/auth/usecases/refresh.token.usecase.js";
 
 @BoundClass
 class AuthController {
@@ -16,6 +17,7 @@ class AuthController {
     private logoutUseCase: LogoutUseCase,
     private resendVerificationUseCase: ResendVerificationUseCase,
     private changePasswordUseCase: ChangePasswordUseCase,
+    private refreshTokenUseCase: RefreshTokenUseCase,
   ) {}
 
   async login(req: Request, res: Response) {
@@ -32,11 +34,7 @@ class AuthController {
   async logout(req: Request, res: Response) {
     const logoutAll = req.query.all === "true";
 
-    await this.logoutUseCase.execute(
-      req.user!.userId,
-      req.deviceId!,
-      logoutAll,
-    );
+    await this.logoutUseCase.execute(req.userId!, req.deviceId!, logoutAll);
 
     res.clearCookie("accessToken", accessCookieOptions);
     res.clearCookie("refreshToken", refreshCookieOptions);
@@ -63,7 +61,11 @@ class AuthController {
   }
 
   async changePassword(req: Request, res: Response) {
-    await this.changePasswordUseCase.execute(req.body, req.user!.userId);
+    await this.changePasswordUseCase.execute(
+      req.body,
+      req.userId!,
+      req.deviceId!,
+    );
 
     res.clearCookie("accessToken", accessCookieOptions);
     res.clearCookie("refreshToken", refreshCookieOptions);
@@ -71,6 +73,22 @@ class AuthController {
     res.status(200).json({
       success: true,
       message: "Your Password Changed successfully. Please Login Again",
+    });
+  }
+
+  async refresh(req: Request, res: Response) {
+    const token = await this.refreshTokenUseCase.execute(
+      req.cookies.refreshToken,
+      req.userId!,
+      req.deviceId!,
+      req.role!,
+    );
+
+    res.cookie("accessToken", token.accessToken, accessCookieOptions);
+    res.cookie("refreshToken", token.refreshToken, refreshCookieOptions);
+    res.status(200).json({
+      success: true,
+      message: "Token refreshed successfully",
     });
   }
 }

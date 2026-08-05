@@ -11,6 +11,8 @@ import RefreshTokenRepository from "../../infrastructure/repositories/refresh.to
 import TokenManagementApplicationService from "./services/token.management.application.service.js";
 import EmailVerificationRepository from "../../infrastructure/repositories/email.verification.pg.repository.js";
 import EmailVerificationApplicationService from "./services/email.verification.application.service.js";
+import redisService from "../../infrastructure/redis/redis.service.js";
+import SessionManagementApplicationService from "./services/session.management.application.service.js";
 
 import LoginUseCase from "./usecases/login.usecase.js";
 import RefreshTokenUseCase from "./usecases/refresh.token.usecase.js";
@@ -38,6 +40,9 @@ function buildAuthModule() {
   const emailVerificationApplicationService =
     new EmailVerificationApplicationService(emailVerificationRepository);
 
+  const sessionManagementApplicationService =
+    new SessionManagementApplicationService(redisService);
+
   const registerAdminUseCase = new RegisterAdminUseCase(
     transactionManager,
     userDomainService,
@@ -63,6 +68,7 @@ function buildAuthModule() {
     tokenService,
     tokenManagementApplicationService,
     emailVerificationApplicationService,
+    redisService,
   );
 
   const refreshTokenUseCase = new RefreshTokenUseCase(
@@ -70,6 +76,7 @@ function buildAuthModule() {
     bcryptService,
     tokenService,
     tokenManagementApplicationService,
+    redisService,
   );
 
   const resendVerificationUseCase = new ResendVerificationUseCase(
@@ -82,6 +89,7 @@ function buildAuthModule() {
   const logoutUseCase = new LogoutUseCase(
     transactionManager,
     tokenManagementApplicationService,
+    sessionManagementApplicationService,
   );
 
   const changePasswordUseCase = new ChangePasswordUseCase(
@@ -90,23 +98,19 @@ function buildAuthModule() {
     bcryptService,
     emailOrchestrationService,
     tokenManagementApplicationService,
+    sessionManagementApplicationService,
   );
 
-  const adminController = new AdminController(
-    registerAdminUseCase,
-    refreshTokenUseCase,
-  );
+  const adminController = new AdminController(registerAdminUseCase);
 
-  const userController = new UserController(
-    registerUserUseCase,
-    refreshTokenUseCase,
-  );
+  const userController = new UserController(registerUserUseCase);
 
   const authController = new AuthController(
     loginUseCase,
     logoutUseCase,
     resendVerificationUseCase,
     changePasswordUseCase,
+    refreshTokenUseCase,
   );
 
   return {

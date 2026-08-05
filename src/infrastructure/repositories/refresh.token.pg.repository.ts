@@ -22,7 +22,7 @@ class RefreshTokenRepository implements IRefreshTokenRepository {
     const query = `
     INSERT INTO refresh_token (
     id,user_id,token_hash,device_id,expires_at)
-    VALUES ($1, $2, $3, $4, NOW() + INTERVAL '7 days')
+    VALUES ($1, $2, $3, $4, NOW() + INTERVAL '30 days')
     `;
     try {
       await dbClient.query(query, [randomUUID(), userId, tokenHash, deviceId]);

@@ -4,6 +4,7 @@ import IUserApplicationService from "../../../domains/user/Interfaces/iuser.appl
 import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import IEmailOrchestrationService from "../../../domains/user/Interfaces/iemail.orchestration.service.js";
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
+import ISessionManagementApplicationService from "../../../domains/user/Interfaces/isession.management.application.service.js";
 import AppError from "../../../shared/errors/app.error.js";
 
 class ChangePasswordUseCase {
@@ -13,9 +14,14 @@ class ChangePasswordUseCase {
     private bcryptService: IBcryptService,
     private emailOrchestrationService: IEmailOrchestrationService,
     private tokenManagementApplicationService: ITokenManagementApplicationService,
+    private sessionManagementApplicationService: ISessionManagementApplicationService,
   ) {}
 
-  async execute(dto: ChangePasswordDto, userId: string): Promise<void> {
+  async execute(
+    dto: ChangePasswordDto,
+    userId: string,
+    deviceId: string,
+  ): Promise<void> {
     const { oldPassword, newPassword } = dto;
 
     const userEmail = await this.transactionManager.runInTransaction(
@@ -51,6 +57,12 @@ class ChangePasswordUseCase {
         );
 
         await this.tokenManagementApplicationService.revokeAll(user.id, client);
+
+        await this.sessionManagementApplicationService.increaseVersion(
+          user.id,
+          deviceId,
+        );
+
         return user.email;
       },
     );

@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import { ZodType, ZodError } from "zod";
 import ZodValidationError from "../shared/errors/zod.validation.error.js";
 
-const validateBody = <T>(schema: ZodType<T>): RequestHandler => {
+const validateBodyMiddleware = <T>(schema: ZodType<T>): RequestHandler => {
   return (req, res, next) => {
     try {
       req.body = schema.parse(req.body);
@@ -16,4 +16,4 @@ const validateBody = <T>(schema: ZodType<T>): RequestHandler => {
   };
 };
 
-export default validateBody;
+export default validateBodyMiddleware;

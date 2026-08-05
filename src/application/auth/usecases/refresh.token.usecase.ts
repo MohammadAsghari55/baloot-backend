@@ -2,6 +2,7 @@ import ITransactionManager from "../../../shared/interfaces/itransaction.manager
 import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
+import IRedisService from "../../../shared/interfaces/iredis.service.js";
 import AppError from "../../../shared/errors/app.error.js";
 
 class RefreshTokenUseCase {
@@ -10,70 +11,93 @@ class RefreshTokenUseCase {
     private bcryptService: IBcryptService,
     private tokenService: ITokenService,
     private tokenManagementApplicationService: ITokenManagementApplicationService,
+    private redisService: IRedisService,
   ) {}
 
   async execute(
-    role: string,
     refreshToken: string,
     userId: string,
     deviceId: string,
+    role: string,
   ) {
-    if (!deviceId) {
-      throw AppError.badRequest("MISSING_DEVICE_ID");
-    }
     if (!refreshToken) {
       throw AppError.badRequest("INVALID_REFRESH_TOKEN");
     }
 
     return this.transactionManager.runInTransaction(async (client) => {
-      const storedToken =
-        await this.tokenManagementApplicationService.findToken(
-          userId,
-          deviceId,
-          client,
-        );
+      const sessionKey = `session:${userId}:${deviceId}`;
 
-      if (!storedToken) {
-        throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
-      }
+      const session = await this.redisService.get<{
+        status: string;
+        version: number;
+        expiresAt: number;
+      }>(sessionKey);
 
-      const compare = await this.bcryptService.compare(
-        refreshToken,
-        storedToken.tokenHash,
+      const redisVersion = await this.redisService.get<number>(
+        `version:${userId}`,
       );
 
-      if (!compare) {
-        throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
+      if (!redisVersion) {
+        throw AppError.unauthorized("VERSION_NOT_FOUND");
       }
 
-      if (
-        storedToken.revokedAt !== null ||
-        storedToken.expiresAt < new Date()
-      ) {
-        throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
+      if (session && session.status === "active") {
+        if (session.version !== redisVersion) {
+          throw AppError.unauthorized("VERSION_MISMATCH");
+        }
+      } else {
+        const storedToken =
+          await this.tokenManagementApplicationService.findToken(
+            userId,
+            deviceId,
+            client,
+          );
+
+        if (!storedToken) {
+          throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
+        }
+
+        if (storedToken.expiresAt <= new Date()) {
+          throw AppError.unauthorized("REFRESH_TOKEN_EXPIRED");
+        }
+
+        const isMatch = await this.bcryptService.compare(
+          refreshToken,
+          storedToken.tokenHash,
+        );
+
+        if (!isMatch) {
+          throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
+        }
+
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+        await this.redisService.set(
+          sessionKey,
+          {
+            status: "active",
+            version: redisVersion,
+            expiresAt: expiresAt.getTime(),
+          },
+          7 * 24 * 60 * 60,
+        );
       }
 
-      const tokens = await this.tokenService.generateTokenPair(
-        storedToken.userId,
+      await this.redisService.set(
+        `version:${userId}`,
+        redisVersion,
+        30 * 24 * 60 * 60,
+      );
+
+      const newAccessToken = await this.tokenService.generateAccessToken(
+        userId,
+        deviceId,
         role,
       );
 
-      await this.tokenManagementApplicationService.revokeByDevice(
-        storedToken.userId,
-        deviceId,
-        client,
-      );
-
-      await this.tokenManagementApplicationService.saveToken(
-        tokens.hashedRefreshToken,
-        storedToken.userId,
-        deviceId,
-        client,
-      );
-
       return {
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
+        accessToken: newAccessToken,
+        refreshToken: refreshToken,
       };
     });
   }

@@ -1,10 +1,12 @@
 import { LoginDto } from "../../../application/auth/dtos/login.dto.js";
+import { randomUUID } from "crypto";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
 import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
 import IEmailVerificationApplicationService from "../../../domains/user/Interfaces/iemail.verification.application.service.js";
+import IRedisService from "../../../shared/interfaces/iredis.service.js";
 import AppError from "../../../shared/errors/app.error.js";
 
 class LoginUseCase {
@@ -15,14 +17,11 @@ class LoginUseCase {
     private tokenService: ITokenService,
     private tokenManagementApplicationService: ITokenManagementApplicationService,
     private emailVerificationApplicationService: IEmailVerificationApplicationService,
+    private redisService: IRedisService,
   ) {}
 
   async execute(dto: LoginDto, deviceId: string) {
     const { identifier, password, code } = dto;
-
-    if (!deviceId) {
-      throw AppError.badRequest("MISSING_DEVICE_ID");
-    }
 
     return this.transactionManager.runInTransaction(async (client) => {
       const user = await this.userApplicationService.findUserByIdentifier(
@@ -81,15 +80,20 @@ class LoginUseCase {
         await this.emailVerificationApplicationService.delete(user.id, client);
       }
 
-      const tokens = await this.tokenService.generateTokenPair(
-        user.id,
-        user.role,
+      if (!deviceId) {
+        deviceId = randomUUID();
+      }
+
+      const redisVersion = await this.redisService.get<number>(
+        `version:${user.id}`,
       );
 
-      await this.tokenManagementApplicationService.revokeByDevice(
+      const version = redisVersion ?? 1;
+
+      const tokens = await this.tokenService.generateTokenPair(
         user.id,
         deviceId,
-        client,
+        user.role,
       );
 
       await this.tokenManagementApplicationService.saveToken(
@@ -97,6 +101,23 @@ class LoginUseCase {
         user.id,
         deviceId,
         client,
+      );
+
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      await this.redisService.set(
+        `session:${user.id}:${deviceId}`,
+        {
+          status: "active",
+          version: version,
+          expiresAt: expiresAt.getTime(),
+        },
+        7 * 24 * 60 * 60,
+      );
+
+      await this.redisService.set(
+        `version:${user.id}`,
+        version,
+        30 * 24 * 60 * 60,
       );
 
       return {

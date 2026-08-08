@@ -1,155 +1,19 @@
+import { AuthErrors } from "./error-codes/auth.errors.js";
+import { UserErrors } from "./error-codes/user.errors.js";
+import { VerificationErrors } from "./error-codes/verification.errors.js";
+import { ValidationErrors } from "./error-codes/validation.errors.js";
+import { InfrastructureErrors } from "./error-codes/infrastructure.errors.js";
+import { MigrationErrors } from "./error-codes/migration.errors.js";
+import { GeneralErrors } from "./error-codes/general.errors.js";
+
 export const ErrorCodes = {
-  EMAIL_EXISTS: {
-    code: "EMAIL_EXISTS",
-    message: "Email already exists",
-    status: 409,
-  },
-  USERNAME_EXISTS: {
-    code: "USERNAME_EXISTS",
-    message: "Username already taken",
-    status: 409,
-  },
-  INVALID_CREDENTIALS: {
-    code: "INVALID_CREDENTIALS",
-    message: "Invalid username or password",
-    status: 401,
-  },
-  DB_SAVE_FAILD: {
-    code: "DB_SAVE_FAILD",
-    message: "Database save failed",
-    status: 500,
-  },
-  NOT_FOUND: {
-    code: "NOT_FOUND",
-    message: "Resource not found",
-    status: 404,
-  },
-  MIGRATION_FILE_INVALID: {
-    code: "MIGRATION_FILE_INVALID",
-    message: "Migration file is missing UP/DOWN sections",
-    status: 500,
-  },
-  MIGRATION_EXECUTION_FAILED: {
-    code: "MIGRATION_EXECUTION_FAILED",
-    message: "Failed to execute migration file",
-    status: 500,
-  },
-  DB_CONNECTION_FAILED: {
-    code: "DB_CONNECTION_FAILED",
-    message: "Could not connect to the database",
-    status: 500,
-  },
-  DUPLICATE_ENTRY: {
-    code: "DUPLICATE_ENTRY",
-    message: "Duplicate entry violates unique constraint",
-    status: 409,
-  },
-  INVALID_ROLE: {
-    code: "INVALID_ROLE",
-    message: "Invalid role for this endpoint",
-    status: 403,
-  },
-  PASSWORD_MISMATCH: {
-    code: "PASSWORD_MISMATCH",
-    message: "Passwords do not match",
-    status: 400,
-  },
-  MISSING_DEVICE_ID: {
-    code: "MISSING_DEVICE_ID",
-    message: "Device ID is required in X-Device-Id header",
-    status: 400,
-  },
-  MAX_ADMINS_EXCEEDED: {
-    code: "MAX_ADMINS_EXCEEDED",
-    message: "Maximum number of admins reached",
-    status: 403,
-  },
-  INVALID_REFRESH_TOKEN: {
-    code: "INVALID_REFRESH_TOKEN",
-    message: "Invalid refresh token",
-    status: 401,
-  },
-  INVALID_ACCESS_TOKEN: {
-    code: "INVALID_ACCESS_TOKEN",
-    message: "Invalid access token",
-    status: 401,
-  },
-  ACCESS_TOKEN_EXPIRED: {
-    code: "ACCESS_TOKEN_EXPIRED",
-    message: "Access token has expired",
-    status: 401,
-  },
-  EMAIL_NOT_VERIFIED: {
-    code: "EMAIL_NOT_VERIFIED",
-    message:
-      "Email address is not verified. Please provide the verification code.",
-    status: 403,
-  },
-
-  INVALID_VERIFICATION_CODE: {
-    code: "INVALID_VERIFICATION_CODE",
-    message: "The verification code is invalid or expired.",
-    status: 400,
-  },
-
-  ALREADY_VERIFIED: {
-    code: "ALREADY_VERIFIED",
-    message: "Email address is already verified.",
-    status: 400,
-  },
-
-  EMAIL_SEND_FAILED: {
-    code: "EMAIL_SEND_FAILED",
-    message: "Failed to send verification email. Please try again later.",
-    status: 500,
-  },
-
-  TOO_MANY_REQUESTS: {
-    code: "TOO_MANY_REQUESTS",
-    message: "Too many requests. Please try again later.",
-    status: 429,
-  },
-  YOU_ARE_LOGGED_IN: {
-    code: "YOU_ARE_LOGGED_IN",
-    message:
-      "You are already logged in on this device. Please log out first if you want to login again.",
-    status: 409,
-  },
-  SAME_PASSWORD: {
-    code: "SAME_PASSWORD",
-    message: "New password cannot be the same as the old password.",
-    status: 400,
-  },
-
-  REDIS_CONNECTION_FAILED: {
-    code: "REDIS_CONNECTION_FAILED",
-    message: "Redis connection failed. Please check your Redis server.",
-    status: 500,
-  },
-  REDIS_OPERATION_FAILED: {
-    code: "REDIS_OPERATION_FAILED",
-    message: "Redis operation failed.",
-    status: 500,
-  },
-  SESSION_INACTIVE: {
-    code: "SESSION_INACTIVE",
-    message: "Your session is no longer active. Please log in again.",
-    status: 401,
-  },
-  VERSION_NOT_FOUND: {
-    code: "VERSION_NOT_FOUND",
-    message: "User version not found. Please log in again.",
-    status: 401,
-  },
-  VERSION_MISMATCH: {
-    code: "VERSION_MISMATCH",
-    message: "Session version mismatch. Please log in again.",
-    status: 401,
-  },
-  REFRESH_TOKEN_EXPIRED: {
-    code: "REFRESH_TOKEN_EXPIRED",
-    message: "Refresh token has expired",
-    status: 401,
-  },
+  ...AuthErrors,
+  ...UserErrors,
+  ...VerificationErrors,
+  ...ValidationErrors,
+  ...InfrastructureErrors,
+  ...MigrationErrors,
+  ...GeneralErrors,
 } as const;
+
 export type ErrorCode = keyof typeof ErrorCodes;

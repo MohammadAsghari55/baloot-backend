@@ -29,55 +29,57 @@ class RefreshTokenUseCase {
 
       const redisVersion = await this.sessionService.getVersion(userId);
 
-      if (!redisVersion) {
+      let version: number;
+
+      if (!redisVersion && !session) {
         throw AppError.unauthorized("VERSION_NOT_FOUND");
+      } else if (redisVersion) {
+        version = redisVersion;
+      } else {
+        version = session!.version;
       }
 
-      if (session && session.status === "active") {
-        if (session.version !== redisVersion) {
-          throw AppError.unauthorized("VERSION_MISMATCH");
-        }
-      } else {
-        const storedToken =
-          await this.tokenManagementApplicationService.findToken(
-            userId,
-            deviceId,
-            client,
-          );
+      if (session && session.version !== version) {
+        throw AppError.unauthorized("VERSION_MISMATCH");
+      }
 
-        if (!storedToken) {
-          throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
-        }
-
-        if (storedToken.expiresAt <= new Date()) {
-          throw AppError.unauthorized("REFRESH_TOKEN_EXPIRED");
-        }
-
-        const isMatch = await this.bcryptService.compare(
-          refreshToken,
-          storedToken.tokenHash,
+      const storedToken =
+        await this.tokenManagementApplicationService.findToken(
+          userId,
+          deviceId,
+          client,
         );
 
-        if (!isMatch) {
-          throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
-        }
+      if (!storedToken) {
+        throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
+      }
 
+      if (storedToken.expiresAt <= new Date()) {
+        throw AppError.unauthorized("REFRESH_TOKEN_EXPIRED");
+      }
+
+      const isMatch = await this.bcryptService.compare(
+        refreshToken,
+        storedToken.tokenHash,
+      );
+
+      if (!isMatch) {
+        throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
+      }
+
+      if (!session || session.status !== "active") {
         await this.sessionService.setSession(
           userId,
           deviceId,
           {
             status: "active",
-            version: redisVersion,
+            version: version,
           },
           7 * 24 * 60 * 60,
         );
       }
 
-      await this.sessionService.setVersion(
-        userId,
-        redisVersion,
-        30 * 24 * 60 * 60,
-      );
+      await this.sessionService.setVersion(userId, version, 30 * 24 * 60 * 60);
 
       const newAccessToken = await this.tokenService.generateAccessToken(
         userId,

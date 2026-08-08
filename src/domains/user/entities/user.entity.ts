@@ -6,7 +6,7 @@ class User {
     private _email: string,
     private _username: string,
     private _passwordHash: string,
-    private _role: "user" | "admin",
+    private readonly _role: "user" | "admin",
     private _walletBalance: number,
     private _isEmailVerified: boolean,
     private _wrongPasswordNumber: number,

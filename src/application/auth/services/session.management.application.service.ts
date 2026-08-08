@@ -17,7 +17,6 @@ class SessionManagementApplicationService implements ISessionManagementApplicati
         {
           status: "inactive",
           version: session.version,
-          expiresAt: session.expiresAt,
         },
         60,
       );

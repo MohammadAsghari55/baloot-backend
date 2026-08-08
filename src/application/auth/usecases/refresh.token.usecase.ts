@@ -62,15 +62,12 @@ class RefreshTokenUseCase {
           throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
         }
 
-        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
         await this.sessionService.setSession(
           userId,
           deviceId,
           {
             status: "active",
             version: redisVersion,
-            expiresAt: expiresAt.getTime(),
           },
           7 * 24 * 60 * 60,
         );

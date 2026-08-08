@@ -101,15 +101,12 @@ class LoginUseCase {
         client,
       );
 
-      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
       await this.sessionService.setSession(
         user.id,
         deviceId,
         {
           status: "active",
           version: version,
-          expiresAt: expiresAt.getTime(),
         },
         7 * 24 * 60 * 60,
       );

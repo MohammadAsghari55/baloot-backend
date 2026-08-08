@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS users (
     wallet_balance          INTEGER DEFAULT 0,
     card_number             VARCHAR(20),
     birth_date              DATE,
-    last_seen_at            TIMESTAMP,
     wrong_password_number   INTEGER DEFAULT 0,
     wrong_password_until    TIMESTAMP,
     is_profile_completed    BOOLEAN DEFAULT FALSE,

@@ -15,7 +15,7 @@ class DatabaseError extends AppError {
       }
       throw AppError.conflict("DUPLICATE_ENTRY");
     }
-    throw new DatabaseError("Database operation failed", "DB_SAVE_FAILD");
+    throw new DatabaseError("Database operation failed", "DB_SAVE_FAILED");
   }
 }
 

@@ -6,7 +6,7 @@ import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js"
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
 import IEmailVerificationApplicationService from "../../../domains/user/Interfaces/iemail.verification.application.service.js";
-import IRedisService from "../../../shared/interfaces/iredis.service.js";
+import ISessionService from "../../../domains/user/Interfaces/isession.service.js";
 import AppError from "../../../shared/errors/app.error.js";
 
 class LoginUseCase {
@@ -17,7 +17,7 @@ class LoginUseCase {
     private tokenService: ITokenService,
     private tokenManagementApplicationService: ITokenManagementApplicationService,
     private emailVerificationApplicationService: IEmailVerificationApplicationService,
-    private redisService: IRedisService,
+    private sessionService: ISessionService,
   ) {}
 
   async execute(dto: LoginDto, deviceId: string) {
@@ -84,9 +84,7 @@ class LoginUseCase {
         deviceId = randomUUID();
       }
 
-      const redisVersion = await this.redisService.get<number>(
-        `version:${user.id}`,
-      );
+      const redisVersion = await this.sessionService.getVersion(user.id);
 
       const version = redisVersion ?? 1;
 
@@ -104,8 +102,10 @@ class LoginUseCase {
       );
 
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-      await this.redisService.set(
-        `session:${user.id}:${deviceId}`,
+
+      await this.sessionService.setSession(
+        user.id,
+        deviceId,
         {
           status: "active",
           version: version,
@@ -114,11 +114,7 @@ class LoginUseCase {
         7 * 24 * 60 * 60,
       );
 
-      await this.redisService.set(
-        `version:${user.id}`,
-        version,
-        30 * 24 * 60 * 60,
-      );
+      await this.sessionService.setVersion(user.id, version, 30 * 24 * 60 * 60);
 
       return {
         accessToken: tokens.accessToken,

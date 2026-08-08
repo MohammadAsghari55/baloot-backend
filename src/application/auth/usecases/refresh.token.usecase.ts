@@ -2,7 +2,7 @@ import ITransactionManager from "../../../shared/interfaces/itransaction.manager
 import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
-import IRedisService from "../../../shared/interfaces/iredis.service.js";
+import ISessionService from "../../../domains/user/Interfaces/isession.service.js";
 import AppError from "../../../shared/errors/app.error.js";
 
 class RefreshTokenUseCase {
@@ -11,7 +11,7 @@ class RefreshTokenUseCase {
     private bcryptService: IBcryptService,
     private tokenService: ITokenService,
     private tokenManagementApplicationService: ITokenManagementApplicationService,
-    private redisService: IRedisService,
+    private sessionService: ISessionService,
   ) {}
 
   async execute(
@@ -25,17 +25,9 @@ class RefreshTokenUseCase {
     }
 
     return this.transactionManager.runInTransaction(async (client) => {
-      const sessionKey = `session:${userId}:${deviceId}`;
+      const session = await this.sessionService.getSession(userId, deviceId);
 
-      const session = await this.redisService.get<{
-        status: string;
-        version: number;
-        expiresAt: number;
-      }>(sessionKey);
-
-      const redisVersion = await this.redisService.get<number>(
-        `version:${userId}`,
-      );
+      const redisVersion = await this.sessionService.getVersion(userId);
 
       if (!redisVersion) {
         throw AppError.unauthorized("VERSION_NOT_FOUND");
@@ -72,8 +64,9 @@ class RefreshTokenUseCase {
 
         const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-        await this.redisService.set(
-          sessionKey,
+        await this.sessionService.setSession(
+          userId,
+          deviceId,
           {
             status: "active",
             version: redisVersion,
@@ -83,8 +76,8 @@ class RefreshTokenUseCase {
         );
       }
 
-      await this.redisService.set(
-        `version:${userId}`,
+      await this.sessionService.setVersion(
+        userId,
         redisVersion,
         30 * 24 * 60 * 60,
       );

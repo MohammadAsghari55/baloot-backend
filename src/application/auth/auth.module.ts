@@ -13,6 +13,7 @@ import EmailVerificationRepository from "../../infrastructure/repositories/email
 import EmailVerificationApplicationService from "./services/email.verification.application.service.js";
 import redisService from "../../infrastructure/redis/redis.service.js";
 import SessionManagementApplicationService from "./services/session.management.application.service.js";
+import SessionService from "../../infrastructure/services/session.service.js";
 
 import LoginUseCase from "./usecases/login.usecase.js";
 import RefreshTokenUseCase from "./usecases/refresh.token.usecase.js";
@@ -40,8 +41,9 @@ function buildAuthModule() {
   const emailVerificationApplicationService =
     new EmailVerificationApplicationService(emailVerificationRepository);
 
+  const sessionService = new SessionService(redisService);
   const sessionManagementApplicationService =
-    new SessionManagementApplicationService(redisService);
+    new SessionManagementApplicationService(sessionService);
 
   const registerAdminUseCase = new RegisterAdminUseCase(
     transactionManager,
@@ -68,7 +70,7 @@ function buildAuthModule() {
     tokenService,
     tokenManagementApplicationService,
     emailVerificationApplicationService,
-    redisService,
+    sessionService,
   );
 
   const refreshTokenUseCase = new RefreshTokenUseCase(
@@ -76,7 +78,7 @@ function buildAuthModule() {
     bcryptService,
     tokenService,
     tokenManagementApplicationService,
-    redisService,
+    sessionService,
   );
 
   const resendVerificationUseCase = new ResendVerificationUseCase(

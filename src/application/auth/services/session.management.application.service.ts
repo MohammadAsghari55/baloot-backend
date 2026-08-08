@@ -1,23 +1,19 @@
 import ISessionManagementApplicationService from "../../../domains/user/Interfaces/isession.management.application.service.js";
-import IRedisService from "../../../shared/interfaces/iredis.service.js";
+import ISessionService from "../../../domains/user/Interfaces/isession.service.js";
 import AppError from "../../../shared/errors/app.error.js";
+
 class SessionManagementApplicationService implements ISessionManagementApplicationService {
-  constructor(private redisService: IRedisService) {}
+  constructor(private sessionService: ISessionService) {}
 
   async inactiveSession(userId: string, deviceId: string): Promise<void> {
-    const sessionKey = `session:${userId}:${deviceId}`;
-
-    const session = await this.redisService.get<{
-      status: string;
-      version: number;
-      expiresAt: number;
-    }>(sessionKey);
+    const session = await this.sessionService.getSession(userId, deviceId);
 
     if (!session) {
       throw AppError.unauthorized("SESSION_INACTIVE");
     } else {
-      await this.redisService.set(
-        sessionKey,
+      await this.sessionService.setSession(
+        userId,
+        deviceId,
         {
           status: "inactive",
           version: session.version,
@@ -29,16 +25,10 @@ class SessionManagementApplicationService implements ISessionManagementApplicati
   }
 
   async increaseVersion(userId: string, deviceId: string): Promise<void> {
-    let redisVersion = await this.redisService.get<number>(`version:${userId}`);
+    let redisVersion = await this.sessionService.getVersion(userId);
 
     if (!redisVersion) {
-      const sessionKey = `session:${userId}:${deviceId}`;
-
-      const session = await this.redisService.get<{
-        status: string;
-        version: number;
-        expiresAt: number;
-      }>(sessionKey);
+      const session = await this.sessionService.getSession(userId, deviceId);
 
       if (!session) {
         throw AppError.unauthorized("SESSION_INACTIVE");
@@ -48,11 +38,7 @@ class SessionManagementApplicationService implements ISessionManagementApplicati
     }
     const newVersion = (redisVersion ?? 0) + 1;
 
-    await this.redisService.set(
-      `version:${userId}`,
-      newVersion,
-      30 * 24 * 60 * 60,
-    );
+    await this.sessionService.setVersion(userId, newVersion, 30 * 24 * 60 * 60);
   }
 }
 

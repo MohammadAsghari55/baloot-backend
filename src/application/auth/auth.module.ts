@@ -5,15 +5,14 @@ import {
   bcryptService,
   emailService,
   tokenService,
+  sessionService,
 } from "../../infrastructure/services/services.index.js";
 import EmailOrchestrationService from "./services/email.orchestration.service.js";
 import RefreshTokenRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
 import TokenManagementApplicationService from "./services/token.management.application.service.js";
 import EmailVerificationRepository from "../../infrastructure/repositories/email.verification.pg.repository.js";
 import EmailVerificationApplicationService from "./services/email.verification.application.service.js";
-import redisService from "../../infrastructure/redis/redis.service.js";
 import SessionManagementApplicationService from "./services/session.management.application.service.js";
-import SessionService from "../../infrastructure/services/session.service.js";
 
 import LoginUseCase from "./usecases/login.usecase.js";
 import RefreshTokenUseCase from "./usecases/refresh.token.usecase.js";
@@ -41,7 +40,6 @@ function buildAuthModule() {
   const emailVerificationApplicationService =
     new EmailVerificationApplicationService(emailVerificationRepository);
 
-  const sessionService = new SessionService(redisService);
   const sessionManagementApplicationService =
     new SessionManagementApplicationService(sessionService);
 

@@ -25,6 +25,19 @@ class SessionService implements ISessionService {
     return this.redisService.get(`version:${userId}`);
   }
 
+  async getAllUserSessionVersions(userId: string): Promise<number[]> {
+    const keys = await this.redisService.keys(`session:${userId}:*`);
+    if (keys.length === 0) return [];
+
+    const sessions = await Promise.all(
+      keys.map((key) => this.redisService.get<SessionData>(key)),
+    );
+
+    return sessions
+      .filter((s): s is SessionData => s !== null)
+      .map((s) => s.version);
+  }
+
   async setVersion(
     userId: string,
     version: number,

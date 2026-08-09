@@ -12,6 +12,8 @@ interface ISessionService {
 
   getVersion(userId: string): Promise<number | null>;
 
+  getAllUserSessionVersions(userId: string): Promise<number[]>;
+
   setVersion(userId: string, version: number, ttl: number): Promise<void>;
 }
 

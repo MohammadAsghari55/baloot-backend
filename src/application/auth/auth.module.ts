@@ -117,6 +117,7 @@ function buildAuthModule() {
     adminController,
     userController,
     authController,
+    tokenManagementApplicationService,
   };
 }
 

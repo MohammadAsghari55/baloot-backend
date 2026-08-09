@@ -31,53 +31,56 @@ class RefreshTokenUseCase {
 
       let version: number;
 
-      if (!redisVersion && !session) {
-        throw AppError.unauthorized("VERSION_NOT_FOUND");
-      } else if (redisVersion) {
+      if (redisVersion) {
         version = redisVersion;
+
+        if (session && session.version !== version) {
+          throw AppError.unauthorized("VERSION_MISMATCH");
+        }
       } else {
-        version = session!.version;
-      }
+        const storedToken =
+          await this.tokenManagementApplicationService.findToken(
+            userId,
+            deviceId,
+            client,
+          );
 
-      if (session && session.version !== version) {
-        throw AppError.unauthorized("VERSION_MISMATCH");
-      }
+        if (!storedToken) {
+          throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
+        }
 
-      const storedToken =
-        await this.tokenManagementApplicationService.findToken(
-          userId,
-          deviceId,
-          client,
+        if (storedToken.expiresAt <= new Date()) {
+          throw AppError.unauthorized("REFRESH_TOKEN_EXPIRED");
+        }
+
+        const isMatch = await this.bcryptService.compare(
+          refreshToken,
+          storedToken.tokenHash,
         );
 
-      if (!storedToken) {
-        throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
+        if (!isMatch) {
+          throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
+        }
+
+        if (session) {
+          const allVersions =
+            await this.sessionService.getAllUserSessionVersions(userId);
+          version =
+            allVersions.length > 0 ? Math.max(...allVersions) : session.version;
+        } else {
+          version = 1;
+        }
       }
 
-      if (storedToken.expiresAt <= new Date()) {
-        throw AppError.unauthorized("REFRESH_TOKEN_EXPIRED");
-      }
-
-      const isMatch = await this.bcryptService.compare(
-        refreshToken,
-        storedToken.tokenHash,
+      await this.sessionService.setSession(
+        userId,
+        deviceId,
+        {
+          status: "active",
+          version: version,
+        },
+        7 * 24 * 60 * 60,
       );
-
-      if (!isMatch) {
-        throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
-      }
-
-      if (!session || session.status !== "active") {
-        await this.sessionService.setSession(
-          userId,
-          deviceId,
-          {
-            status: "active",
-            version: version,
-          },
-          7 * 24 * 60 * 60,
-        );
-      }
 
       await this.sessionService.setVersion(userId, version, 30 * 24 * 60 * 60);
 

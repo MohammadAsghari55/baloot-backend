@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { loginSchema } from "../../../../shared/validators/auth/login.schema.js";
 import { ResendVerificationSchema } from "../../../../shared/validators/auth/resend.verification.schema.js";
+import { changePasswordSchema } from "../../../../shared/validators/auth/change.password.schema.js";
 import {
   extractorMiddleware,
   AccessCheckerMiddleware,
@@ -35,6 +36,7 @@ router.post(
   "/changePassword",
   extractorMiddleware,
   AccessCheckerMiddleware,
+  validateBodyMiddleware(changePasswordSchema),
   asyncHandler(authController.changePassword),
 );
 

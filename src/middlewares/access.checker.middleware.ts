@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import IRedisService from "../shared/interfaces/iredis.service.js";
+import ISessionService from "../domains/user/Interfaces/isession.service.js";
+import ITokenManagementApplicationService from "../domains/user/Interfaces/itoken.management.application.service.js";
 import AppError from "../shared/errors/app.error.js";
 
-const accessCheckerMiddleware = (redisService: IRedisService) => {
+const accessCheckerMiddleware = (
+  sessionService: ISessionService,
+  tokenManagementApplicationService: ITokenManagementApplicationService,
+) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     if (!req.userId || !req.deviceId || !req.role) {
       throw AppError.unauthorized("INVALID_ACCESS_TOKEN");
@@ -12,27 +16,39 @@ const accessCheckerMiddleware = (redisService: IRedisService) => {
       throw AppError.unauthorized("ACCESS_TOKEN_EXPIRED");
     }
 
-    const session = await redisService.get<{
-      status: string;
-      version: number;
-      expiresAt: number;
-    }>(`session:${req.userId}:${req.deviceId}`);
+    const session = await sessionService.getSession(req.userId, req.deviceId);
 
-    if (!session || session.status !== "active") {
+    const redisVersion = await sessionService.getVersion(req.userId);
+
+    if (session && session.status === "active" && redisVersion) {
+      if (session.version !== redisVersion) {
+        throw AppError.unauthorized("VERSION_MISMATCH");
+      }
+      return next();
+    }
+
+    const storedToken = await tokenManagementApplicationService.readActiveToken(
+      req.userId,
+      req.deviceId,
+    );
+
+    if (!storedToken || storedToken.expiresAt <= new Date()) {
       throw AppError.unauthorized("SESSION_INACTIVE");
     }
 
-    const redisVersion = await redisService.get<number>(
-      `version:${req.userId}`,
+    const version = redisVersion ?? 1;
+
+    await sessionService.setSession(
+      req.userId,
+      req.deviceId,
+      {
+        status: "active",
+        version: version,
+      },
+      7 * 24 * 60 * 60,
     );
 
-    if (!redisVersion) {
-      throw AppError.unauthorized("VERSION_NOT_FOUND");
-    }
-
-    if (session.version !== redisVersion) {
-      throw AppError.unauthorized("VERSION_MISMATCH");
-    }
+    await sessionService.setVersion(req.userId, version, 30 * 24 * 60 * 60);
 
     next();
   };

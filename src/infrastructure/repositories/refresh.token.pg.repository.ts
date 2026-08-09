@@ -86,6 +86,40 @@ class RefreshTokenRepository implements IRefreshTokenRepository {
     }
   }
 
+  async readActiveToken(
+    userId: string,
+    deviceId: string,
+  ): Promise<{
+    userId: string;
+    tokenHash: string;
+    expiresAt: Date;
+    revokedAt: Date | null;
+  } | null> {
+    const query = `
+    SELECT user_id, token_hash, expires_at, revoked_at 
+    FROM refresh_token 
+    WHERE user_id = $1 AND device_id = $2 AND revoked_at IS NULL
+    ORDER BY created_at DESC
+    LIMIT 1
+    `;
+    try {
+      const token = await this.pool.query(query, [userId, deviceId]);
+
+      if (token.rows.length === 0) {
+        return null;
+      }
+
+      return {
+        userId: token.rows[0].user_id,
+        tokenHash: token.rows[0].token_hash,
+        expiresAt: token.rows[0].expires_at,
+        revokedAt: token.rows[0].revoked_at,
+      };
+    } catch (error) {
+      throw DatabaseError.fromPGError(error);
+    }
+  }
+
   async revokeAllByUserId(
     userId: string,
     client?: IDatabaseClient,

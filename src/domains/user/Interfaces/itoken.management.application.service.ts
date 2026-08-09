@@ -26,6 +26,16 @@ interface ITokenManagementApplicationService {
     expiresAt: Date;
     revokedAt: Date | null;
   } | null>;
+
+  readActiveToken(
+    userId: string,
+    deviceId: string,
+  ): Promise<{
+    userId: string;
+    tokenHash: string;
+    expiresAt: Date;
+    revokedAt: Date | null;
+  } | null>;
 }
 
 export default ITokenManagementApplicationService;

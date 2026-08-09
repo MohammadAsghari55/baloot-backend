@@ -34,6 +34,7 @@ class TokenManagementApplicationService implements ITokenManagementApplicationSe
   async revokeAll(userId: string, client?: IDatabaseClient): Promise<void> {
     return this.refreshTokenRepository.revokeAllByUserId(userId, client);
   }
+
   async findToken(
     userId: string,
     deviceId: string,
@@ -49,6 +50,18 @@ class TokenManagementApplicationService implements ITokenManagementApplicationSe
       deviceId,
       client,
     );
+  }
+
+  async readActiveToken(
+    userId: string,
+    deviceId: string,
+  ): Promise<{
+    userId: string;
+    tokenHash: string;
+    expiresAt: Date;
+    revokedAt: Date | null;
+  } | null> {
+    return this.refreshTokenRepository.readActiveToken(userId, deviceId);
   }
 }
 

@@ -5,19 +5,21 @@ interface IRefreshTokenRepository {
     tokenHash: string,
     userId: string,
     deviceId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void>;
 
   revokeByDeviceId(
     userId: string,
     deviceId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void>;
+
+  revokeAllByUserId(userId: string, client: IDatabaseClient): Promise<void>;
 
   findTokenByDeviceIdAndUserId(
     userId: string,
     deviceId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<{
     userId: string;
     tokenHash: string;
@@ -34,8 +36,6 @@ interface IRefreshTokenRepository {
     expiresAt: Date;
     revokedAt: Date | null;
   } | null>;
-
-  revokeAllByUserId(userId: string, client?: IDatabaseClient): Promise<void>;
 }
 
 export default IRefreshTokenRepository;

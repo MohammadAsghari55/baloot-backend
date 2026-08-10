@@ -7,43 +7,34 @@ import config from "../../../infrastructure/config/env.index.js";
 class UserApplicationService implements IUserApplicationService {
   constructor(private userRepository: IUserRepository) {}
 
-  async findUserByEmail(
-    email: string,
-    client?: IDatabaseClient,
-  ): Promise<User | null> {
-    return this.userRepository.findByEmail(email, client);
+  async findUserByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findByEmail(email);
   }
 
-  async findUserByUsername(
-    username: string,
-    client?: IDatabaseClient,
-  ): Promise<User | null> {
-    return this.userRepository.findByUsername(username, client);
+  async findUserByUsername(username: string): Promise<User | null> {
+    return this.userRepository.findByUsername(username);
   }
 
-  async findUserByIdentifier(
-    identifier: string,
-    client?: IDatabaseClient,
-  ): Promise<User | null> {
+  async findUserByIdentifier(identifier: string): Promise<User | null> {
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
     if (isEmail) {
-      return this.userRepository.findByEmail(identifier, client);
+      return this.userRepository.findByEmail(identifier);
     }
-    return this.userRepository.findByUsername(identifier, client);
+    return this.userRepository.findByUsername(identifier);
   }
 
   async findUserById(
     userId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<User | null> {
     return this.userRepository.findById(userId, client);
   }
 
-  async countAdmins(client?: IDatabaseClient): Promise<number> {
-    return this.userRepository.countAdmins(client);
+  async countAdmins(): Promise<number> {
+    return this.userRepository.countAdmins();
   }
 
-  async saveUser(user: User, client?: IDatabaseClient): Promise<void> {
+  async saveUser(user: User, client: IDatabaseClient): Promise<void> {
     await this.userRepository.insertUser(user, client);
   }
 
@@ -54,7 +45,7 @@ class UserApplicationService implements IUserApplicationService {
   async updateEmailVerified(
     userId: string,
     verified: boolean,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void> {
     await this.userRepository.updateEmailVerified(userId, verified, client);
   }
@@ -62,7 +53,7 @@ class UserApplicationService implements IUserApplicationService {
   async updatePassword(
     userId: string,
     hashedPassword: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void> {
     await this.userRepository.updatePassword(userId, hashedPassword, client);
   }

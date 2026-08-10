@@ -2,22 +2,16 @@ import { Pool } from "pg";
 import EmailVerification from "../../domains/user/entities/email.verification.entity.js";
 import IEmailVerificationRepository from "../../domains/user/repositories/iemail.verification.repository.js";
 import IDatabaseClient from "../../domains/shared/interfaces/idatabase.client.js";
-import PgDatabaseClient from "../database/pg.database.client.js";
 import DatabaseError from "../../shared/errors/database.error.js";
 
 class EmailVerificationPgRepository implements IEmailVerificationRepository {
   constructor(private readonly pool: Pool) {}
 
-  private async getClient(client?: IDatabaseClient): Promise<IDatabaseClient> {
-    return client || new PgDatabaseClient(await this.pool.connect());
-  }
-
   async findByUserId(
     userId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<EmailVerification | null> {
-    const dbClient = await this.getClient(client);
-    const result = await dbClient.query(
+    const result = await client.query(
       "SELECT * FROM email_verifications WHERE user_id = $1 FOR UPDATE",
       [userId],
     );
@@ -28,16 +22,15 @@ class EmailVerificationPgRepository implements IEmailVerificationRepository {
 
   async save(
     emailVerification: EmailVerification,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void> {
-    const dbClient = await this.getClient(client);
     const query = `
     INSERT INTO email_verifications (
     id, user_id, code, updated_at, expires_at)
     VALUES ($1, $2, $3, $4, $5)
     `;
     try {
-      await dbClient.query(query, [
+      await client.query(query, [
         emailVerification.id,
         emailVerification.userId,
         emailVerification.code,
@@ -49,17 +42,13 @@ class EmailVerificationPgRepository implements IEmailVerificationRepository {
     }
   }
 
-  async deleteByUserId(
-    userId: string,
-    client?: IDatabaseClient,
-  ): Promise<void> {
-    const dbClient = await this.getClient(client);
+  async deleteByUserId(userId: string, client: IDatabaseClient): Promise<void> {
     const query = `
     DELETE FROM email_verifications 
     WHERE user_id = $1 
     `;
     try {
-      await dbClient.query(query, [userId]);
+      await client.query(query, [userId]);
     } catch (error) {
       throw DatabaseError.fromPGError(error);
     }
@@ -67,10 +56,9 @@ class EmailVerificationPgRepository implements IEmailVerificationRepository {
 
   async updateUpdatedAt(
     userId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void> {
-    const dbClient = await this.getClient(client);
-    await dbClient.query(
+    await client.query(
       `UPDATE email_verifications SET updated_at = NOW() WHERE user_id = $1`,
       [userId],
     );

@@ -10,23 +10,23 @@ class EmailVerificationApplicationService implements IEmailVerificationApplicati
 
   async findByUserId(
     userId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<EmailVerification | null> {
     return this.emailVerificationRepository.findByUserId(userId, client);
   }
 
   async save(
     emailVerification: EmailVerification,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void> {
     return this.emailVerificationRepository.save(emailVerification, client);
   }
 
-  async delete(userId: string, client?: IDatabaseClient): Promise<void> {
+  async delete(userId: string, client: IDatabaseClient): Promise<void> {
     return this.emailVerificationRepository.deleteByUserId(userId, client);
   }
 
-  async update(userId: string, client?: IDatabaseClient): Promise<void> {
+  async update(userId: string, client: IDatabaseClient): Promise<void> {
     return this.emailVerificationRepository.updateUpdatedAt(userId, client);
   }
 }

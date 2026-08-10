@@ -3,17 +3,17 @@ import EmailVerification from "../entities/email.verification.entity.js";
 interface IEmailVerificationRepository {
   findByUserId(
     userId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<EmailVerification | null>;
 
   save(
     emailVerification: EmailVerification,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void>;
 
-  deleteByUserId(userId: string, client?: IDatabaseClient): Promise<void>;
+  deleteByUserId(userId: string, client: IDatabaseClient): Promise<void>;
 
-  updateUpdatedAt(userId: string, client?: IDatabaseClient): Promise<void>;
+  updateUpdatedAt(userId: string, client: IDatabaseClient): Promise<void>;
 }
 
 export default IEmailVerificationRepository;

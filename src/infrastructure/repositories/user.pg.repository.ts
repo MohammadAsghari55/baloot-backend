@@ -2,22 +2,13 @@ import { Pool } from "pg";
 import User from "../../domains/user/entities/user.entity.js";
 import IUserRepository from "../../domains/user/repositories/iuser.repository.js";
 import IDatabaseClient from "../../domains/shared/interfaces/idatabase.client.js";
-import PgDatabaseClient from "../database/pg.database.client.js";
 import DatabaseError from "../../shared/errors/database.error.js";
 
 class UserPgRepository implements IUserRepository {
-  constructor(private pool: Pool) {}
+  constructor(private readonly pool: Pool) {}
 
-  private async getClient(client?: IDatabaseClient): Promise<IDatabaseClient> {
-    return client || new PgDatabaseClient(await this.pool.connect());
-  }
-
-  async findByEmail(
-    email: string,
-    client?: IDatabaseClient,
-  ): Promise<User | null> {
-    const dbClient = await this.getClient(client);
-    const result = await dbClient.query(
+  async findByEmail(email: string): Promise<User | null> {
+    const result = await this.pool.query(
       "SELECT * FROM users WHERE email = $1",
       [email],
     );
@@ -26,12 +17,8 @@ class UserPgRepository implements IUserRepository {
     return User.fromDB(row);
   }
 
-  async findByUsername(
-    username: string,
-    client?: IDatabaseClient,
-  ): Promise<User | null> {
-    const dbClient = await this.getClient(client);
-    const result = await dbClient.query(
+  async findByUsername(username: string): Promise<User | null> {
+    const result = await this.pool.query(
       "SELECT * FROM users WHERE username = $1",
       [username],
     );
@@ -42,10 +29,9 @@ class UserPgRepository implements IUserRepository {
 
   async findById(
     userId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<User | null> {
-    const dbClient = await this.getClient(client);
-    const result = await dbClient.query(
+    const result = await client.query(
       "SELECT * FROM users WHERE id = $1 FOR UPDATE",
       [userId],
     );
@@ -54,8 +40,7 @@ class UserPgRepository implements IUserRepository {
     return User.fromDB(row);
   }
 
-  async insertUser(user: User, client?: IDatabaseClient): Promise<void> {
-    const dbClient = await this.getClient(client);
+  async insertUser(user: User, client: IDatabaseClient): Promise<void> {
     const query = `
     INSERT INTO users (
       id, email, username, password_hash, role, wallet_balance,
@@ -64,7 +49,7 @@ class UserPgRepository implements IUserRepository {
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       `;
     try {
-      await dbClient.query(query, [
+      await client.query(query, [
         user.id,
         user.email,
         user.username,
@@ -82,9 +67,8 @@ class UserPgRepository implements IUserRepository {
     }
   }
 
-  async countAdmins(client?: IDatabaseClient): Promise<number> {
-    const dbClient = await this.getClient(client);
-    const adminsNumber = await dbClient.query(
+  async countAdmins(): Promise<number> {
+    const adminsNumber = await this.pool.query(
       "SELECT COUNT(*) FROM users WHERE role = 'admin'",
     );
     return parseInt(adminsNumber.rows[0].count, 10);
@@ -93,29 +77,27 @@ class UserPgRepository implements IUserRepository {
   async updateEmailVerified(
     userId: string,
     verified: boolean,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void> {
-    const dbClient = await this.getClient(client);
     const query = `
     UPDATE users 
     SET is_email_verified = $1, updated_at = NOW()
     WHERE id = $2
   `;
-    await dbClient.query(query, [verified, userId]);
+    await client.query(query, [verified, userId]);
   }
 
   async updatePassword(
     userId: string,
     hashedPassword: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void> {
-    const dbClient = await this.getClient(client);
     const query = `
     UPDATE users 
     SET password_hash = $1, updated_at = NOW()
     WHERE id = $2
   `;
-    await dbClient.query(query, [hashedPassword, userId]);
+    await client.query(query, [hashedPassword, userId]);
   }
 }
 

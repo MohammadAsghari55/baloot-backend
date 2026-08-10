@@ -2,39 +2,30 @@ import IDatabaseClient from "../../shared/interfaces/idatabase.client.js";
 import User from "../../../domains/user/entities/user.entity.js";
 
 interface IUserApplicationService {
-  findUserByEmail(
-    email: string,
-    client?: IDatabaseClient,
-  ): Promise<User | null>;
+  findUserByEmail(email: string): Promise<User | null>;
 
-  findUserByUsername(
-    username: string,
-    client?: IDatabaseClient,
-  ): Promise<User | null>;
+  findUserByUsername(username: string): Promise<User | null>;
 
-  findUserByIdentifier(
-    identifier: string,
-    client?: IDatabaseClient,
-  ): Promise<User | null>;
+  findUserByIdentifier(identifier: string): Promise<User | null>;
 
-  findUserById(userId: string, client?: IDatabaseClient): Promise<User | null>;
+  findUserById(userId: string, client: IDatabaseClient): Promise<User | null>;
 
-  countAdmins(client?: IDatabaseClient): Promise<number>;
+  countAdmins(): Promise<number>;
 
-  saveUser(user: User, client?: IDatabaseClient): Promise<void>;
+  saveUser(user: User, client: IDatabaseClient): Promise<void>;
 
   getMaxAdmins(): Promise<number>;
 
   updateEmailVerified(
     userId: string,
     verified: boolean,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void>;
 
   updatePassword(
     userId: string,
     hashedPassword: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void>;
 }
 

@@ -9,7 +9,7 @@ class TokenManagementApplicationService implements ITokenManagementApplicationSe
     tokenHash: string,
     userId: string,
     deviceId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void> {
     return this.refreshTokenRepository.saveToken(
       tokenHash,
@@ -22,7 +22,7 @@ class TokenManagementApplicationService implements ITokenManagementApplicationSe
   async revokeByDevice(
     userId: string,
     deviceId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void> {
     return this.refreshTokenRepository.revokeByDeviceId(
       userId,
@@ -31,14 +31,14 @@ class TokenManagementApplicationService implements ITokenManagementApplicationSe
     );
   }
 
-  async revokeAll(userId: string, client?: IDatabaseClient): Promise<void> {
+  async revokeAll(userId: string, client: IDatabaseClient): Promise<void> {
     return this.refreshTokenRepository.revokeAllByUserId(userId, client);
   }
 
   async findToken(
     userId: string,
     deviceId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<{
     userId: string;
     tokenHash: string;

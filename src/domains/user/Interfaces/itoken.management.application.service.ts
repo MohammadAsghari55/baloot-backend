@@ -5,21 +5,21 @@ interface ITokenManagementApplicationService {
     tokenHash: string,
     userId: string,
     deviceId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void>;
 
   revokeByDevice(
     userId: string,
     deviceId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<void>;
 
-  revokeAll(userId: string, client?: IDatabaseClient): Promise<void>;
+  revokeAll(userId: string, client: IDatabaseClient): Promise<void>;
 
   findToken(
     userId: string,
     deviceId: string,
-    client?: IDatabaseClient,
+    client: IDatabaseClient,
   ): Promise<{
     userId: string;
     tokenHash: string;

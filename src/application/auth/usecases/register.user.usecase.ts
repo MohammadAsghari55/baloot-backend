@@ -31,14 +31,10 @@ class RegisterUserUseCase {
       await this.transactionManager.runInTransaction(async (client) => {
         const existingEmail = await this.userApplicationService.findUserByEmail(
           dto.email,
-          client,
         );
 
         const existingUsername =
-          await this.userApplicationService.findUserByUsername(
-            dto.username,
-            client,
-          );
+          await this.userApplicationService.findUserByUsername(dto.username);
 
         await this.userDomainService.checkUniqueness(
           existingEmail,

@@ -29,22 +29,18 @@ class RegisterAdminUseCase {
 
     const { user, code, response } =
       await this.transactionManager.runInTransaction(async (client) => {
-        const adminsNumber =
-          await this.userApplicationService.countAdmins(client);
+        const adminsNumber = await this.userApplicationService.countAdmins();
+
         const maxAdmins = await this.userApplicationService.getMaxAdmins();
 
         await this.userDomainService.checkAdminLimit(adminsNumber, maxAdmins);
 
         const existingEmail = await this.userApplicationService.findUserByEmail(
           dto.email,
-          client,
         );
 
         const existingUsername =
-          await this.userApplicationService.findUserByUsername(
-            dto.username,
-            client,
-          );
+          await this.userApplicationService.findUserByUsername(dto.username);
 
         await this.userDomainService.checkUniqueness(
           existingEmail,

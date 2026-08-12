@@ -24,7 +24,7 @@ class ChangePasswordUseCase {
   ): Promise<void> {
     const { oldPassword, newPassword } = dto;
 
-    const userEmail = await this.transactionManager.runInTransaction(
+    const result = await this.transactionManager.runInTransaction(
       async (client) => {
         const user = await this.userApplicationService.findUserById(
           userId,
@@ -35,13 +35,48 @@ class ChangePasswordUseCase {
           throw AppError.notFound("NOT_FOUND");
         }
 
+        let passwordChangeTry = user.passwordChangeTry;
+        let passwordChangeLockedUntil = user.passwordChangeLockedUntil;
+
+        if (
+          passwordChangeLockedUntil &&
+          passwordChangeLockedUntil < new Date()
+        ) {
+          passwordChangeTry = 0;
+          passwordChangeLockedUntil = null;
+        }
+
+        if (
+          passwordChangeLockedUntil &&
+          passwordChangeLockedUntil >= new Date()
+        ) {
+          if (passwordChangeTry === 0) {
+            throw AppError.fromCode("PASSWORD_RECENTLY_CHANGED");
+          } else {
+            throw AppError.fromCode("PASSWORD_CHANGE_LOCKED");
+          }
+        }
+
         const isMatch = await this.bcryptService.compare(
           oldPassword,
           user.passwordHash,
         );
 
         if (!isMatch) {
-          throw AppError.unauthorized("INVALID_CREDENTIALS");
+          passwordChangeTry++;
+          if (passwordChangeTry >= 3) {
+            passwordChangeLockedUntil = new Date(
+              Date.now() + 24 * 60 * 60 * 1000,
+            );
+          }
+
+          await this.userApplicationService.updatePasswordChangeFields(
+            user.id,
+            passwordChangeTry,
+            passwordChangeLockedUntil,
+            client,
+          );
+          return { success: false as const };
         }
 
         if (oldPassword === newPassword) {
@@ -50,9 +85,15 @@ class ChangePasswordUseCase {
 
         const hashedPassword = await this.bcryptService.hash(newPassword);
 
+        passwordChangeTry = 0;
+
+        passwordChangeLockedUntil = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
         await this.userApplicationService.updatePassword(
           user.id,
           hashedPassword,
+          passwordChangeTry,
+          passwordChangeLockedUntil,
           client,
         );
 
@@ -62,13 +103,19 @@ class ChangePasswordUseCase {
           user.id,
           deviceId,
         );
-
-        return user.email;
+        return {
+          success: true as const,
+          email: user.email,
+        };
       },
     );
 
+    if (!result.success) {
+      throw AppError.unauthorized("INVALID_CREDENTIALS");
+    }
+
     try {
-      await this.emailOrchestrationService.notifEmailSender(userEmail);
+      await this.emailOrchestrationService.notifEmailSender(result.email);
     } catch (error) {
       const appError = AppError.internalWithOptions("EMAIL_SEND_FAILED", {
         publicMessage: "Failed to send Notification email.",

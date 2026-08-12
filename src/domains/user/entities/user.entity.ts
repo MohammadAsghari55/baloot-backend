@@ -9,6 +9,8 @@ class User {
     private readonly _role: "user" | "admin",
     private _walletBalance: number,
     private _isEmailVerified: boolean,
+    private _passwordChangeTry: number,
+    private _passwordChangeLockedUntil: Date | null,
     private _wrongPasswordNumber: number,
     private _wrongPasswordUntil: Date | null,
     private readonly _createdAt: Date,
@@ -36,17 +38,24 @@ class User {
   get isEmailVerified(): boolean {
     return this._isEmailVerified;
   }
-  get createdAt(): Date {
-    return this._createdAt;
+  get passwordChangeTry(): number {
+    return this._passwordChangeTry;
   }
-  get updatedAt(): Date {
-    return this._updatedAt;
+  get passwordChangeLockedUntil(): Date | null {
+    return this._passwordChangeLockedUntil;
   }
+
   get wrongPasswordNumber(): number {
     return this._wrongPasswordNumber;
   }
   get wrongPasswordUntil(): Date | null {
     return this._wrongPasswordUntil;
+  }
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+  get updatedAt(): Date {
+    return this._updatedAt;
   }
 
   static createNew(
@@ -65,6 +74,8 @@ class User {
       false,
       0,
       null,
+      0,
+      null,
       new Date(),
       new Date(),
     );
@@ -78,6 +89,8 @@ class User {
     role: "user" | "admin";
     wallet_balance: number;
     is_email_verified: boolean;
+    password_change_try: number;
+    password_change_locked_until: Date | null;
     wrong_password_number: number;
     wrong_password_until: Date | null;
     created_at: Date;
@@ -91,6 +104,8 @@ class User {
       data.role,
       data.wallet_balance,
       data.is_email_verified,
+      data.password_change_try,
+      data.password_change_locked_until,
       data.wrong_password_number,
       data.wrong_password_until,
       data.created_at,

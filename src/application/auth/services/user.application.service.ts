@@ -53,9 +53,31 @@ class UserApplicationService implements IUserApplicationService {
   async updatePassword(
     userId: string,
     hashedPassword: string,
+    passwordChangeTry: number,
+    passwordChangeLockedUntil: Date | null,
     client: IDatabaseClient,
   ): Promise<void> {
-    await this.userRepository.updatePassword(userId, hashedPassword, client);
+    await this.userRepository.updatePassword(
+      userId,
+      hashedPassword,
+      passwordChangeTry,
+      passwordChangeLockedUntil,
+      client,
+    );
+  }
+
+  async updatePasswordChangeFields(
+    userId: string,
+    passwordChangeTry: number,
+    passwordChangeLockedUntil: Date | null,
+    client: IDatabaseClient,
+  ): Promise<void> {
+    await this.userRepository.updatePasswordChangeFields(
+      userId,
+      passwordChangeTry,
+      passwordChangeLockedUntil,
+      client,
+    );
   }
 }
 

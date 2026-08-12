@@ -25,6 +25,15 @@ interface IUserApplicationService {
   updatePassword(
     userId: string,
     hashedPassword: string,
+    passwordChangeTry: number,
+    passwordChangeLockedUntil: Date | null,
+    client: IDatabaseClient,
+  ): Promise<void>;
+
+  updatePasswordChangeFields(
+    userId: string,
+    passwordChangeTry: number,
+    passwordChangeLockedUntil: Date | null,
     client: IDatabaseClient,
   ): Promise<void>;
 }

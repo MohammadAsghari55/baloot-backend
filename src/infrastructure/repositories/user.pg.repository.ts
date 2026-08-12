@@ -44,9 +44,10 @@ class UserPgRepository implements IUserRepository {
     const query = `
     INSERT INTO users (
       id, email, username, password_hash, role, wallet_balance,
-      is_email_verified, wrong_password_number, wrong_password_until,
+      is_email_verified, password_change_try, password_change_locked_until,
+      wrong_password_number, wrong_password_until,
       created_at, updated_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       `;
     try {
       await client.query(query, [
@@ -57,6 +58,8 @@ class UserPgRepository implements IUserRepository {
         user.role,
         user.walletBalance,
         user.isEmailVerified,
+        user.passwordChangeTry,
+        user.passwordChangeLockedUntil,
         user.wrongPasswordNumber,
         user.wrongPasswordUntil,
         user.createdAt,
@@ -90,14 +93,39 @@ class UserPgRepository implements IUserRepository {
   async updatePassword(
     userId: string,
     hashedPassword: string,
+    passwordChangeTry: number,
+    passwordChangeLockedUntil: Date | null,
     client: IDatabaseClient,
   ): Promise<void> {
     const query = `
     UPDATE users 
-    SET password_hash = $1, updated_at = NOW()
-    WHERE id = $2
+    SET password_hash = $1, password_change_try = $2, password_change_locked_until = $3, updated_at = NOW()
+    WHERE id = $4
   `;
-    await client.query(query, [hashedPassword, userId]);
+    await client.query(query, [
+      hashedPassword,
+      passwordChangeTry,
+      passwordChangeLockedUntil,
+      userId,
+    ]);
+  }
+
+  async updatePasswordChangeFields(
+    userId: string,
+    passwordChangeTry: number,
+    passwordChangeLockedUntil: Date | null,
+    client: IDatabaseClient,
+  ): Promise<void> {
+    const query = `
+    UPDATE users 
+    SET password_change_try = $1, password_change_locked_until = $2
+    WHERE id = $3
+  `;
+    await client.query(query, [
+      passwordChangeTry,
+      passwordChangeLockedUntil,
+      userId,
+    ]);
   }
 }
 

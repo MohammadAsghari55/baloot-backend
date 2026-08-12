@@ -45,4 +45,14 @@ export const AuthErrors = {
     message: "Session version mismatch. Please log in again.",
     status: 401,
   },
+  PASSWORD_CHANGE_LOCKED: {
+    code: "PASSWORD_CHANGE_LOCKED",
+    message: "Too many failed attempts. Password change is temporarily locked.",
+    status: 429,
+  },
+  PASSWORD_RECENTLY_CHANGED: {
+    code: "PASSWORD_RECENTLY_CHANGED",
+    message: "Password was changed recently. Please try again later.",
+    status: 429,
+  },
 } as const;

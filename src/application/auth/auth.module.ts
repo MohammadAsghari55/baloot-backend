@@ -13,6 +13,8 @@ import TokenManagementApplicationService from "./services/token.management.appli
 import EmailVerificationRepository from "../../infrastructure/repositories/email.verification.pg.repository.js";
 import EmailVerificationApplicationService from "./services/email.verification.application.service.js";
 import SessionManagementApplicationService from "./services/session.management.application.service.js";
+import PasswordHistoryApplicationService from "./services/password.history.application.service.js";
+import PasswordHistoryPgRepository from "../../infrastructure/repositories/password.history.pg.repository.js";
 
 import LoginUseCase from "./usecases/login.usecase.js";
 import RefreshTokenUseCase from "./usecases/refresh.token.usecase.js";
@@ -43,6 +45,10 @@ function buildAuthModule() {
   const sessionManagementApplicationService =
     new SessionManagementApplicationService(sessionService);
 
+  const passwordHistoryPgRepository = new PasswordHistoryPgRepository();
+  const passwordHistoryApplicationService =
+    new PasswordHistoryApplicationService(passwordHistoryPgRepository);
+
   const registerAdminUseCase = new RegisterAdminUseCase(
     transactionManager,
     userDomainService,
@@ -50,6 +56,7 @@ function buildAuthModule() {
     bcryptService,
     emailOrchestrationService,
     emailVerificationApplicationService,
+    passwordHistoryApplicationService,
   );
 
   const registerUserUseCase = new RegisterUserUseCase(
@@ -59,6 +66,7 @@ function buildAuthModule() {
     bcryptService,
     emailOrchestrationService,
     emailVerificationApplicationService,
+    passwordHistoryApplicationService,
   );
 
   const loginUseCase = new LoginUseCase(
@@ -99,6 +107,7 @@ function buildAuthModule() {
     emailOrchestrationService,
     tokenManagementApplicationService,
     sessionManagementApplicationService,
+    passwordHistoryApplicationService,
   );
 
   const adminController = new AdminController(registerAdminUseCase);

@@ -19,4 +19,9 @@ export const ValidationErrors = {
     message: "Too many requests. Please try again later.",
     status: 429,
   },
+  CANNOT_REUSE_OLD_PASSWORD: {
+    code: "CANNOT_REUSE_OLD_PASSWORD",
+    message: "You cannot reuse one of your recent passwords.",
+    status: 400,
+  },
 } as const;

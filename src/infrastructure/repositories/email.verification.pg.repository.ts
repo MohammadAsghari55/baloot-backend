@@ -1,12 +1,9 @@
-import { Pool } from "pg";
 import EmailVerification from "../../domains/user/entities/email.verification.entity.js";
 import IEmailVerificationRepository from "../../domains/user/repositories/iemail.verification.repository.js";
 import IDatabaseClient from "../../domains/shared/interfaces/idatabase.client.js";
 import DatabaseError from "../../shared/errors/database.error.js";
 
 class EmailVerificationPgRepository implements IEmailVerificationRepository {
-  constructor(private readonly pool: Pool) {}
-
   async findByUserId(
     userId: string,
     client: IDatabaseClient,

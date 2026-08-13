@@ -38,7 +38,7 @@ function buildAuthModule() {
   const tokenManagementApplicationService =
     new TokenManagementApplicationService(refreshTokenPgRepository);
 
-  const emailVerificationPgRepository = new EmailVerificationPgRepository(pool);
+  const emailVerificationPgRepository = new EmailVerificationPgRepository();
   const emailVerificationApplicationService =
     new EmailVerificationApplicationService(emailVerificationPgRepository);
 

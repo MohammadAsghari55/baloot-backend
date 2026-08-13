@@ -4,8 +4,9 @@ import IDatabaseClient from "../../domains/shared/interfaces/idatabase.client.js
 class PgDatabaseClient implements IDatabaseClient {
   constructor(private client: PoolClient) {}
 
-  async query(sql: string, params?: any[]): Promise<any> {
-    return this.client.query(sql, params);
+  async query<T = any>(sql: string, params?: any[]): Promise<{ rows: T[] }> {
+    const result = await this.client.query(sql, params);
+    return result;
   }
 }
 

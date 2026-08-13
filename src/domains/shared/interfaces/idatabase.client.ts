@@ -1,5 +1,5 @@
 interface IDatabaseClient {
-  query(sql: string, params?: any[]): Promise<any>;
+  query<T = any>(sql: string, params?: any[]): Promise<{ rows: T[] }>;
 }
 
 export default IDatabaseClient;

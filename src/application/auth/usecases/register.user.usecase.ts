@@ -5,6 +5,7 @@ import IUserApplicationService from "../../../domains/user/Interfaces/iuser.appl
 import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import IEmailOrchestrationService from "../../../domains/user/Interfaces/iemail.orchestration.service.js";
 import IEmailVerificationApplicationService from "../../../domains/user/Interfaces/iemail.verification.application.service.js";
+import IPasswordHistoryApplicationService from "../../../domains/user/Interfaces/ipassword.history.application.service.js";
 import EmailVerification from "../../../domains/user/entities/email.verification.entity.js";
 import UserResponseDto from "../dtos/user.response.dto.js";
 import AppError from "../../../shared/errors/app.error.js";
@@ -17,6 +18,7 @@ class RegisterUserUseCase {
     private bcryptService: IBcryptService,
     private emailOrchestrationService: IEmailOrchestrationService,
     private emailVerificationApplicationService: IEmailVerificationApplicationService,
+    private passwordHistoryApplicationService: IPasswordHistoryApplicationService,
   ) {}
 
   async execute(dto: RegisterDto) {
@@ -57,6 +59,12 @@ class RegisterUserUseCase {
 
         await this.emailVerificationApplicationService.save(
           emailVerification,
+          client,
+        );
+
+        await this.passwordHistoryApplicationService.save(
+          user.id,
+          hashedPassword,
           client,
         );
 

@@ -5,6 +5,7 @@ import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js"
 import IEmailOrchestrationService from "../../../domains/user/Interfaces/iemail.orchestration.service.js";
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
 import ISessionManagementApplicationService from "../../../domains/user/Interfaces/isession.management.application.service.js";
+import IPasswordHistoryApplicationService from "../../../domains/user/Interfaces/ipassword.history.application.service.js";
 import AppError from "../../../shared/errors/app.error.js";
 
 class ChangePasswordUseCase {
@@ -15,6 +16,7 @@ class ChangePasswordUseCase {
     private emailOrchestrationService: IEmailOrchestrationService,
     private tokenManagementApplicationService: ITokenManagementApplicationService,
     private sessionManagementApplicationService: ISessionManagementApplicationService,
+    private passwordHistoryApplicationService: IPasswordHistoryApplicationService,
   ) {}
 
   async execute(
@@ -85,6 +87,23 @@ class ChangePasswordUseCase {
 
         const hashedPassword = await this.bcryptService.hash(newPassword);
 
+        const recentPasswords =
+          await this.passwordHistoryApplicationService.findRecentByUserId(
+            user.id,
+            3,
+            client,
+          );
+
+        for (const password of recentPasswords) {
+          const isReused = await this.bcryptService.compare(
+            newPassword,
+            password.passwordHash,
+          );
+          if (isReused) {
+            throw AppError.badRequest("CANNOT_REUSE_OLD_PASSWORD");
+          }
+        }
+
         passwordChangeTry = 0;
 
         passwordChangeLockedUntil = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -94,6 +113,17 @@ class ChangePasswordUseCase {
           hashedPassword,
           passwordChangeTry,
           passwordChangeLockedUntil,
+          client,
+        );
+
+        await this.passwordHistoryApplicationService.save(
+          user.id,
+          hashedPassword,
+          client,
+        );
+
+        await this.passwordHistoryApplicationService.pruneHistory(
+          user.id,
           client,
         );
 

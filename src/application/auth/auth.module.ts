@@ -8,9 +8,9 @@ import {
   sessionService,
 } from "../../infrastructure/services/services.index.js";
 import EmailOrchestrationService from "./services/email.orchestration.service.js";
-import RefreshTokenRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
+import RefreshTokenPgRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
 import TokenManagementApplicationService from "./services/token.management.application.service.js";
-import EmailVerificationRepository from "../../infrastructure/repositories/email.verification.pg.repository.js";
+import EmailVerificationPgRepository from "../../infrastructure/repositories/email.verification.pg.repository.js";
 import EmailVerificationApplicationService from "./services/email.verification.application.service.js";
 import SessionManagementApplicationService from "./services/session.management.application.service.js";
 import PasswordHistoryApplicationService from "./services/password.history.application.service.js";
@@ -34,13 +34,13 @@ function buildAuthModule() {
   const transactionManager = new PgTransactionManager(pool);
   const emailOrchestrationService = new EmailOrchestrationService(emailService);
 
-  const refreshTokenRepository = new RefreshTokenRepository(pool);
+  const refreshTokenPgRepository = new RefreshTokenPgRepository(pool);
   const tokenManagementApplicationService =
-    new TokenManagementApplicationService(refreshTokenRepository);
+    new TokenManagementApplicationService(refreshTokenPgRepository);
 
-  const emailVerificationRepository = new EmailVerificationRepository(pool);
+  const emailVerificationPgRepository = new EmailVerificationPgRepository(pool);
   const emailVerificationApplicationService =
-    new EmailVerificationApplicationService(emailVerificationRepository);
+    new EmailVerificationApplicationService(emailVerificationPgRepository);
 
   const sessionManagementApplicationService =
     new SessionManagementApplicationService(sessionService);

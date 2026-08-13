@@ -4,7 +4,7 @@ import IDatabaseClient from "../../domains/shared/interfaces/idatabase.client.js
 import DatabaseError from "../../shared/errors/database.error.js";
 import { randomUUID } from "crypto";
 
-class RefreshTokenRepository implements IRefreshTokenRepository {
+class RefreshTokenPgRepository implements IRefreshTokenRepository {
   constructor(private readonly pool: Pool) {}
 
   async saveToken(
@@ -129,4 +129,4 @@ class RefreshTokenRepository implements IRefreshTokenRepository {
   }
 }
 
-export default RefreshTokenRepository;
+export default RefreshTokenPgRepository;

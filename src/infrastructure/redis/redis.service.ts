@@ -11,6 +11,15 @@ class RedisService implements IRedisService {
       socket: {
         host: config.REDIS_HOST,
         port: config.REDIS_PORT,
+        reconnectStrategy: (retries) => {
+          if (retries > 10) {
+            console.error(
+              "❌ Redis reconnect failed after 10 attempts, giving up",
+            );
+            return new Error("Redis unreachable");
+          }
+          return Math.min(retries * 100, 3000);
+        },
       },
       password: config.REDIS_PASSWORD || undefined,
       database: config.REDIS_DB,
@@ -18,31 +27,24 @@ class RedisService implements IRedisService {
 
     this.client.on("error", (err) => {
       console.error("❌ Redis Client Error:", err);
-
-      throw new AppError(
-        `Redis connection error: ${err.message}`,
-        500,
-        "REDIS_CONNECTION_FAILED",
-        { isPublic: false },
-      );
     });
 
     this.client.on("connect", () => {
       console.log("✅ Redis connected successfully");
     });
 
-    this.connect();
+    this.connect().catch((err) => {
+      console.error("❌ Initial Redis connection failed:", err.message);
+    });
   }
 
   async connect(): Promise<void> {
     try {
       await this.client.connect();
     } catch (error) {
-      throw new AppError(
-        "Failed to establish Redis connection",
-        500,
-        "REDIS_CONNECTION_FAILED",
-        { isPublic: false },
+      console.error(
+        "❌ Redis initial connect failed, will retry via reconnectStrategy:",
+        error,
       );
     }
   }

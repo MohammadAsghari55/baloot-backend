@@ -28,10 +28,7 @@ class ChangePasswordUseCase {
 
     const result = await this.transactionManager.runInTransaction(
       async (client) => {
-        const user = await this.userApplicationService.findUserById(
-          userId,
-          client,
-        );
+        const user = await this.userApplicationService.findById(userId, client);
 
         if (!user) {
           throw AppError.notFound("NOT_FOUND");
@@ -127,7 +124,10 @@ class ChangePasswordUseCase {
           client,
         );
 
-        await this.tokenManagementApplicationService.revokeAll(user.id, client);
+        await this.tokenManagementApplicationService.revokeAllByUserId(
+          user.id,
+          client,
+        );
 
         await this.sessionManagementApplicationService.increaseVersion(
           user.id,

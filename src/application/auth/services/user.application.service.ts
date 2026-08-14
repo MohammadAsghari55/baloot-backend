@@ -7,11 +7,11 @@ import config from "../../../infrastructure/config/env.index.js";
 class UserApplicationService implements IUserApplicationService {
   constructor(private userRepository: IUserRepository) {}
 
-  async findUserByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findByEmail(email);
   }
 
-  async findUserByUsername(username: string): Promise<User | null> {
+  async findByUsername(username: string): Promise<User | null> {
     return this.userRepository.findByUsername(username);
   }
 
@@ -23,7 +23,7 @@ class UserApplicationService implements IUserApplicationService {
     return this.userRepository.findByUsername(identifier);
   }
 
-  async findUserById(
+  async findById(
     userId: string,
     client: IDatabaseClient,
   ): Promise<User | null> {

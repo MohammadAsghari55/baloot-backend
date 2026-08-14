@@ -19,7 +19,7 @@ class TokenManagementApplicationService implements ITokenManagementApplicationSe
     );
   }
 
-  async revokeByDevice(
+  async revokeByDeviceId(
     userId: string,
     deviceId: string,
     client: IDatabaseClient,
@@ -31,11 +31,14 @@ class TokenManagementApplicationService implements ITokenManagementApplicationSe
     );
   }
 
-  async revokeAll(userId: string, client: IDatabaseClient): Promise<void> {
+  async revokeAllByUserId(
+    userId: string,
+    client: IDatabaseClient,
+  ): Promise<void> {
     return this.refreshTokenRepository.revokeAllByUserId(userId, client);
   }
 
-  async findToken(
+  async findTokenByDeviceIdAndUserId(
     userId: string,
     deviceId: string,
     client: IDatabaseClient,

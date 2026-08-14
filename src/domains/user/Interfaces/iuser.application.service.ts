@@ -2,13 +2,13 @@ import IDatabaseClient from "../../shared/interfaces/idatabase.client.js";
 import User from "../../../domains/user/entities/user.entity.js";
 
 interface IUserApplicationService {
-  findUserByEmail(email: string): Promise<User | null>;
+  findByEmail(email: string): Promise<User | null>;
 
-  findUserByUsername(username: string): Promise<User | null>;
+  findByUsername(username: string): Promise<User | null>;
 
   findUserByIdentifier(identifier: string): Promise<User | null>;
 
-  findUserById(userId: string, client: IDatabaseClient): Promise<User | null>;
+  findById(userId: string, client: IDatabaseClient): Promise<User | null>;
 
   countAdmins(): Promise<number>;
 

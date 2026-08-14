@@ -39,7 +39,7 @@ class RefreshTokenUseCase {
         }
       } else {
         const storedToken =
-          await this.tokenManagementApplicationService.findToken(
+          await this.tokenManagementApplicationService.findTokenByDeviceIdAndUserId(
             userId,
             deviceId,
             client,

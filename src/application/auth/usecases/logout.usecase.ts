@@ -16,14 +16,17 @@ class LogoutUseCase {
   ): Promise<void> {
     await this.transactionManager.runInTransaction(async (client) => {
       if (allDevice) {
-        await this.tokenManagementApplicationService.revokeAll(userId, client);
+        await this.tokenManagementApplicationService.revokeAllByUserId(
+          userId,
+          client,
+        );
 
         await this.sessionManagementApplicationService.increaseVersion(
           userId,
           deviceId,
         );
       } else {
-        await this.tokenManagementApplicationService.revokeByDevice(
+        await this.tokenManagementApplicationService.revokeByDeviceId(
           userId,
           deviceId,
           client,

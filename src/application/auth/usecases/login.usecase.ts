@@ -36,7 +36,7 @@ class LoginUseCase {
       }
 
       const existingToken =
-        await this.tokenManagementApplicationService.findToken(
+        await this.tokenManagementApplicationService.findTokenByDeviceIdAndUserId(
           user.id,
           deviceId,
           client,

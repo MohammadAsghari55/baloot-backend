@@ -8,15 +8,15 @@ interface ITokenManagementApplicationService {
     client: IDatabaseClient,
   ): Promise<void>;
 
-  revokeByDevice(
+  revokeByDeviceId(
     userId: string,
     deviceId: string,
     client: IDatabaseClient,
   ): Promise<void>;
 
-  revokeAll(userId: string, client: IDatabaseClient): Promise<void>;
+  revokeAllByUserId(userId: string, client: IDatabaseClient): Promise<void>;
 
-  findToken(
+  findTokenByDeviceIdAndUserId(
     userId: string,
     deviceId: string,
     client: IDatabaseClient,

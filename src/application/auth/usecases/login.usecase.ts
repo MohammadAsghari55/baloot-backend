@@ -25,7 +25,7 @@ class LoginUseCase {
 
     return this.transactionManager.runInTransaction(async (client) => {
       const user =
-        await this.userApplicationService.findUserByIdentifier(identifier);
+        await this.userApplicationService.findByIdentifier(identifier);
 
       if (!user) {
         throw AppError.unauthorized("INVALID_CREDENTIALS");

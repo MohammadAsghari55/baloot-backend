@@ -40,7 +40,7 @@ class UserPgRepository implements IUserRepository {
     return User.fromDB(row);
   }
 
-  async insertUser(user: User, client: IDatabaseClient): Promise<void> {
+  async save(user: User, client: IDatabaseClient): Promise<void> {
     const query = `
     INSERT INTO users (
       id, email, username, password_hash, role, wallet_balance,

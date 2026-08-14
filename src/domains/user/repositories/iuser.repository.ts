@@ -7,7 +7,7 @@ interface IUserRepository {
 
   findById(userId: string, client: IDatabaseClient): Promise<User | null>;
 
-  insertUser(user: User, client: IDatabaseClient): Promise<void>;
+  save(user: User, client: IDatabaseClient): Promise<void>;
 
   countAdmins(): Promise<number>;
 

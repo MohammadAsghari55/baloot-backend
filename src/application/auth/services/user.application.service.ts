@@ -15,7 +15,7 @@ class UserApplicationService implements IUserApplicationService {
     return this.userRepository.findByUsername(username);
   }
 
-  async findUserByIdentifier(identifier: string): Promise<User | null> {
+  async findByIdentifier(identifier: string): Promise<User | null> {
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
     if (isEmail) {
       return this.userRepository.findByEmail(identifier);
@@ -34,8 +34,8 @@ class UserApplicationService implements IUserApplicationService {
     return this.userRepository.countAdmins();
   }
 
-  async saveUser(user: User, client: IDatabaseClient): Promise<void> {
-    await this.userRepository.insertUser(user, client);
+  async save(user: User, client: IDatabaseClient): Promise<void> {
+    await this.userRepository.save(user, client);
   }
 
   async getMaxAdmins(): Promise<number> {

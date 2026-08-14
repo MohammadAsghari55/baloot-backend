@@ -6,13 +6,13 @@ interface IUserApplicationService {
 
   findByUsername(username: string): Promise<User | null>;
 
-  findUserByIdentifier(identifier: string): Promise<User | null>;
+  findByIdentifier(identifier: string): Promise<User | null>;
 
   findById(userId: string, client: IDatabaseClient): Promise<User | null>;
 
   countAdmins(): Promise<number>;
 
-  saveUser(user: User, client: IDatabaseClient): Promise<void>;
+  save(user: User, client: IDatabaseClient): Promise<void>;
 
   getMaxAdmins(): Promise<number>;
 

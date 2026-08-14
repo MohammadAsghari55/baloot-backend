@@ -4,6 +4,13 @@ import IDatabaseClient from "../../domains/shared/interfaces/idatabase.client.js
 import DatabaseError from "../../shared/errors/database.error.js";
 import { randomUUID } from "crypto";
 
+interface RefreshTokenRow {
+  user_id: string;
+  token_hash: string;
+  expires_at: Date;
+  revoked_at: Date | null;
+}
+
 class RefreshTokenPgRepository implements IRefreshTokenRepository {
   constructor(private readonly pool: Pool) {}
 
@@ -77,7 +84,10 @@ class RefreshTokenPgRepository implements IRefreshTokenRepository {
     FOR UPDATE
     `;
     try {
-      const token = await client.query(query, [userId, deviceId]);
+      const token = await client.query<RefreshTokenRow>(query, [
+        userId,
+        deviceId,
+      ]);
 
       if (token.rows.length === 0) {
         return null;
@@ -111,7 +121,10 @@ class RefreshTokenPgRepository implements IRefreshTokenRepository {
     LIMIT 1
     `;
     try {
-      const token = await this.pool.query(query, [userId, deviceId]);
+      const token = await this.pool.query<RefreshTokenRow>(query, [
+        userId,
+        deviceId,
+      ]);
 
       if (token.rows.length === 0) {
         return null;

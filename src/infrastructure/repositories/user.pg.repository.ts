@@ -4,11 +4,31 @@ import IUserRepository from "../../domains/user/repositories/iuser.repository.js
 import IDatabaseClient from "../../domains/shared/interfaces/idatabase.client.js";
 import DatabaseError from "../../shared/errors/database.error.js";
 
+interface UserRow {
+  id: string;
+  email: string;
+  username: string;
+  password_hash: string;
+  role: "user" | "admin";
+  wallet_balance: number;
+  is_email_verified: boolean;
+  wrong_password_number: number;
+  wrong_password_until: Date | null;
+  password_change_try: number;
+  password_change_locked_until: Date | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+interface CountRow {
+  count: string;
+}
+
 class UserPgRepository implements IUserRepository {
   constructor(private readonly pool: Pool) {}
 
   async findByEmail(email: string): Promise<User | null> {
-    const result = await this.pool.query(
+    const result = await this.pool.query<UserRow>(
       "SELECT * FROM users WHERE email = $1",
       [email],
     );
@@ -18,7 +38,7 @@ class UserPgRepository implements IUserRepository {
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    const result = await this.pool.query(
+    const result = await this.pool.query<UserRow>(
       "SELECT * FROM users WHERE username = $1",
       [username],
     );
@@ -31,7 +51,7 @@ class UserPgRepository implements IUserRepository {
     userId: string,
     client: IDatabaseClient,
   ): Promise<User | null> {
-    const result = await client.query(
+    const result = await client.query<UserRow>(
       "SELECT * FROM users WHERE id = $1 FOR UPDATE",
       [userId],
     );
@@ -71,7 +91,7 @@ class UserPgRepository implements IUserRepository {
   }
 
   async countAdmins(): Promise<number> {
-    const adminsNumber = await this.pool.query(
+    const adminsNumber = await this.pool.query<CountRow>(
       "SELECT COUNT(*) FROM users WHERE role = 'admin'",
     );
     return parseInt(adminsNumber.rows[0].count, 10);

@@ -3,12 +3,21 @@ import IEmailVerificationRepository from "../../domains/user/repositories/iemail
 import IDatabaseClient from "../../domains/shared/interfaces/idatabase.client.js";
 import DatabaseError from "../../shared/errors/database.error.js";
 
+interface EmailVerificationRow {
+  id: string;
+  user_id: string;
+  code: string;
+  created_at: Date;
+  updated_at: Date;
+  expires_at: Date;
+}
+
 class EmailVerificationPgRepository implements IEmailVerificationRepository {
   async findByUserId(
     userId: string,
     client: IDatabaseClient,
   ): Promise<EmailVerification | null> {
-    const result = await client.query(
+    const result = await client.query<EmailVerificationRow>(
       "SELECT * FROM email_verifications WHERE user_id = $1 FOR UPDATE",
       [userId],
     );

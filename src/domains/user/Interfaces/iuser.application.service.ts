@@ -10,6 +10,8 @@ interface IUserApplicationService {
 
   findById(userId: string, client: IDatabaseClient): Promise<User | null>;
 
+  readById(userId: string): Promise<User | null>;
+
   countAdmins(): Promise<number>;
 
   save(user: User, client: IDatabaseClient): Promise<void>;
@@ -36,6 +38,8 @@ interface IUserApplicationService {
     passwordChangeLockedUntil: Date | null,
     client: IDatabaseClient,
   ): Promise<void>;
+
+  increaseVersion(userId: string, client: IDatabaseClient): Promise<number>;
 }
 
 export default IUserApplicationService;

@@ -30,6 +30,10 @@ class UserApplicationService implements IUserApplicationService {
     return this.userRepository.findById(userId, client);
   }
 
+  async readById(userId: string): Promise<User | null> {
+    return this.userRepository.readById(userId);
+  }
+
   async countAdmins(): Promise<number> {
     return this.userRepository.countAdmins();
   }
@@ -78,6 +82,13 @@ class UserApplicationService implements IUserApplicationService {
       passwordChangeLockedUntil,
       client,
     );
+  }
+
+  async increaseVersion(
+    userId: string,
+    client: IDatabaseClient,
+  ): Promise<number> {
+    return this.userRepository.increaseVersion(userId, client);
   }
 }
 

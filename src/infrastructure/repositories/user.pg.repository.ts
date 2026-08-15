@@ -16,6 +16,7 @@ interface UserRow {
   wrong_password_until: Date | null;
   password_change_try: number;
   password_change_locked_until: Date | null;
+  token_version: number;
   created_at: Date;
   updated_at: Date;
 }
@@ -60,14 +61,24 @@ class UserPgRepository implements IUserRepository {
     return User.fromDB(row);
   }
 
+  async readById(userId: string): Promise<User | null> {
+    const result = await this.pool.query<UserRow>(
+      "SELECT * FROM users WHERE id = $1",
+      [userId],
+    );
+    if (result.rows.length === 0) return null;
+    const row = result.rows[0];
+    return User.fromDB(row);
+  }
+
   async save(user: User, client: IDatabaseClient): Promise<void> {
     const query = `
     INSERT INTO users (
       id, email, username, password_hash, role, wallet_balance,
       is_email_verified, password_change_try, password_change_locked_until,
-      wrong_password_number, wrong_password_until,
+      wrong_password_number, wrong_password_until, token_version,
       created_at, updated_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
       `;
     try {
       await client.query(query, [
@@ -82,6 +93,7 @@ class UserPgRepository implements IUserRepository {
         user.passwordChangeLockedUntil,
         user.wrongPasswordNumber,
         user.wrongPasswordUntil,
+        user.tokenVersion,
         user.createdAt,
         user.updatedAt,
       ]);
@@ -146,6 +158,23 @@ class UserPgRepository implements IUserRepository {
       passwordChangeLockedUntil,
       userId,
     ]);
+  }
+
+  async increaseVersion(
+    userId: string,
+    client: IDatabaseClient,
+  ): Promise<number> {
+    const query = `
+    UPDATE users 
+    SET token_version = token_version + 1 
+    WHERE id = $1 
+    RETURNING token_version
+    `;
+    const result = await client.query<{ token_version: number }>(query, [
+      userId,
+    ]);
+
+    return result.rows[0].token_version;
   }
 }
 

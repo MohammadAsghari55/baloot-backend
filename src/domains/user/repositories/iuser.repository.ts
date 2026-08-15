@@ -7,6 +7,8 @@ interface IUserRepository {
 
   findById(userId: string, client: IDatabaseClient): Promise<User | null>;
 
+  readById(userId: string): Promise<User | null>;
+
   save(user: User, client: IDatabaseClient): Promise<void>;
 
   countAdmins(): Promise<number>;
@@ -31,6 +33,8 @@ interface IUserRepository {
     passwordChangeLockedUntil: Date | null,
     client: IDatabaseClient,
   ): Promise<void>;
+
+  increaseVersion(userId: string, client: IDatabaseClient): Promise<number>;
 }
 
 export default IUserRepository;

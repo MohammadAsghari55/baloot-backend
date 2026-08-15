@@ -13,6 +13,7 @@ class User {
     private _passwordChangeLockedUntil: Date | null,
     private _wrongPasswordNumber: number,
     private _wrongPasswordUntil: Date | null,
+    private _tokenVersion: number,
     private readonly _createdAt: Date,
     private _updatedAt: Date,
   ) {}
@@ -44,12 +45,14 @@ class User {
   get passwordChangeLockedUntil(): Date | null {
     return this._passwordChangeLockedUntil;
   }
-
   get wrongPasswordNumber(): number {
     return this._wrongPasswordNumber;
   }
   get wrongPasswordUntil(): Date | null {
     return this._wrongPasswordUntil;
+  }
+  get tokenVersion(): number {
+    return this._tokenVersion;
   }
   get createdAt(): Date {
     return this._createdAt;
@@ -76,6 +79,7 @@ class User {
       null,
       0,
       null,
+      1,
       new Date(),
       new Date(),
     );
@@ -93,6 +97,7 @@ class User {
     password_change_locked_until: Date | null;
     wrong_password_number: number;
     wrong_password_until: Date | null;
+    token_version: number;
     created_at: Date;
     updated_at: Date;
   }): User {
@@ -108,6 +113,7 @@ class User {
       data.password_change_locked_until,
       data.wrong_password_number,
       data.wrong_password_until,
+      data.token_version,
       data.created_at,
       data.updated_at,
     );

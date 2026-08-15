@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS users (
     wrong_password_until            TIMESTAMP,
     is_profile_completed            BOOLEAN DEFAULT FALSE,
     is_email_verified               BOOLEAN DEFAULT FALSE,
+    token_version                   INTEGER NOT NULL DEFAULT 1,
     created_at                      TIMESTAMP DEFAULT NOW(),
     updated_at                      TIMESTAMP DEFAULT NOW()
 );

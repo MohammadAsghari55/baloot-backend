@@ -23,99 +23,118 @@ class LoginUseCase {
   async execute(dto: LoginDto, deviceId: string) {
     const { identifier, password, code } = dto;
 
-    return this.transactionManager.runInTransaction(async (client) => {
-      const user =
-        await this.userApplicationService.findByIdentifier(identifier);
+    const result = await this.transactionManager.runInTransaction(
+      async (client) => {
+        const user =
+          await this.userApplicationService.findByIdentifier(identifier);
 
-      if (!user) {
-        throw AppError.unauthorized("INVALID_CREDENTIALS");
-      }
+        if (!user) {
+          throw AppError.unauthorized("INVALID_CREDENTIALS");
+        }
 
-      if (!user.isEmailVerified && !code) {
-        throw AppError.badRequest("EMAIL_NOT_VERIFIED");
-      }
+        if (!user.isEmailVerified && !code) {
+          throw AppError.badRequest("EMAIL_NOT_VERIFIED");
+        }
 
-      const existingToken =
-        await this.tokenManagementApplicationService.findTokenByDeviceIdAndUserId(
+        const existingToken =
+          await this.tokenManagementApplicationService.findTokenByDeviceIdAndUserId(
+            user.id,
+            deviceId,
+            client,
+          );
+        if (existingToken && existingToken.expiresAt > new Date()) {
+          throw AppError.badRequest("YOU_ARE_LOGGED_IN");
+        }
+
+        const isMatch = await this.bcryptService.compare(
+          password,
+          user.passwordHash,
+        );
+
+        if (!isMatch) {
+          throw AppError.unauthorized("INVALID_CREDENTIALS");
+        }
+
+        if (!user.isEmailVerified) {
+          const emailVerification =
+            await this.emailVerificationApplicationService.findByUserId(
+              user.id,
+              client,
+            );
+
+          if (!emailVerification) {
+            throw AppError.badRequest("INVALID_VERIFICATION_CODE");
+          }
+
+          if (code !== emailVerification.code) {
+            throw AppError.badRequest("INVALID_VERIFICATION_CODE");
+          }
+
+          await this.userApplicationService.updateEmailVerified(
+            user.id,
+            true,
+            client,
+          );
+
+          await this.emailVerificationApplicationService.delete(
+            user.id,
+            client,
+          );
+        }
+
+        if (!deviceId) {
+          deviceId = randomUUID();
+        }
+
+        const version = user.tokenVersion;
+
+        const tokens = await this.tokenService.generateTokenPair(
+          user.id,
+          deviceId,
+          user.role,
+        );
+
+        await this.tokenManagementApplicationService.saveToken(
+          tokens.hashedRefreshToken,
           user.id,
           deviceId,
           client,
         );
-      if (existingToken && existingToken.expiresAt > new Date()) {
-        throw AppError.badRequest("YOU_ARE_LOGGED_IN");
-      }
 
-      const isMatch = await this.bcryptService.compare(
-        password,
-        user.passwordHash,
-      );
+        return {
+          user,
+          deviceId,
+          version,
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+        };
+      },
+    );
 
-      if (!isMatch) {
-        throw AppError.unauthorized("INVALID_CREDENTIALS");
-      }
-
-      if (!user.isEmailVerified) {
-        const emailVerification =
-          await this.emailVerificationApplicationService.findByUserId(
-            user.id,
-            client,
-          );
-
-        if (!emailVerification) {
-          throw AppError.badRequest("INVALID_VERIFICATION_CODE");
-        }
-
-        if (code !== emailVerification.code) {
-          throw AppError.badRequest("INVALID_VERIFICATION_CODE");
-        }
-
-        await this.userApplicationService.updateEmailVerified(
-          user.id,
-          true,
-          client,
-        );
-
-        await this.emailVerificationApplicationService.delete(user.id, client);
-      }
-
-      if (!deviceId) {
-        deviceId = randomUUID();
-      }
-
-      const redisVersion = await this.sessionService.getVersion(user.id);
-
-      const version = redisVersion ?? 1;
-
-      const tokens = await this.tokenService.generateTokenPair(
-        user.id,
-        deviceId,
-        user.role,
-      );
-
-      await this.tokenManagementApplicationService.saveToken(
-        tokens.hashedRefreshToken,
-        user.id,
-        deviceId,
-        client,
-      );
-
+    try {
       await this.sessionService.setSession(
-        user.id,
-        deviceId,
+        result.user.id,
+        result.deviceId,
         {
           status: "active",
-          version: version,
+          version: result.version,
         },
         7 * 24 * 60 * 60,
       );
 
-      await this.sessionService.setVersion(user.id, version, 30 * 24 * 60 * 60);
+      await this.sessionService.setVersion(
+        result.user.id,
+        result.version,
+        30 * 24 * 60 * 60,
+      );
+    } catch (error) {
+      console.error("Redis sync failed after login:", error);
+    }
 
-      return {
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
-      };
-    });
+    return {
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    };
   }
 }
 

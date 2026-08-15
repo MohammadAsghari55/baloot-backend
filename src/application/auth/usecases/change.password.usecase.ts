@@ -4,8 +4,8 @@ import IUserApplicationService from "../../../domains/user/Interfaces/iuser.appl
 import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import IEmailOrchestrationService from "../../../domains/user/Interfaces/iemail.orchestration.service.js";
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
-import ISessionManagementApplicationService from "../../../domains/user/Interfaces/isession.management.application.service.js";
 import IPasswordHistoryApplicationService from "../../../domains/user/Interfaces/ipassword.history.application.service.js";
+import ISessionService from "../../../domains/user/Interfaces/isession.service.js";
 import AppError from "../../../shared/errors/app.error.js";
 
 class ChangePasswordUseCase {
@@ -15,15 +15,11 @@ class ChangePasswordUseCase {
     private bcryptService: IBcryptService,
     private emailOrchestrationService: IEmailOrchestrationService,
     private tokenManagementApplicationService: ITokenManagementApplicationService,
-    private sessionManagementApplicationService: ISessionManagementApplicationService,
     private passwordHistoryApplicationService: IPasswordHistoryApplicationService,
+    private sessionService: ISessionService,
   ) {}
 
-  async execute(
-    dto: ChangePasswordDto,
-    userId: string,
-    deviceId: string,
-  ): Promise<void> {
+  async execute(dto: ChangePasswordDto, userId: string): Promise<void> {
     const { oldPassword, newPassword } = dto;
 
     const result = await this.transactionManager.runInTransaction(
@@ -129,12 +125,12 @@ class ChangePasswordUseCase {
           client,
         );
 
-        await this.sessionManagementApplicationService.increaseVersion(
-          user.id,
-          deviceId,
-        );
+        const newTokenVersion =
+          await this.userApplicationService.increaseVersion(user.id, client);
+
         return {
           success: true as const,
+          newVersion: newTokenVersion,
           email: user.email,
         };
       },
@@ -142,6 +138,16 @@ class ChangePasswordUseCase {
 
     if (!result.success) {
       throw AppError.unauthorized("INVALID_CREDENTIALS");
+    }
+
+    try {
+      await this.sessionService.setVersion(
+        userId,
+        result.newVersion,
+        30 * 24 * 60 * 60,
+      );
+    } catch (error) {
+      console.error("Redis version sync failed after password change:", error);
     }
 
     try {

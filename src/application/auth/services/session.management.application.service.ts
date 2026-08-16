@@ -22,23 +22,6 @@ class SessionManagementApplicationService implements ISessionManagementApplicati
       );
     }
   }
-
-  async increaseVersion(userId: string, deviceId: string): Promise<void> {
-    let redisVersion = await this.sessionService.getVersion(userId);
-
-    if (!redisVersion) {
-      const session = await this.sessionService.getSession(userId, deviceId);
-
-      if (!session) {
-        throw AppError.unauthorized("SESSION_INACTIVE");
-      } else {
-        redisVersion = session.version;
-      }
-    }
-    const newVersion = (redisVersion ?? 0) + 1;
-
-    await this.sessionService.setVersion(userId, newVersion, 30 * 24 * 60 * 60);
-  }
 }
 
 export default SessionManagementApplicationService;

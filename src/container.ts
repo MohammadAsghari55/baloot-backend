@@ -4,6 +4,7 @@ const {
   adminController,
   userController,
   authController,
+  userApplicationService,
   tokenManagementApplicationService,
 } = buildAuthModule();
 
@@ -11,5 +12,6 @@ export {
   adminController,
   userController,
   authController,
+  userApplicationService,
   tokenManagementApplicationService,
 };

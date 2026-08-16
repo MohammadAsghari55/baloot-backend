@@ -81,6 +81,7 @@ function buildAuthModule() {
 
   const refreshTokenUseCase = new RefreshTokenUseCase(
     transactionManager,
+    userApplicationService,
     bcryptService,
     tokenService,
     tokenManagementApplicationService,
@@ -96,8 +97,10 @@ function buildAuthModule() {
 
   const logoutUseCase = new LogoutUseCase(
     transactionManager,
+    userApplicationService,
     tokenManagementApplicationService,
     sessionManagementApplicationService,
+    sessionService,
   );
 
   const changePasswordUseCase = new ChangePasswordUseCase(
@@ -106,8 +109,8 @@ function buildAuthModule() {
     bcryptService,
     emailOrchestrationService,
     tokenManagementApplicationService,
-    sessionManagementApplicationService,
     passwordHistoryApplicationService,
+    sessionService,
   );
 
   const adminController = new AdminController(registerAdminUseCase);
@@ -126,6 +129,7 @@ function buildAuthModule() {
     adminController,
     userController,
     authController,
+    userApplicationService,
     tokenManagementApplicationService,
   };
 }

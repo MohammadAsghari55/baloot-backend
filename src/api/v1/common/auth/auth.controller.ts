@@ -61,11 +61,7 @@ class AuthController {
   }
 
   async changePassword(req: Request, res: Response) {
-    await this.changePasswordUseCase.execute(
-      req.body,
-      req.userId!,
-      req.deviceId!,
-    );
+    await this.changePasswordUseCase.execute(req.body, req.userId!);
 
     res.clearCookie("accessToken", accessCookieOptions);
     res.clearCookie("refreshToken", refreshCookieOptions);

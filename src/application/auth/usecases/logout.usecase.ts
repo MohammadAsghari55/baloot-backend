@@ -1,12 +1,16 @@
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
+import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
 import ISessionManagementApplicationService from "../../../domains/user/Interfaces/isession.management.application.service.js";
+import ISessionService from "../../../domains/user/Interfaces/isession.service.js";
 
 class LogoutUseCase {
   constructor(
     private transactionManager: ITransactionManager,
+    private userApplicationService: IUserApplicationService,
     private tokenManagementApplicationService: ITokenManagementApplicationService,
     private sessionManagementApplicationService: ISessionManagementApplicationService,
+    private sessionService: ISessionService,
   ) {}
 
   async execute(
@@ -14,30 +18,52 @@ class LogoutUseCase {
     deviceId: string,
     allDevice: boolean,
   ): Promise<void> {
-    await this.transactionManager.runInTransaction(async (client) => {
-      if (allDevice) {
+    if (allDevice) {
+      await this.logoutAllDevices(userId);
+    } else {
+      await this.logoutSingleDevice(userId, deviceId);
+    }
+  }
+
+  private async logoutAllDevices(userId: string) {
+    const newTokenVersion = await this.transactionManager.runInTransaction(
+      async (client) => {
         await this.tokenManagementApplicationService.revokeAllByUserId(
           userId,
           client,
         );
+        return this.userApplicationService.increaseVersion(userId, client);
+      },
+    );
 
-        await this.sessionManagementApplicationService.increaseVersion(
-          userId,
-          deviceId,
-        );
-      } else {
-        await this.tokenManagementApplicationService.revokeByDeviceId(
-          userId,
-          deviceId,
-          client,
-        );
+    try {
+      await this.sessionService.setVersion(
+        userId,
+        newTokenVersion,
+        30 * 24 * 60 * 60,
+      );
+    } catch (error) {
+      console.error("Redis sync failed:", error);
+    }
+  }
 
-        await this.sessionManagementApplicationService.inactiveSession(
-          userId,
-          deviceId,
-        );
-      }
+  private async logoutSingleDevice(userId: string, deviceId: string) {
+    await this.transactionManager.runInTransaction(async (client) => {
+      await this.tokenManagementApplicationService.revokeByDeviceId(
+        userId,
+        deviceId,
+        client,
+      );
     });
+
+    try {
+      await this.sessionManagementApplicationService.inactiveSession(
+        userId,
+        deviceId,
+      );
+    } catch (error) {
+      console.error("Redis sync failed:", error);
+    }
   }
 }
 

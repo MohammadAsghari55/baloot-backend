@@ -5,7 +5,7 @@ declare global {
     interface Request {
       userId?: string | null;
       deviceId?: string | null;
-      role?: "user" | "admin" | null;
+      role?: "user" | "admin" | "super_admin" | null;
       tokenValidation?: boolean | null;
     }
   }

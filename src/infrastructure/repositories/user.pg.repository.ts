@@ -9,7 +9,7 @@ interface UserRow {
   email: string;
   username: string;
   password_hash: string;
-  role: "user" | "admin";
+  role: "user" | "admin" | "super_admin";
   wallet_balance: number;
   is_email_verified: boolean;
   wrong_password_number: number;

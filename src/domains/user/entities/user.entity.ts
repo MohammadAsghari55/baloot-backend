@@ -6,7 +6,7 @@ class User {
     private _email: string,
     private _username: string,
     private _passwordHash: string,
-    private readonly _role: "user" | "admin",
+    private readonly _role: "user" | "admin" | "super_admin",
     private _walletBalance: number,
     private _isEmailVerified: boolean,
     private _passwordChangeTry: number,
@@ -30,7 +30,7 @@ class User {
   get passwordHash(): string {
     return this._passwordHash;
   }
-  get role(): "user" | "admin" {
+  get role(): "user" | "admin" | "super_admin" {
     return this._role;
   }
   get walletBalance(): number {
@@ -65,7 +65,7 @@ class User {
     email: string,
     username: string,
     hashedPassword: string,
-    role: "user" | "admin" = "user",
+    role: "user" | "admin" | "super_admin" = "user",
   ): User {
     return new User(
       randomUUID(),
@@ -90,7 +90,7 @@ class User {
     email: string;
     username: string;
     password_hash: string;
-    role: "user" | "admin";
+    role: "user" | "admin" | "super_admin";
     wallet_balance: number;
     is_email_verified: boolean;
     password_change_try: number;

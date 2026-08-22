@@ -26,7 +26,7 @@ export const registerSchema = z
           "Password must contain at least one special character like @ - $ & !",
       }),
     confirmPassword: z.string(),
-    role: z.enum(["user", "admin"]).default("user"),
+    role: z.enum(["user", "admin", "super_admin"]).default("user"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",

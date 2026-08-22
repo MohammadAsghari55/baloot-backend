@@ -18,7 +18,7 @@ const tokenExtractorMiddleware = (tokenService: ITokenService) => {
     let payload: {
       userId: string;
       deviceId: string;
-      role: "user" | "admin";
+      role: "user" | "admin" | "super_admin";
     } | null = null;
 
     let isValid = false;
@@ -27,7 +27,7 @@ const tokenExtractorMiddleware = (tokenService: ITokenService) => {
       payload = tokenService.verifyAccessToken(accessToken) as {
         userId: string;
         deviceId: string;
-        role: "user" | "admin";
+        role: "user" | "admin" | "super_admin";
       };
       isValid = true;
     } catch (error) {
@@ -35,7 +35,7 @@ const tokenExtractorMiddleware = (tokenService: ITokenService) => {
         payload = tokenService.decodeAccessToken(accessToken) as {
           userId: string;
           deviceId: string;
-          role: "user" | "admin";
+          role: "user" | "admin" | "super_admin";
         } | null;
         isValid = false;
       } else {

@@ -20,7 +20,7 @@ class UserDomainService {
     email: string,
     username: string,
     hashedPassword: string,
-    role: "user" | "admin" = "user",
+    role: "user" | "admin" | "super_admin" = "user",
   ): User {
     return User.createNew(email, username, hashedPassword, role);
   }

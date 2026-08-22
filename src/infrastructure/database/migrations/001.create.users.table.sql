@@ -1,6 +1,6 @@
 -- UP
 DO $$ BEGIN
-    CREATE TYPE user_role AS ENUM ('user', 'admin');
+    CREATE TYPE user_role AS ENUM ('user', 'admin', 'super_admin');
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
@@ -30,6 +30,30 @@ CREATE TABLE IF NOT EXISTS users (
     created_at                      TIMESTAMP DEFAULT NOW(),
     updated_at                      TIMESTAMP DEFAULT NOW()
 );
+
+
+INSERT INTO users (
+    id,
+    email,
+    username,
+    password_hash,
+    role,
+    is_email_verified,
+    token_version,
+    created_at,
+    updated_at
+) VALUES (
+    gen_random_uuid(),
+    'admin@baloot.local',
+    'BalootSuperAdmin',
+    crypt('Baloot@74', gen_salt('bf', 10)),
+    'super_admin',
+    false,
+    1,
+    NOW(),
+    NOW()
+);
+
 
 -- DOWN
 DROP TABLE IF EXISTS users;

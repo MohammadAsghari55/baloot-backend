@@ -6,6 +6,7 @@ import {
   emailService,
   tokenService,
   sessionService,
+  registerAdminService,
 } from "../../infrastructure/services/services.index.js";
 import EmailOrchestrationService from "./services/email.orchestration.service.js";
 import RefreshTokenPgRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
@@ -19,6 +20,8 @@ import PasswordHistoryPgRepository from "../../infrastructure/repositories/passw
 import LoginUseCase from "./usecases/login.usecase.js";
 import RefreshTokenUseCase from "./usecases/refresh.token.usecase.js";
 import RegisterAdminUseCase from "./usecases/register.admin.usecase.js";
+import VerifyRegisterAdminUseCase from "./usecases/verify.register.admin.usecase.js";
+import ResendAdminVerificationUseCase from "./usecases/resend.admin.verification.usecase.js";
 import RegisterUserUseCase from "./usecases/register.user.usecase.js";
 import ResendVerificationUseCase from "./usecases/resend.verification.usecase.js";
 import LogoutUseCase from "./usecases/logout.usecase.js";
@@ -50,13 +53,27 @@ function buildAuthModule() {
     new PasswordHistoryApplicationService(passwordHistoryPgRepository);
 
   const registerAdminUseCase = new RegisterAdminUseCase(
-    transactionManager,
     userDomainService,
     userApplicationService,
     bcryptService,
     emailOrchestrationService,
+    registerAdminService,
+  );
+
+  const verifyRegisterAdminUseCase = new VerifyRegisterAdminUseCase(
+    transactionManager,
+    userDomainService,
+    userApplicationService,
+    emailOrchestrationService,
     emailVerificationApplicationService,
     passwordHistoryApplicationService,
+    registerAdminService,
+  );
+
+  const resendAdminVerificationUseCase = new ResendAdminVerificationUseCase(
+    userApplicationService,
+    emailOrchestrationService,
+    registerAdminService,
   );
 
   const registerUserUseCase = new RegisterUserUseCase(
@@ -113,7 +130,11 @@ function buildAuthModule() {
     sessionService,
   );
 
-  const adminController = new AdminController(registerAdminUseCase);
+  const adminController = new AdminController(
+    registerAdminUseCase,
+    verifyRegisterAdminUseCase,
+    resendAdminVerificationUseCase,
+  );
 
   const userController = new UserController(registerUserUseCase);
 

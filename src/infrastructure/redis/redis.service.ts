@@ -68,6 +68,26 @@ class RedisService implements IRedisService {
     }
   }
 
+  async setIfNotExists(
+    key: string,
+    value: string,
+    ttl: number,
+  ): Promise<boolean> {
+    try {
+      const result = await this.client.set(key, value, {
+        EX: ttl,
+        NX: true,
+      });
+      return result === "OK";
+    } catch (error) {
+      throw new AppError(
+        "Failed to set key in Redis",
+        500,
+        "REDIS_OPERATION_FAILED",
+      );
+    }
+  }
+
   async get<T = any>(key: string): Promise<T | null> {
     try {
       const value = await this.client.get(key);

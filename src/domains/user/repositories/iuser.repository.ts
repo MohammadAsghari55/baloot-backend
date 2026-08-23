@@ -11,6 +11,12 @@ interface IUserRepository {
 
   save(user: User, client: IDatabaseClient): Promise<void>;
 
+  saveAdmin(
+    user: User,
+    maxAdmins: number,
+    client: IDatabaseClient,
+  ): Promise<boolean>;
+
   updateEmailVerified(
     userId: string,
     verified: boolean,

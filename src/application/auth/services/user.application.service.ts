@@ -37,6 +37,14 @@ class UserApplicationService implements IUserApplicationService {
     await this.userRepository.save(user, client);
   }
 
+  async saveAdmin(
+    user: User,
+    maxAdmins: number,
+    client: IDatabaseClient,
+  ): Promise<boolean> {
+    return this.userRepository.saveAdmin(user, maxAdmins, client);
+  }
+
   async updateEmailVerified(
     userId: string,
     verified: boolean,

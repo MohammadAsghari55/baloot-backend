@@ -1,6 +1,8 @@
 import { buildUserModule } from "../../domains/user/user.index.js";
 import PgTransactionManager from "../../infrastructure/database/pg.transaction.manager.js";
 import pool from "../../infrastructure/database/pg.client.js";
+import config from "../../infrastructure/config/env.index.js";
+
 import {
   bcryptService,
   emailService,
@@ -68,6 +70,7 @@ function buildAuthModule() {
     emailVerificationApplicationService,
     passwordHistoryApplicationService,
     registerAdminService,
+    config.MAX_ADMINS,
   );
 
   const resendAdminVerificationUseCase = new ResendAdminVerificationUseCase(

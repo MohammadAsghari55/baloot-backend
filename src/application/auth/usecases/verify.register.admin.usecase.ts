@@ -19,6 +19,7 @@ class VerifyRegisterAdminUseCase {
     private emailVerificationApplicationService: IEmailVerificationApplicationService,
     private passwordHistoryApplicationService: IPasswordHistoryApplicationService,
     private registerAdminService: IRegisterAdminService,
+    private readonly maxAdmins: number,
   ) {}
 
   async execute(dto: VerifyRegisterDto, userId: string, userRole: string) {
@@ -46,9 +47,18 @@ class VerifyRegisterAdminUseCase {
           redisNewAdmin.role,
         );
 
-        await this.userApplicationService.save(user, client);
+        const inserted = await this.userApplicationService.saveAdmin(
+          user,
+          this.maxAdmins,
+          client,
+        );
+
+        if (!inserted) {
+          throw AppError.forbidden("MAX_ADMINS_EXCEEDED");
+        }
 
         const code = this.emailOrchestrationService.generateVerificationCode();
+
         const emailVerification = EmailVerification.createNew(user.id, code);
 
         await this.emailVerificationApplicationService.save(

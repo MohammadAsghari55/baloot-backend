@@ -98,6 +98,46 @@ class UserPgRepository implements IUserRepository {
     }
   }
 
+  async saveAdmin(
+    user: User,
+    maxAdmins: number,
+    client: IDatabaseClient,
+  ): Promise<boolean> {
+    const query = `
+    INSERT INTO users (
+    id, email, username, password_hash, role, wallet_balance,
+    is_email_verified, password_change_try, password_change_locked_until,
+    wrong_password_number, wrong_password_until, token_version,
+    created_at, updated_at
+    )
+    SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+    WHERE (SELECT COUNT(*) FROM users WHERE role = 'admin') < $15
+      `;
+    try {
+      const result = await client.query(query, [
+        user.id,
+        user.email,
+        user.username,
+        user.passwordHash,
+        user.role,
+        user.walletBalance,
+        user.isEmailVerified,
+        user.passwordChangeTry,
+        user.passwordChangeLockedUntil,
+        user.wrongPasswordNumber,
+        user.wrongPasswordUntil,
+        user.tokenVersion,
+        user.createdAt,
+        user.updatedAt,
+        maxAdmins,
+      ]);
+
+      return result.rowCount > 0;
+    } catch (error) {
+      throw DatabaseError.fromPGError(error);
+    }
+  }
+
   async updateEmailVerified(
     userId: string,
     verified: boolean,

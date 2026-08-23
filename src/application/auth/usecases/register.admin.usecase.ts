@@ -1,100 +1,88 @@
 import { RegisterDto } from "../../../shared/validators/auth/register.schema.js";
-import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import UserDomainService from "../../../domains/user/services/user.domain.service.js";
 import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
 import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import IEmailOrchestrationService from "../../../domains/user/Interfaces/iemail.orchestration.service.js";
-import IEmailVerificationApplicationService from "../../../domains/user/Interfaces/iemail.verification.application.service.js";
-import IPasswordHistoryApplicationService from "../../../domains/user/Interfaces/ipassword.history.application.service.js";
-import EmailVerification from "../../../domains/user/entities/email.verification.entity.js";
-import UserResponseDto from "../dtos/user.response.dto.js";
+import IRegisterAdminService from "../../../domains/user/Interfaces/iregister.admin.service.js";
 import AppError from "../../../shared/errors/app.error.js";
 
 class RegisterAdminUseCase {
   constructor(
-    private transactionManager: ITransactionManager,
     private userDomainService: UserDomainService,
     private userApplicationService: IUserApplicationService,
     private bcryptService: IBcryptService,
     private emailOrchestrationService: IEmailOrchestrationService,
-    private emailVerificationApplicationService: IEmailVerificationApplicationService,
-    private passwordHistoryApplicationService: IPasswordHistoryApplicationService,
+    private registerAdminService: IRegisterAdminService,
   ) {}
 
-  async execute(dto: RegisterDto) {
-    if (dto.role && dto.role !== "admin") {
+  async execute(dto: RegisterDto, userId: string, userRole: string) {
+    if (userRole !== "super_admin") {
       throw AppError.forbidden("INVALID_ROLE");
     }
-    if (dto.password !== dto.confirmPassword) {
-      throw AppError.validation("PASSWORD_MISMATCH");
+
+    const redisNewAdmin =
+      await this.registerAdminService.getPendingAdmin(userId);
+
+    if (redisNewAdmin) {
+      throw AppError.fromCode("TOO_MANY_REQUESTS");
     }
 
-    const { user, code, response } =
-      await this.transactionManager.runInTransaction(async (client) => {
-        const adminsNumber = await this.userApplicationService.countAdmins();
+    const adminsNumber = await this.userApplicationService.countAdmins();
 
-        const maxAdmins = await this.userApplicationService.getMaxAdmins();
+    const maxAdmins = await this.userApplicationService.getMaxAdmins();
 
-        await this.userDomainService.checkAdminLimit(adminsNumber, maxAdmins);
+    await this.userDomainService.checkAdminLimit(adminsNumber, maxAdmins);
 
-        const existingEmail = await this.userApplicationService.findByEmail(
-          dto.email,
-        );
+    const existingEmail = await this.userApplicationService.findByEmail(
+      dto.email,
+    );
 
-        const existingUsername =
-          await this.userApplicationService.findByUsername(dto.username);
+    const existingUsername = await this.userApplicationService.findByUsername(
+      dto.username,
+    );
 
-        await this.userDomainService.checkUniqueness(
-          existingEmail,
-          existingUsername,
-        );
+    await this.userDomainService.checkUniqueness(
+      existingEmail,
+      existingUsername,
+    );
 
-        const hashedPassword = await this.bcryptService.hash(dto.password);
+    const user = await this.userApplicationService.readById(userId);
 
-        const user = this.userDomainService.createUser(
-          dto.email,
-          dto.username,
-          hashedPassword,
-          "admin",
-        );
+    if (!user) {
+      throw AppError.unauthorized("INVALID_CREDENTIALS");
+    }
 
-        await this.userApplicationService.save(user, client);
+    const hashedPassword = await this.bcryptService.hash(dto.password);
 
-        const code = this.emailOrchestrationService.generateVerificationCode();
-        const emailVerification = EmailVerification.createNew(user.id, code);
+    const superAdminCreationCode =
+      this.emailOrchestrationService.generateVerificationCode();
 
-        await this.emailVerificationApplicationService.save(
-          emailVerification,
-          client,
-        );
+    const saved = await this.registerAdminService.savePendingAdmin(
+      userId,
+      {
+        email: dto.email,
+        username: dto.username,
+        passwordHash: hashedPassword,
+        role: "admin",
+      },
+      superAdminCreationCode,
+    );
 
-        await this.passwordHistoryApplicationService.save(
-          user.id,
-          hashedPassword,
-          client,
-        );
-
-        const userDto: UserResponseDto = {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          role: user.role,
-        };
-
-        return {
-          user,
-          code,
-          response: userDto,
-        };
-      });
+    if (!saved) {
+      throw AppError.fromCode("TOO_MANY_REQUESTS");
+    }
 
     let warning: string | undefined;
 
     try {
-      await this.emailOrchestrationService.emailSender(user.email, code);
+      await this.emailOrchestrationService.emailSender(
+        user.email,
+        superAdminCreationCode,
+      );
     } catch (error) {
       warning =
-        "User registered, but verification email could not be sent. Please request a new code.";
+        "verification email could not be sent. Please request a new code.";
+
       const appError = AppError.internalWithOptions("EMAIL_SEND_FAILED", {
         publicMessage:
           "Failed to send verification email. Please request a new code later.",
@@ -111,7 +99,7 @@ class RegisterAdminUseCase {
       );
     }
 
-    return { response, warning };
+    return warning;
   }
 }
 

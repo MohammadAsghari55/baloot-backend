@@ -55,4 +55,9 @@ export const AuthErrors = {
     message: "Password was changed recently. Please try again later.",
     status: 429,
   },
+  NO_PENDING_REQUEST: {
+    code: "NO_PENDING_REQUEST",
+    message: "No pending admin registration request found.",
+    status: 404,
+  },
 } as const;

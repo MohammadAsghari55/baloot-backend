@@ -2,7 +2,6 @@ import User from "../../../domains/user/entities/user.entity.js";
 import IDatabaseClient from "../../../domains/shared/interfaces/idatabase.client.js";
 import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
 import IUserRepository from "../../../domains/user/repositories/iuser.repository.js";
-import config from "../../../infrastructure/config/env.index.js";
 
 class UserApplicationService implements IUserApplicationService {
   constructor(private userRepository: IUserRepository) {}
@@ -34,16 +33,8 @@ class UserApplicationService implements IUserApplicationService {
     return this.userRepository.readById(userId);
   }
 
-  async countAdmins(): Promise<number> {
-    return this.userRepository.countAdmins();
-  }
-
   async save(user: User, client: IDatabaseClient): Promise<void> {
     await this.userRepository.save(user, client);
-  }
-
-  async getMaxAdmins(): Promise<number> {
-    return config.MAX_ADMINS;
   }
 
   async updateEmailVerified(

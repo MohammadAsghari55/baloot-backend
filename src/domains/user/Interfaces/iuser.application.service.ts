@@ -12,11 +12,7 @@ interface IUserApplicationService {
 
   readById(userId: string): Promise<User | null>;
 
-  countAdmins(): Promise<number>;
-
   save(user: User, client: IDatabaseClient): Promise<void>;
-
-  getMaxAdmins(): Promise<number>;
 
   updateEmailVerified(
     userId: string,

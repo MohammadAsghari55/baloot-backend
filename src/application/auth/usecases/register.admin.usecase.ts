@@ -27,12 +27,6 @@ class RegisterAdminUseCase {
       throw AppError.fromCode("TOO_MANY_REQUESTS");
     }
 
-    const adminsNumber = await this.userApplicationService.countAdmins();
-
-    const maxAdmins = await this.userApplicationService.getMaxAdmins();
-
-    await this.userDomainService.checkAdminLimit(adminsNumber, maxAdmins);
-
     const existingEmail = await this.userApplicationService.findByEmail(
       dto.email,
     );

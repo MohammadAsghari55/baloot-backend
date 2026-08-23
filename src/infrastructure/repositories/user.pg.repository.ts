@@ -21,10 +21,6 @@ interface UserRow {
   updated_at: Date;
 }
 
-interface CountRow {
-  count: string;
-}
-
 class UserPgRepository implements IUserRepository {
   constructor(private readonly pool: Pool) {}
 
@@ -100,13 +96,6 @@ class UserPgRepository implements IUserRepository {
     } catch (error) {
       throw DatabaseError.fromPGError(error);
     }
-  }
-
-  async countAdmins(): Promise<number> {
-    const adminsNumber = await this.pool.query<CountRow>(
-      "SELECT COUNT(*) FROM users WHERE role = 'admin'",
-    );
-    return parseInt(adminsNumber.rows[0].count, 10);
   }
 
   async updateEmailVerified(

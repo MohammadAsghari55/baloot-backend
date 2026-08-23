@@ -11,8 +11,6 @@ interface IUserRepository {
 
   save(user: User, client: IDatabaseClient): Promise<void>;
 
-  countAdmins(): Promise<number>;
-
   updateEmailVerified(
     userId: string,
     verified: boolean,

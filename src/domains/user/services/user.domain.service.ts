@@ -10,12 +10,6 @@ class UserDomainService {
     if (existingUsername) throw AppError.conflict("USERNAME_EXISTS");
   }
 
-  checkAdminLimit(currentAdminCount: number, maxAdmins: number): void {
-    if (currentAdminCount >= maxAdmins) {
-      throw AppError.forbidden("MAX_ADMINS_EXCEEDED");
-    }
-  }
-
   createUser(
     email: string,
     username: string,

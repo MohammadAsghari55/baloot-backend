@@ -67,8 +67,8 @@ class TokenManagementApplicationService implements ITokenManagementApplicationSe
     return this.refreshTokenRepository.readActiveToken(userId, deviceId);
   }
 
-  async cleanExpiredAndRevokedTokens(): Promise<number> {
-    return this.refreshTokenRepository.cleanExpiredAndRevokedTokens();
+  async cleanExpiredAndRevokedTokens(limit: number): Promise<number> {
+    return this.refreshTokenRepository.cleanExpiredAndRevokedTokens(limit);
   }
 }
 

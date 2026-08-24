@@ -38,6 +38,7 @@ const envSchema = z.object({
   REDIS_PASSWORD: z.string().optional().default(""),
   REDIS_DB: z.coerce.number().min(0).default(0),
   CRON_SCHEDULE: z.string().default("0 3 * * *"),
+  CLEANUP_BATCH_SIZE: z.coerce.number().positive().default(1000),
 });
 
 export default envSchema;

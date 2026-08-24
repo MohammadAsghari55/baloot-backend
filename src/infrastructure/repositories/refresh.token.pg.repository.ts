@@ -140,6 +140,15 @@ class RefreshTokenPgRepository implements IRefreshTokenRepository {
       throw DatabaseError.fromPGError(error);
     }
   }
+
+  async cleanExpiredAndRevokedTokens(): Promise<number> {
+    const query = `
+    DELETE FROM refresh_token
+    WHERE expires_at < NOW() OR revoked_at IS NOT NULL
+  `;
+    const result = await this.pool.query(query);
+    return result.rowCount ?? 0;
+  }
 }
 
 export default RefreshTokenPgRepository;

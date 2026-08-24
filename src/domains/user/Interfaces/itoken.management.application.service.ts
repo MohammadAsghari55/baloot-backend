@@ -36,6 +36,8 @@ interface ITokenManagementApplicationService {
     expiresAt: Date;
     revokedAt: Date | null;
   } | null>;
+
+  cleanExpiredAndRevokedTokens(): Promise<number>;
 }
 
 export default ITokenManagementApplicationService;

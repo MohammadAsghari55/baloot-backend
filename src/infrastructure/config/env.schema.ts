@@ -37,6 +37,7 @@ const envSchema = z.object({
   REDIS_PORT: z.coerce.number().positive().default(6379),
   REDIS_PASSWORD: z.string().optional().default(""),
   REDIS_DB: z.coerce.number().min(0).default(0),
+  CRON_SCHEDULE: z.string().default("0 3 * * *"),
 });
 
 export default envSchema;

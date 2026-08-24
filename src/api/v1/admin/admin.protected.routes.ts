@@ -11,26 +11,23 @@ import asyncHandler from "../../../shared/utils/async.handler.js";
 
 const router = Router();
 
+router.use(extractorMiddleware);
+router.use(AccessCheckerMiddleware);
+
 router.post(
   "/register",
-  extractorMiddleware,
-  AccessCheckerMiddleware,
   validateBodyMiddleware(registerSchema),
   asyncHandler(adminController.register),
 );
 
 router.post(
   "/verifyRegister",
-  extractorMiddleware,
-  AccessCheckerMiddleware,
   validateBodyMiddleware(verifyRegisterSchema),
   asyncHandler(adminController.verifyRegister),
 );
 
 router.post(
   "/resendAdminVerification",
-  extractorMiddleware,
-  AccessCheckerMiddleware,
   asyncHandler(adminController.resendAdminVerification),
 );
 export default router;

@@ -41,7 +41,7 @@ class AdminController {
     });
   }
 
-  async resendAdminVerification(req: Request, res: Response) {
+  async resendCode(req: Request, res: Response) {
     const warning = await this.resendAdminVerificationUseCase.execute(
       req.userId!,
       req.role!,

@@ -16,9 +16,9 @@ router.post(
 );
 
 router.post(
-  "/resend",
+  "/resendCode",
   validateBodyMiddleware(ResendVerificationSchema),
-  asyncHandler(authController.resend),
+  asyncHandler(authController.resendCode),
 );
 
 router.post(

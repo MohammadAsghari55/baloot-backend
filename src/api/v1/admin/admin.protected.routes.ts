@@ -26,8 +26,5 @@ router.post(
   asyncHandler(adminController.verifyRegister),
 );
 
-router.post(
-  "/resendAdminVerification",
-  asyncHandler(adminController.resendAdminVerification),
-);
+router.post("/resendCode", asyncHandler(adminController.resendCode));
 export default router;

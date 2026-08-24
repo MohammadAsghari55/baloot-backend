@@ -47,7 +47,7 @@ class AuthController {
     });
   }
 
-  async resend(req: Request, res: Response) {
+  async resendCode(req: Request, res: Response) {
     const result = await this.resendVerificationUseCase.execute(req.body);
 
     const responseBody = {

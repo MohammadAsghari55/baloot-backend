@@ -10,7 +10,6 @@ interface UserRow {
   username: string;
   password_hash: string;
   role: "user" | "admin" | "super_admin";
-  wallet_balance: number;
   is_email_verified: boolean;
   wrong_password_number: number;
   wrong_password_until: Date | null;
@@ -70,11 +69,11 @@ class UserPgRepository implements IUserRepository {
   async save(user: User, client: IDatabaseClient): Promise<void> {
     const query = `
     INSERT INTO users (
-      id, email, username, password_hash, role, wallet_balance,
+      id, email, username, password_hash, role,
       is_email_verified, password_change_try, password_change_locked_until,
       wrong_password_number, wrong_password_until, token_version,
       created_at, updated_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       `;
     try {
       await client.query(query, [
@@ -83,7 +82,6 @@ class UserPgRepository implements IUserRepository {
         user.username,
         user.passwordHash,
         user.role,
-        user.walletBalance,
         user.isEmailVerified,
         user.passwordChangeTry,
         user.passwordChangeLockedUntil,
@@ -105,13 +103,13 @@ class UserPgRepository implements IUserRepository {
   ): Promise<boolean> {
     const query = `
     INSERT INTO users (
-    id, email, username, password_hash, role, wallet_balance,
+    id, email, username, password_hash, role,
     is_email_verified, password_change_try, password_change_locked_until,
     wrong_password_number, wrong_password_until, token_version,
     created_at, updated_at
     )
-    SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
-    WHERE (SELECT COUNT(*) FROM users WHERE role = 'admin') < $15
+    SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+    WHERE (SELECT COUNT(*) FROM users WHERE role = 'admin') < $14
       `;
     try {
       const result = await client.query(query, [
@@ -120,7 +118,6 @@ class UserPgRepository implements IUserRepository {
         user.username,
         user.passwordHash,
         user.role,
-        user.walletBalance,
         user.isEmailVerified,
         user.passwordChangeTry,
         user.passwordChangeLockedUntil,

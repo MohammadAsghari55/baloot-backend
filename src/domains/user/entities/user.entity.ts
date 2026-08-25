@@ -7,7 +7,6 @@ class User {
     private _username: string,
     private _passwordHash: string,
     private readonly _role: "user" | "admin" | "super_admin",
-    private _walletBalance: number,
     private _isEmailVerified: boolean,
     private _passwordChangeTry: number,
     private _passwordChangeLockedUntil: Date | null,
@@ -32,9 +31,6 @@ class User {
   }
   get role(): "user" | "admin" | "super_admin" {
     return this._role;
-  }
-  get walletBalance(): number {
-    return this._walletBalance;
   }
   get isEmailVerified(): boolean {
     return this._isEmailVerified;
@@ -73,7 +69,6 @@ class User {
       username,
       hashedPassword,
       role,
-      0,
       false,
       0,
       null,
@@ -91,7 +86,6 @@ class User {
     username: string;
     password_hash: string;
     role: "user" | "admin" | "super_admin";
-    wallet_balance: number;
     is_email_verified: boolean;
     password_change_try: number;
     password_change_locked_until: Date | null;
@@ -107,7 +101,6 @@ class User {
       data.username,
       data.password_hash,
       data.role,
-      data.wallet_balance,
       data.is_email_verified,
       data.password_change_try,
       data.password_change_locked_until,

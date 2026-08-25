@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS users (
     phone_number                    VARCHAR(20),
     username                        VARCHAR(20) UNIQUE NOT NULL,
     password_hash                   TEXT NOT NULL,
-    wallet_balance                  INTEGER DEFAULT 0,
     card_number                     VARCHAR(20),
     birth_date                      DATE,
     password_change_try             INTEGER DEFAULT 0,

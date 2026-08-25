@@ -6,15 +6,22 @@ import DatabaseError from "../../shared/errors/database.error.js";
 
 interface UserRow {
   id: string;
+  first_name: string | null;
+  last_name: string | null;
+  role: "user" | "admin" | "super_admin";
   email: string;
+  address: string | null;
+  phone_number: string | null;
   username: string;
   password_hash: string;
-  role: "user" | "admin" | "super_admin";
-  is_email_verified: boolean;
-  wrong_password_number: number;
-  wrong_password_until: Date | null;
+  card_number: string | null;
+  birth_date: Date | null;
   password_change_try: number;
   password_change_locked_until: Date | null;
+  wrong_password_number: number;
+  wrong_password_until: Date | null;
+  is_profile_completed: boolean;
+  is_email_verified: boolean;
   token_version: number;
   created_at: Date;
   updated_at: Date;
@@ -68,25 +75,34 @@ class UserPgRepository implements IUserRepository {
 
   async save(user: User, client: IDatabaseClient): Promise<void> {
     const query = `
-    INSERT INTO users (
-      id, email, username, password_hash, role,
-      is_email_verified, password_change_try, password_change_locked_until,
-      wrong_password_number, wrong_password_until, token_version,
-      created_at, updated_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+      INSERT INTO users (
+        id, first_name, last_name, role, email, address, phone_number,
+        username, password_hash, card_number, birth_date,
+        password_change_try, password_change_locked_until,
+        wrong_password_number, wrong_password_until,
+        is_profile_completed, is_email_verified, token_version,
+        created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
       `;
     try {
       await client.query(query, [
         user.id,
+        user.firstName,
+        user.lastName,
+        user.role,
         user.email,
+        user.address,
+        user.phoneNumber,
         user.username,
         user.passwordHash,
-        user.role,
-        user.isEmailVerified,
+        user.cardNumber,
+        user.birthDate,
         user.passwordChangeTry,
         user.passwordChangeLockedUntil,
         user.wrongPasswordNumber,
         user.wrongPasswordUntil,
+        user.isProfileCompleted,
+        user.isEmailVerified,
         user.tokenVersion,
         user.createdAt,
         user.updatedAt,
@@ -102,27 +118,36 @@ class UserPgRepository implements IUserRepository {
     client: IDatabaseClient,
   ): Promise<boolean> {
     const query = `
-    INSERT INTO users (
-    id, email, username, password_hash, role,
-    is_email_verified, password_change_try, password_change_locked_until,
-    wrong_password_number, wrong_password_until, token_version,
-    created_at, updated_at
-    )
-    SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
-    WHERE (SELECT COUNT(*) FROM users WHERE role = 'admin') < $14
+      INSERT INTO users (
+        id, first_name, last_name, role, email, address, phone_number,
+        username, password_hash, card_number, birth_date,
+        password_change_try, password_change_locked_until,
+        wrong_password_number, wrong_password_until,
+        is_profile_completed, is_email_verified, token_version,
+        created_at, updated_at
+      )
+      SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
+      WHERE (SELECT COUNT(*) FROM users WHERE role = 'admin') < $21
       `;
     try {
       const result = await client.query(query, [
         user.id,
+        user.firstName,
+        user.lastName,
+        user.role,
         user.email,
+        user.address,
+        user.phoneNumber,
         user.username,
         user.passwordHash,
-        user.role,
-        user.isEmailVerified,
+        user.cardNumber,
+        user.birthDate,
         user.passwordChangeTry,
         user.passwordChangeLockedUntil,
         user.wrongPasswordNumber,
         user.wrongPasswordUntil,
+        user.isProfileCompleted,
+        user.isEmailVerified,
         user.tokenVersion,
         user.createdAt,
         user.updatedAt,

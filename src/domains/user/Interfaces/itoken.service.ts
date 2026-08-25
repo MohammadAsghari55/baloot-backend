@@ -1,4 +1,6 @@
 interface ITokenService {
+  hashRefreshToken(refreshToken: string): string;
+
   generateAccessToken(userId: string, deviceId: string, role: string): string;
 
   generateRefreshToken(): string;

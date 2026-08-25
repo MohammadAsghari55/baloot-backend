@@ -1,11 +1,20 @@
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import IBcryptService from "../../domains/user/Interfaces/ibcrypt.service.js";
 import ITokenService from "../../domains/user/Interfaces/itoken.service.js";
 import config from "../config/env.index.js";
 
 class TokenService implements ITokenService {
-  constructor(private readonly bcryptService: IBcryptService) {}
+  private readonly REFRESH_HASH_SECRET = crypto
+    .createHash("sha256")
+    .update(config.JWT_ACCESS_SECRET + "refresh-hash")
+    .digest("hex");
+
+  hashRefreshToken(refreshToken: string): string {
+    return crypto
+      .createHmac("sha256", this.REFRESH_HASH_SECRET)
+      .update(refreshToken)
+      .digest("hex");
+  }
 
   generateAccessToken(userId: string, deviceId: string, role: string): string {
     return jwt.sign({ userId, deviceId, role }, config.JWT_ACCESS_SECRET, {
@@ -28,7 +37,7 @@ class TokenService implements ITokenService {
   }> {
     const accessToken = this.generateAccessToken(userId, deviceId, role);
     const refreshToken = this.generateRefreshToken();
-    const hashedRefreshToken = await this.bcryptService.hash(refreshToken);
+    const hashedRefreshToken = this.hashRefreshToken(refreshToken);
 
     return {
       accessToken,

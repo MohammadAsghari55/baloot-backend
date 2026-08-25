@@ -1,6 +1,5 @@
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
-import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
 import ISessionService from "../../../domains/user/Interfaces/isession.service.js";
@@ -10,7 +9,6 @@ class RefreshTokenUseCase {
   constructor(
     private transactionManager: ITransactionManager,
     private userApplicationService: IUserApplicationService,
-    private bcryptService: IBcryptService,
     private tokenService: ITokenService,
     private tokenManagementApplicationService: ITokenManagementApplicationService,
     private sessionService: ISessionService,
@@ -59,12 +57,10 @@ class RefreshTokenUseCase {
           throw AppError.unauthorized("REFRESH_TOKEN_EXPIRED");
         }
 
-        const isMatch = await this.bcryptService.compare(
-          refreshToken,
-          storedToken.tokenHash,
-        );
+        const hashedRefreshToken =
+          this.tokenService.hashRefreshToken(refreshToken);
 
-        if (!isMatch) {
+        if (hashedRefreshToken !== storedToken.tokenHash) {
           throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
         }
 

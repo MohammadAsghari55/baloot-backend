@@ -102,7 +102,6 @@ function buildAuthModule() {
   const refreshTokenUseCase = new RefreshTokenUseCase(
     transactionManager,
     userApplicationService,
-    bcryptService,
     tokenService,
     tokenManagementApplicationService,
     sessionService,

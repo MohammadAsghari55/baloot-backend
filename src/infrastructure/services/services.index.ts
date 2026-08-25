@@ -6,7 +6,7 @@ import RegisterAdminService from "./register.admin.service.js";
 import redisService from "../redis/redis.service.js";
 
 export const bcryptService = new BcryptService();
-export const tokenService = new TokenService(bcryptService);
+export const tokenService = new TokenService();
 export const emailService = new EmailService();
 export const sessionService = new SessionService(redisService);
 export const registerAdminService = new RegisterAdminService(redisService);

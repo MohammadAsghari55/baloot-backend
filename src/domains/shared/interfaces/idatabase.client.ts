@@ -1,7 +1,7 @@
 interface IDatabaseClient {
-  query<T = any>(
+  query<T = unknown>(
     sql: string,
-    params?: any[],
+    params?: unknown[],
   ): Promise<{ rows: T[]; rowCount: number }>;
 }
 

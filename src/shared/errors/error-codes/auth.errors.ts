@@ -54,4 +54,10 @@ export const AuthErrors = {
     message: "No pending admin registration request found.",
     status: 404,
   },
+  PENDING_ADMIN_REQUEST_EXISTS: {
+    code: "PENDING_ADMIN_REQUEST_EXISTS",
+    message:
+      "You already have a pending admin registration request. Please complete it or wait for it to expire.",
+    status: 409,
+  },
 } as const;

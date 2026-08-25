@@ -24,7 +24,7 @@ class RegisterAdminUseCase {
       await this.registerAdminService.getPendingAdmin(userId);
 
     if (redisNewAdmin) {
-      throw AppError.fromCode("TOO_MANY_REQUESTS");
+      throw AppError.fromCode("PENDING_ADMIN_REQUEST_EXISTS");
     }
 
     const existingEmail = await this.userApplicationService.findByEmail(

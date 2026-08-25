@@ -42,8 +42,13 @@ class LoginUseCase {
             deviceId,
             client,
           );
+
         if (existingToken && existingToken.expiresAt > new Date()) {
-          throw AppError.badRequest("YOU_ARE_LOGGED_IN");
+          await this.tokenManagementApplicationService.revokeByDeviceId(
+            user.id,
+            deviceId,
+            client,
+          );
         }
 
         const isMatch = await this.bcryptService.compare(
@@ -125,7 +130,7 @@ class LoginUseCase {
       await this.sessionService.setVersion(
         result.user.id,
         result.version,
-        30 * 24 * 60 * 60,
+        7 * 24 * 60 * 60,
       );
     } catch (error) {
       console.error("Redis sync failed after login:", error);

@@ -36,33 +36,56 @@ class RefreshTokenUseCase {
       throw AppError.notFound("NOT_FOUND");
     }
 
-    const storedToken =
-      await this.tokenManagementApplicationService.readActiveToken(
-        userId,
-        deviceId,
-      );
-
-    if (!storedToken) {
-      throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
-    }
-
-    if (storedToken.expiresAt <= new Date()) {
-      throw AppError.unauthorized("REFRESH_TOKEN_EXPIRED");
-    }
-
-    const isMatch = await this.bcryptService.compare(
-      refreshToken,
-      storedToken.tokenHash,
-    );
-
-    if (!isMatch) {
-      throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
-    }
-
-    const newAccessToken = await this.tokenService.generateAccessToken(
+    const tokens = await this.tokenService.generateTokenPair(
       userId,
       deviceId,
       role,
+    );
+
+    const result = await this.transactionManager.runInTransaction(
+      async (client) => {
+        const storedToken =
+          await this.tokenManagementApplicationService.findTokenByDeviceIdAndUserId(
+            userId,
+            deviceId,
+            client,
+          );
+
+        if (!storedToken) {
+          throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
+        }
+
+        if (storedToken.expiresAt <= new Date()) {
+          throw AppError.unauthorized("REFRESH_TOKEN_EXPIRED");
+        }
+
+        const isMatch = await this.bcryptService.compare(
+          refreshToken,
+          storedToken.tokenHash,
+        );
+
+        if (!isMatch) {
+          throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
+        }
+
+        await this.tokenManagementApplicationService.revokeByDeviceId(
+          userId,
+          deviceId,
+          client,
+        );
+
+        await this.tokenManagementApplicationService.saveToken(
+          tokens.hashedRefreshToken,
+          user.id,
+          deviceId,
+          client,
+        );
+
+        return {
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+        };
+      },
     );
 
     try {
@@ -79,15 +102,15 @@ class RefreshTokenUseCase {
       await this.sessionService.setVersion(
         userId,
         user.tokenVersion,
-        30 * 24 * 60 * 60,
+        7 * 24 * 60 * 60,
       );
     } catch (error) {
       console.error("Redis sync failed after refresh:", error);
     }
 
     return {
-      accessToken: newAccessToken,
-      refreshToken: refreshToken,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
     };
   }
 }

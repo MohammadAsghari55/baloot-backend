@@ -40,7 +40,7 @@ class LogoutUseCase {
       await this.sessionService.setVersion(
         userId,
         newTokenVersion,
-        30 * 24 * 60 * 60,
+        7 * 24 * 60 * 60,
       );
     } catch (error) {
       console.error("Redis sync failed:", error);

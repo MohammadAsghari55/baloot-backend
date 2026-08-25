@@ -23,7 +23,7 @@ class RefreshTokenPgRepository implements IRefreshTokenRepository {
     const query = `
     INSERT INTO refresh_token (
     id,user_id,token_hash,device_id,expires_at)
-    VALUES ($1, $2, $3, $4, NOW() + INTERVAL '30 days')
+    VALUES ($1, $2, $3, $4, NOW() + INTERVAL '7 days')
     `;
     try {
       await client.query(query, [randomUUID(), userId, tokenHash, deviceId]);

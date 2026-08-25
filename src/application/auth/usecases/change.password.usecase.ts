@@ -144,7 +144,7 @@ class ChangePasswordUseCase {
       await this.sessionService.setVersion(
         userId,
         result.newVersion,
-        30 * 24 * 60 * 60,
+        7 * 24 * 60 * 60,
       );
     } catch (error) {
       console.error("Redis version sync failed after password change:", error);

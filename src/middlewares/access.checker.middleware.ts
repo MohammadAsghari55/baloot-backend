@@ -67,7 +67,7 @@ const accessCheckerMiddleware = (
       await sessionService.setVersion(
         req.userId,
         user.tokenVersion,
-        30 * 24 * 60 * 60,
+        7 * 24 * 60 * 60,
       );
     } catch (error) {
       console.error(

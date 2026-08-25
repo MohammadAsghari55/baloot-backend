@@ -12,6 +12,6 @@ export const refreshCookieOptions: CookieOptions = {
   httpOnly: true,
   sameSite: "strict" as const,
   secure: config.NODE_ENV === "production",
-  maxAge: 30 * 24 * 60 * 60 * 1000,
+  maxAge: 7 * 24 * 60 * 60 * 1000,
   path: "/api/v1/common/auth/refresh",
 };

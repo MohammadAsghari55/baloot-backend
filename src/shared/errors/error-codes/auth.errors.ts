@@ -24,12 +24,6 @@ export const AuthErrors = {
     message: "Refresh token has expired",
     status: 401,
   },
-  YOU_ARE_LOGGED_IN: {
-    code: "YOU_ARE_LOGGED_IN",
-    message:
-      "You are already logged in on this device. Please log out first if you want to login again.",
-    status: 409,
-  },
   SESSION_INACTIVE: {
     code: "SESSION_INACTIVE",
     message: "Your session is no longer active. Please log in again.",

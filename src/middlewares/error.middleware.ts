@@ -5,9 +5,10 @@ import zodErrorMapper from "../shared/utils/zod.error.mapper.js";
 import config from "../infrastructure/config/env.index.js";
 
 function errorMiddleware(
-  err: any,
+  err: unknown,
   req: Request,
   res: Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction,
 ) {
   if (err instanceof ZodValidationError) {
@@ -40,13 +41,30 @@ function errorMiddleware(
     });
   }
 
+  if (err instanceof Error) {
+    console.error("UNEXPECTED ERROR:", err);
+    return res.status(500).json({
+      success: false,
+      error: {
+        message:
+          config.NODE_ENV === "production"
+            ? "Something went wrong"
+            : err.message,
+        code: "INTERNAL_ERROR",
+        statusCode: 500,
+      },
+    });
+  }
+
   console.error("UNEXPECTED ERROR:", err);
 
   return res.status(500).json({
     success: false,
     error: {
       message:
-        config.NODE_ENV === "production" ? "Something went wrong" : err.message,
+        config.NODE_ENV === "production"
+          ? "Something went wrong"
+          : "Unknown error",
       code: "INTERNAL_ERROR",
       statusCode: 500,
     },

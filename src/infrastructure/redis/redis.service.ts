@@ -80,6 +80,7 @@ class RedisService implements IRedisService {
       });
       return result === "OK";
     } catch (error) {
+      console.error("Redis setIfNotExists failed:", error);
       throw new AppError(
         "Failed to set key in Redis",
         500,

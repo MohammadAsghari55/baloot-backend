@@ -49,7 +49,7 @@ class RedisService implements IRedisService {
     }
   }
 
-  async set(key: string, value: any, ttl?: number): Promise<void> {
+  async set(key: string, value: unknown, ttl?: number): Promise<void> {
     try {
       const stringValue =
         typeof value === "string" ? value : JSON.stringify(value);
@@ -88,7 +88,7 @@ class RedisService implements IRedisService {
     }
   }
 
-  async get<T = any>(key: string): Promise<T | null> {
+  async get<T = unknown>(key: string): Promise<T | null> {
     try {
       const value = await this.client.get(key);
       if (!value) return null;

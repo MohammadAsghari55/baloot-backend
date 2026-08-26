@@ -1,4 +1,4 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import IDatabaseClient from "../../domains/shared/interfaces/idatabase.client.js";
 import PgDatabaseClient from "./pg.database.client.js";
 import ITransactionManager from "../../shared/interfaces/itransaction.manager.js";

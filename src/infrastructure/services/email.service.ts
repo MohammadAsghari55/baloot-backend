@@ -15,7 +15,6 @@ class EmailService implements IEmailService {
         user: config.SMTP_USER,
         pass: config.SMTP_PASS,
       },
-      ignoreTLS: true,
       connectionTimeout: 10000,
       greetingTimeout: 10000,
       socketTimeout: 10000,

@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import type SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
 import config from "../config/env.index.js";
 import IEmailService from "../../domains/user/Interfaces/iemail.service.js";
 
@@ -6,7 +7,7 @@ class EmailService implements IEmailService {
   private transporter: nodemailer.Transporter;
 
   constructor() {
-    const transportOptions: any = {
+    const transportOptions: SMTPTransport.Options = {
       host: config.SMTP_HOST,
       port: config.SMTP_PORT,
       secure: config.SMTP_SECURE,

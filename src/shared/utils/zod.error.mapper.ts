@@ -17,8 +17,8 @@ const errorMessages: Record<string, string> = {
     "This field must be at least 5 characters",
   "String must contain at least 8 character(s)":
     "This field must be at least 8 characters",
-  "String must contain at most 20 character(s)":
-    "This field must be at most 20 characters",
+  "String must contain at most 40 character(s)":
+    "This field must be at most 40 characters",
   "String must contain exactly 6 character(s)":
     "This field must be exactly 6 characters",
 

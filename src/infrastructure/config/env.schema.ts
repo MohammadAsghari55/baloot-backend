@@ -25,15 +25,15 @@ const envSchema = z.object({
   EXPIRE_TIME: z.coerce
     .number()
     .positive()
-    .default(24 * 60 * 60 * 1000),
+    .default(15 * 60 * 1000),
   RESEND_LIMIT_VALID: z.coerce
     .number()
     .positive()
-    .default(20 * 60 * 1000),
+    .default(5 * 60 * 1000),
   RESEND_LIMIT_EXPIRED: z.coerce
     .number()
     .positive()
-    .default(4 * 60 * 60 * 1000),
+    .default(60 * 60 * 1000),
   REDIS_HOST: z.string().min(1).default("localhost"),
   REDIS_PORT: z.coerce.number().positive().default(6379),
   REDIS_PASSWORD: z.string().optional().default(""),

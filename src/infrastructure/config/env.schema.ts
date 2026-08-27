@@ -21,6 +21,7 @@ const envSchema = z.object({
     }
     return val;
   }, z.boolean().default(false)),
+  ADMIN_REGISTER_EXPIRE_TIME: z.coerce.number().positive().default(3600),
   EXPIRE_TIME: z.coerce
     .number()
     .positive()

@@ -1,6 +1,7 @@
 import IRedisService from "../../shared/interfaces/iredis.service.js";
 import IRegisterAdminService from "../../domains/user/Interfaces/iregister.admin.service.js";
 import PendingAdminData from "../../type/pending.admin.types.js";
+import config from "../config/env.index.js";
 
 class RegisterAdminService implements IRegisterAdminService {
   constructor(private redisService: IRedisService) {}
@@ -9,7 +10,7 @@ class RegisterAdminService implements IRegisterAdminService {
     return `admin-register:${superAdminId}`;
   }
 
-  private readonly TTL = 8 * 60 * 60;
+  private readonly TTL = config.ADMIN_REGISTER_EXPIRE_TIME;
 
   async savePendingAdmin(
     superAdminId: string,

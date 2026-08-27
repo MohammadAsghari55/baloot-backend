@@ -1,6 +1,7 @@
 import { ResendVerificationDto } from "../../../application/auth/dtos/resend.verification.dto.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
+import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import IEmailOrchestrationService from "../../../domains/user/Interfaces/iemail.orchestration.service.js";
 import IEmailVerificationApplicationService from "../../../domains/user/Interfaces/iemail.verification.application.service.js";
 import EmailVerification from "../../../domains/user/entities/email.verification.entity.js";
@@ -12,6 +13,7 @@ class ResendVerificationUseCase {
   constructor(
     private transactionManager: ITransactionManager,
     private userApplicationService: IUserApplicationService,
+    private bcryptService: IBcryptService,
     private emailOrchestrationService: IEmailOrchestrationService,
     private emailVerificationApplicationService: IEmailVerificationApplicationService,
   ) {}
@@ -37,41 +39,33 @@ class ResendVerificationUseCase {
             client,
           );
 
-        let code: string;
+        if (existEmail) {
+          const timeSinceCreation = Date.now() - existEmail.createdAt.getTime();
 
-        if (existEmail && existEmail.expiresAt > new Date()) {
-          if (existEmail.updatedAt) {
-            const lastResend = Date.now() - existEmail.updatedAt.getTime();
-
-            if (lastResend < config.RESEND_LIMIT_VALID) {
-              throw AppError.fromCode("TOO_MANY_REQUESTS");
-            }
+          if (timeSinceCreation < config.EXPIRE_TIME) {
+            throw AppError.fromCode("TOO_MANY_REQUESTS");
           }
-          code = existEmail.code;
-          await this.emailVerificationApplicationService.update(
+
+          await this.emailVerificationApplicationService.delete(
             user.id,
             client,
           );
-        } else {
-          if (existEmail) {
-            const creationEmail = Date.now() - existEmail.createdAt.getTime();
-            if (creationEmail < config.RESEND_LIMIT_EXPIRED) {
-              throw AppError.fromCode("TOO_MANY_REQUESTS");
-            }
-
-            await this.emailVerificationApplicationService.delete(
-              user.id,
-              client,
-            );
-          }
-
-          code = this.emailOrchestrationService.generateVerificationCode();
-          const emailVerification = EmailVerification.createNew(user.id, code);
-          await this.emailVerificationApplicationService.save(
-            emailVerification,
-            client,
-          );
         }
+
+        const newCode =
+          this.emailOrchestrationService.generateVerificationCode();
+
+        const hashedNewCode = await this.bcryptService.hash(newCode);
+
+        const emailVerification = EmailVerification.createNew(
+          user.id,
+          hashedNewCode,
+        );
+
+        await this.emailVerificationApplicationService.save(
+          emailVerification,
+          client,
+        );
 
         const userDto: UserResponseDto = {
           id: user.id,
@@ -82,7 +76,7 @@ class ResendVerificationUseCase {
 
         return {
           user,
-          code,
+          code: newCode,
           response: userDto,
         };
       });

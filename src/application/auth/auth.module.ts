@@ -70,6 +70,7 @@ function buildAuthModule() {
     transactionManager,
     userDomainService,
     userApplicationService,
+    bcryptService,
     emailOrchestrationService,
     emailVerificationApplicationService,
     passwordHistoryApplicationService,
@@ -114,6 +115,7 @@ function buildAuthModule() {
   const resendVerificationUseCase = new ResendVerificationUseCase(
     transactionManager,
     userApplicationService,
+    bcryptService,
     emailOrchestrationService,
     emailVerificationApplicationService,
   );

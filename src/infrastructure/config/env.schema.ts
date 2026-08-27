@@ -39,6 +39,9 @@ const envSchema = z.object({
   REDIS_DB: z.coerce.number().min(0).default(0),
   CRON_SCHEDULE: z.string().default("0 3 * * *"),
   CLEANUP_BATCH_SIZE: z.coerce.number().positive().default(1000),
+  ADMIN_USERNAME: z.string().min(5).default("BalootSuperAdmin"),
+  ADMIN_EMAIL: z.string().email().default("admin@baloot.local"),
+  ADMIN_PASSWORD: z.string().min(8),
 });
 
 export default envSchema;

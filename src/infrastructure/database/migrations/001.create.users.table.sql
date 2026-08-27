@@ -30,30 +30,6 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at                      TIMESTAMP DEFAULT NOW()
 );
 
-
-INSERT INTO users (
-    id,
-    email,
-    username,
-    password_hash,
-    role,
-    is_email_verified,
-    token_version,
-    created_at,
-    updated_at
-) VALUES (
-    gen_random_uuid(),
-    'admin@baloot.local',
-    'BalootSuperAdmin',
-    crypt('Baloot@74', gen_salt('bf', 10)),
-    'super_admin',
-    false,
-    1,
-    NOW(),
-    NOW()
-);
-
-
 -- DOWN
 DROP TABLE IF EXISTS users;
 DROP TYPE IF EXISTS user_role;

@@ -9,20 +9,5 @@ CREATE TABLE IF NOT EXISTS password_history (
 CREATE INDEX idx_password_history_user_id_created_at 
 ON password_history(user_id, created_at DESC);
 
-INSERT INTO password_history (
-    id,
-    user_id,
-    password_hash,
-    created_at
-)
-SELECT 
-    gen_random_uuid(),
-    id,
-    password_hash,
-    created_at
-FROM users
-WHERE email = 'admin@baloot.local' AND role = 'super_admin'
-ON CONFLICT (id) DO NOTHING;
-
 -- DOWN
 DROP TABLE IF EXISTS password_history;

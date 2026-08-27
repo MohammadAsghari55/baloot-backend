@@ -51,16 +51,19 @@ class LoginUseCase {
           );
         }
 
-        const isMatch = await this.bcryptService.compare(
+        const passwordIsMatch = await this.bcryptService.compare(
           password,
           user.passwordHash,
         );
 
-        if (!isMatch) {
+        if (!passwordIsMatch) {
           throw AppError.unauthorized("INVALID_CREDENTIALS");
         }
 
         if (!user.isEmailVerified) {
+          if (!code) {
+            throw AppError.badRequest("INVALID_VERIFICATION_CODE");
+          }
           const emailVerification =
             await this.emailVerificationApplicationService.findByUserId(
               user.id,
@@ -71,7 +74,12 @@ class LoginUseCase {
             throw AppError.badRequest("INVALID_VERIFICATION_CODE");
           }
 
-          if (code !== emailVerification.code) {
+          const codeIsMatch = await this.bcryptService.compare(
+            code,
+            emailVerification.hashedCode,
+          );
+
+          if (!codeIsMatch) {
             throw AppError.badRequest("INVALID_VERIFICATION_CODE");
           }
 

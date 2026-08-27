@@ -38,6 +38,10 @@ interface ITokenManagementApplicationService {
   } | null>;
 
   cleanExpiredAndRevokedTokens(limit: number): Promise<number>;
+
+  addToBlacklist(tokenHash: string, ttl: number): Promise<void>;
+
+  isBlacklisted(tokenHash: string): Promise<boolean>;
 }
 
 export default ITokenManagementApplicationService;

@@ -11,7 +11,9 @@
     "start": "node dist/index.js",
     "migrate": "tsx --env-file=.env src/infrastructure/database/migrate.ts",
     "test-redis": "tsx --env-file=.env src/test-redis.ts",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "seed": "tsx --env-file=.env src/infrastructure/database/seeds/seed.runner.ts",
+    "setup:db": "pnpm migrate && pnpm seed"
   },
   "keywords": [],
   "author": "",

@@ -2,6 +2,7 @@ import { VerifyRegisterDto } from "../../../shared/validators/auth/verify.regist
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import UserDomainService from "../../../domains/user/services/user.domain.service.js";
 import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
+import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
 import IEmailOrchestrationService from "../../../domains/user/Interfaces/iemail.orchestration.service.js";
 import IEmailVerificationApplicationService from "../../../domains/user/Interfaces/iemail.verification.application.service.js";
 import IPasswordHistoryApplicationService from "../../../domains/user/Interfaces/ipassword.history.application.service.js";
@@ -15,6 +16,7 @@ class VerifyRegisterAdminUseCase {
     private transactionManager: ITransactionManager,
     private userDomainService: UserDomainService,
     private userApplicationService: IUserApplicationService,
+    private bcryptService: IBcryptService,
     private emailOrchestrationService: IEmailOrchestrationService,
     private emailVerificationApplicationService: IEmailVerificationApplicationService,
     private passwordHistoryApplicationService: IPasswordHistoryApplicationService,
@@ -59,7 +61,12 @@ class VerifyRegisterAdminUseCase {
 
         const code = this.emailOrchestrationService.generateVerificationCode();
 
-        const emailVerification = EmailVerification.createNew(user.id, code);
+        const hashedCode = await this.bcryptService.hash(code);
+
+        const emailVerification = EmailVerification.createNew(
+          user.id,
+          hashedCode,
+        );
 
         await this.emailVerificationApplicationService.save(
           emailVerification,

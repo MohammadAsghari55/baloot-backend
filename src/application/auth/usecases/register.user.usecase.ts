@@ -55,7 +55,13 @@ class RegisterUserUseCase {
         await this.userApplicationService.save(user, client);
 
         const code = this.emailOrchestrationService.generateVerificationCode();
-        const emailVerification = EmailVerification.createNew(user.id, code);
+
+        const hashedCode = await this.bcryptService.hash(code);
+
+        const emailVerification = EmailVerification.createNew(
+          user.id,
+          hashedCode,
+        );
 
         await this.emailVerificationApplicationService.save(
           emailVerification,

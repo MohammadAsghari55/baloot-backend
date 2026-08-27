@@ -4,6 +4,7 @@ import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
 import ISessionService from "../../../domains/user/Interfaces/isession.service.js";
 import AppError from "../../../shared/errors/app.error.js";
+import crypto from "crypto";
 
 class RefreshTokenUseCase {
   constructor(
@@ -14,12 +15,7 @@ class RefreshTokenUseCase {
     private sessionService: ISessionService,
   ) {}
 
-  async execute(
-    refreshToken: string,
-    userId: string,
-    deviceId: string,
-    role: string,
-  ) {
+  async execute(refreshToken: string, userId: string, deviceId: string) {
     if (!refreshToken) {
       throw AppError.badRequest("INVALID_REFRESH_TOKEN");
     }
@@ -37,7 +33,7 @@ class RefreshTokenUseCase {
     const tokens = await this.tokenService.generateTokenPair(
       userId,
       deviceId,
-      role,
+      user.role,
     );
 
     const result = await this.transactionManager.runInTransaction(
@@ -69,7 +65,12 @@ class RefreshTokenUseCase {
           throw AppError.unauthorized("REFRESH_TOKEN_EXPIRED");
         }
 
-        if (hashedRefreshToken !== storedToken.tokenHash) {
+        const isEqual = crypto.timingSafeEqual(
+          Buffer.from(hashedRefreshToken),
+          Buffer.from(storedToken.tokenHash),
+        );
+
+        if (isEqual) {
           throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
         }
 

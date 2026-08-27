@@ -77,7 +77,6 @@ class AuthController {
       req.cookies.refreshToken,
       req.userId!,
       req.deviceId!,
-      req.role!,
     );
 
     res.cookie("accessToken", token.accessToken, accessCookieOptions);

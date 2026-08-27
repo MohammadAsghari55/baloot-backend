@@ -32,6 +32,7 @@ import ChangePasswordUseCase from "./usecases/change.password.usecase.js";
 import AdminController from "../../api/v1/admin/admin.controller.js";
 import UserController from "../../api/v1/user/user.controller.js";
 import AuthController from "../../api/v1/common/auth/auth.controller.js";
+import redisService from "../../infrastructure/redis/redis.service.js";
 
 function buildAuthModule() {
   const { userApplicationService, userDomainService } = buildUserModule();
@@ -41,7 +42,10 @@ function buildAuthModule() {
 
   const refreshTokenPgRepository = new RefreshTokenPgRepository(pool);
   const tokenManagementApplicationService =
-    new TokenManagementApplicationService(refreshTokenPgRepository);
+    new TokenManagementApplicationService(
+      refreshTokenPgRepository,
+      redisService,
+    );
 
   const emailVerificationPgRepository = new EmailVerificationPgRepository();
   const emailVerificationApplicationService =

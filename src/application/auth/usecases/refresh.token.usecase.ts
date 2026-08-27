@@ -42,6 +42,18 @@ class RefreshTokenUseCase {
 
     const result = await this.transactionManager.runInTransaction(
       async (client) => {
+        const hashedRefreshToken =
+          this.tokenService.hashRefreshToken(refreshToken);
+
+        const isBlacklisted =
+          await this.tokenManagementApplicationService.isBlacklisted(
+            hashedRefreshToken,
+          );
+
+        if (isBlacklisted) {
+          throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
+        }
+
         const storedToken =
           await this.tokenManagementApplicationService.findTokenByDeviceIdAndUserId(
             userId,
@@ -56,9 +68,6 @@ class RefreshTokenUseCase {
         if (storedToken.expiresAt <= new Date()) {
           throw AppError.unauthorized("REFRESH_TOKEN_EXPIRED");
         }
-
-        const hashedRefreshToken =
-          this.tokenService.hashRefreshToken(refreshToken);
 
         if (hashedRefreshToken !== storedToken.tokenHash) {
           throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
@@ -78,6 +87,7 @@ class RefreshTokenUseCase {
         );
 
         return {
+          storedToken: storedToken,
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
         };
@@ -85,6 +95,17 @@ class RefreshTokenUseCase {
     );
 
     try {
+      const ttl = Math.floor(
+        (result.storedToken.expiresAt.getTime() - Date.now()) / 1000,
+      );
+
+      if (ttl > 0) {
+        await this.tokenManagementApplicationService.addToBlacklist(
+          result.storedToken.tokenHash,
+          ttl,
+        );
+      }
+
       await this.sessionService.setSession(
         userId,
         deviceId,

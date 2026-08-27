@@ -6,9 +6,8 @@ import DatabaseError from "../../shared/errors/database.error.js";
 interface EmailVerificationRow {
   id: string;
   user_id: string;
-  code: string;
+  hashed_code: string;
   created_at: Date;
-  updated_at: Date;
   expires_at: Date;
 }
 
@@ -32,15 +31,14 @@ class EmailVerificationPgRepository implements IEmailVerificationRepository {
   ): Promise<void> {
     const query = `
     INSERT INTO email_verifications (
-    id, user_id, code, updated_at, expires_at)
-    VALUES ($1, $2, $3, $4, $5)
+    id, user_id, hashed_code, expires_at)
+    VALUES ($1, $2, $3, $4)
     `;
     try {
       await client.query(query, [
         emailVerification.id,
         emailVerification.userId,
-        emailVerification.code,
-        null,
+        emailVerification.hashedCode,
         emailVerification.expiresAt,
       ]);
     } catch (error) {
@@ -58,16 +56,6 @@ class EmailVerificationPgRepository implements IEmailVerificationRepository {
     } catch (error) {
       throw DatabaseError.fromPGError(error);
     }
-  }
-
-  async updateUpdatedAt(
-    userId: string,
-    client: IDatabaseClient,
-  ): Promise<void> {
-    await client.query(
-      `UPDATE email_verifications SET updated_at = NOW() WHERE user_id = $1`,
-      [userId],
-    );
   }
 }
 export default EmailVerificationPgRepository;

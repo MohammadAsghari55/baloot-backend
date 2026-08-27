@@ -12,5 +12,15 @@ CREATE TABLE IF NOT EXISTS refresh_token (
 CREATE UNIQUE INDEX idx_unique_active_refresh_token_device 
 ON refresh_token(user_id, device_id) 
 WHERE revoked_at IS NULL;
+
+CREATE INDEX idx_refresh_token_user_device_revoked 
+ON refresh_token(user_id, device_id, revoked_at);
+
+CREATE INDEX idx_refresh_token_token_hash 
+ON refresh_token(token_hash);
 -- DOWN
+-- DOWN
+DROP INDEX IF EXISTS idx_unique_active_refresh_token_device;
+DROP INDEX IF EXISTS idx_refresh_token_user_device_revoked;
+DROP INDEX IF EXISTS idx_refresh_token_token_hash;
 DROP TABLE IF EXISTS refresh_token;

@@ -12,8 +12,6 @@ interface IEmailVerificationRepository {
   ): Promise<void>;
 
   deleteByUserId(userId: string, client: IDatabaseClient): Promise<void>;
-
-  updateUpdatedAt(userId: string, client: IDatabaseClient): Promise<void>;
 }
 
 export default IEmailVerificationRepository;

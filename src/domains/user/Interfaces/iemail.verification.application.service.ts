@@ -12,8 +12,6 @@ interface IEmailVerificationApplicationService {
   ): Promise<void>;
 
   delete(userId: string, client: IDatabaseClient): Promise<void>;
-
-  update(userId: string, client: IDatabaseClient): Promise<void>;
 }
 
 export default IEmailVerificationApplicationService;

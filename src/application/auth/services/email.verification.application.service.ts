@@ -25,9 +25,5 @@ class EmailVerificationApplicationService implements IEmailVerificationApplicati
   async delete(userId: string, client: IDatabaseClient): Promise<void> {
     return this.emailVerificationRepository.deleteByUserId(userId, client);
   }
-
-  async update(userId: string, client: IDatabaseClient): Promise<void> {
-    return this.emailVerificationRepository.updateUpdatedAt(userId, client);
-  }
 }
 export default EmailVerificationApplicationService;

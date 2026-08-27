@@ -20,14 +20,14 @@ CREATE TABLE IF NOT EXISTS users (
     card_number                     VARCHAR(20),
     birth_date                      DATE,
     password_change_try             INTEGER DEFAULT 0,
-    password_change_locked_until    TIMESTAMP,
+    password_change_locked_until    TIMESTAMPTZ,
     wrong_password_number           INTEGER DEFAULT 0,
-    wrong_password_until            TIMESTAMP,
+    wrong_password_until            TIMESTAMPTZ,
     is_profile_completed            BOOLEAN DEFAULT FALSE,
     is_email_verified               BOOLEAN DEFAULT FALSE,
     token_version                   INTEGER NOT NULL DEFAULT 1,
-    created_at                      TIMESTAMP DEFAULT NOW(),
-    updated_at                      TIMESTAMP DEFAULT NOW()
+    created_at                      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at                      TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- DOWN

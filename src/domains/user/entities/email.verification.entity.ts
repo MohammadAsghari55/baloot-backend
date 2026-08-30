@@ -31,7 +31,7 @@ class EmailVerification {
       userId,
       hashedCode,
       new Date(),
-      new Date(Date.now() + config.EXPIRE_TIME),
+      new Date(Date.now() + config.EXPIRE_TIME * 1000),
     );
   }
 

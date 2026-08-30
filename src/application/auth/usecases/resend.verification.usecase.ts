@@ -42,7 +42,7 @@ class ResendVerificationUseCase {
         if (existEmail) {
           const timeSinceCreation = Date.now() - existEmail.createdAt.getTime();
 
-          if (timeSinceCreation < config.EXPIRE_TIME) {
+          if (timeSinceCreation < config.EXPIRE_TIME * 1000) {
             throw AppError.fromCode("TOO_MANY_REQUESTS");
           }
 

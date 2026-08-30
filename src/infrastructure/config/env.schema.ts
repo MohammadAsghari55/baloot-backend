@@ -25,7 +25,7 @@ const envSchema = z.object({
   EXPIRE_TIME: z.coerce
     .number()
     .positive()
-    .default(15 * 60 * 1000),
+    .default(15 * 60),
   REDIS_HOST: z.string().min(1).default("localhost"),
   REDIS_PORT: z.coerce.number().positive().default(6379),
   REDIS_PASSWORD: z.string().optional().default(""),

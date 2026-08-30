@@ -5,6 +5,10 @@ interface IUserRepository {
 
   findByUsername(username: string): Promise<User | null>;
 
+  readByIdentifier(
+    identifier: string,
+  ): Promise<Pick<User, "id" | "email"> | null>;
+
   findById(userId: string, client: IDatabaseClient): Promise<User | null>;
 
   readById(userId: string): Promise<User | null>;

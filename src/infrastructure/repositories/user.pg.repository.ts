@@ -50,6 +50,18 @@ class UserPgRepository implements IUserRepository {
     return User.fromDB(row);
   }
 
+  async readByIdentifier(
+    identifier: string,
+  ): Promise<Pick<User, "id" | "email"> | null> {
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+    const result = await this.pool.query<{ id: string; email: string }>(
+      `SELECT id, email FROM users WHERE ${isEmail ? "email" : "username"} = $1`,
+      [identifier],
+    );
+    if (result.rows.length === 0) return null;
+    return result.rows[0];
+  }
+
   async findById(
     userId: string,
     client: IDatabaseClient,

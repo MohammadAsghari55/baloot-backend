@@ -22,6 +22,12 @@ class UserApplicationService implements IUserApplicationService {
     return this.userRepository.findByUsername(identifier);
   }
 
+  async readByIdentifier(
+    identifier: string,
+  ): Promise<Pick<User, "id" | "email"> | null> {
+    return this.userRepository.readByIdentifier(identifier);
+  }
+
   async findById(
     userId: string,
     client: IDatabaseClient,

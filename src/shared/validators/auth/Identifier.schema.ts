@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-export const ResendVerificationSchema = z.object({
+export const identifierSchema = z.object({
   identifier: z
     .string()
     .min(5, { message: "identifier must be at least 5 characters" }),
 });
 
-export type ResendVerificationDto = z.infer<typeof ResendVerificationSchema>;
+export type IdentifierDto = z.infer<typeof identifierSchema>;

@@ -1,1 +1,1 @@
-export { ResendVerificationDto } from "../../../shared/validators/auth/resend.verification.schema.js";
+export { IdentifierDto } from "../../../shared/validators/auth/Identifier.schema.js";

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { loginSchema } from "../../../../shared/validators/auth/login.schema.js";
-import { ResendVerificationSchema } from "../../../../shared/validators/auth/resend.verification.schema.js";
+import { IdentifierSchema } from "../../../../shared/validators/auth/Identifier.schema.js";
 import { extractorMiddleware } from "../../../../middleware.container.index.js";
 import validateBodyMiddleware from "../../../../middlewares/validation.body.middleware.js";
 import { authController } from "../../../../container.js";
@@ -17,7 +17,7 @@ router.post(
 
 router.post(
   "/resendCode",
-  validateBodyMiddleware(ResendVerificationSchema),
+  validateBodyMiddleware(IdentifierSchema),
   asyncHandler(authController.resendCode),
 );
 

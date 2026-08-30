@@ -1,4 +1,4 @@
-import { ResendVerificationDto } from "../../../application/auth/dtos/resend.verification.dto.js";
+import { IdentifierDto } from "../../../application/auth/dtos/resend.verification.dto.js";
 import ITransactionManager from "../../../shared/interfaces/itransaction.manager.js";
 import IUserApplicationService from "../../../domains/user/Interfaces/iuser.application.service.js";
 import IBcryptService from "../../../domains/user/Interfaces/ibcrypt.service.js";
@@ -18,7 +18,7 @@ class ResendVerificationUseCase {
     private emailVerificationApplicationService: IEmailVerificationApplicationService,
   ) {}
 
-  async execute(dto: ResendVerificationDto) {
+  async execute(dto: IdentifierDto) {
     const { user, code, response } =
       await this.transactionManager.runInTransaction(async (client) => {
         const user = await this.userApplicationService.findByIdentifier(

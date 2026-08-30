@@ -1,25 +1,28 @@
-import { buildUserModule } from "../../domains/user/user.index.js";
-import PgTransactionManager from "../../infrastructure/database/pg.transaction.manager.js";
 import pool from "../../infrastructure/database/pg.client.js";
 import config from "../../infrastructure/config/env.index.js";
+import PgTransactionManager from "../../infrastructure/database/pg.transaction.manager.js";
 
+// ---------- Services ----------
 import {
   bcryptService,
-  emailService,
   tokenService,
   sessionService,
   registerAdminService,
   forgetPasswordService,
 } from "../../infrastructure/services/infrastructure.services.index.js";
-import EmailOrchestrationService from "./services/email.orchestration.service.js";
-import RefreshTokenPgRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
-import TokenManagementApplicationService from "./services/token.management.application.service.js";
-import EmailVerificationPgRepository from "../../infrastructure/repositories/email.verification.pg.repository.js";
-import EmailVerificationApplicationService from "./services/email.verification.application.service.js";
-import SessionManagementApplicationService from "./services/session.management.application.service.js";
-import PasswordHistoryApplicationService from "./services/password.history.application.service.js";
-import PasswordHistoryPgRepository from "../../infrastructure/repositories/password.history.pg.repository.js";
 
+import {
+  emailOrchestrationService,
+  emailVerificationApplicationService,
+  passwordHistoryApplicationService,
+  sessionManagementApplicationService,
+  tokenManagementApplicationService,
+  userApplicationService,
+} from "./services/application.services.index.js";
+
+import UserDomainService from "../../domains/user/services/user.domain.service.js";
+
+// ---------- UseCases ----------
 import LoginUseCase from "./usecases/login.usecase.js";
 import RefreshTokenUseCase from "./usecases/refresh.token.usecase.js";
 import RegisterAdminUseCase from "./usecases/register.admin.usecase.js";
@@ -32,34 +35,15 @@ import ChangePasswordUseCase from "./usecases/change.password.usecase.js";
 import ForgetPasswordUseCase from "./usecases/forget.password.usecase.js";
 import ResetPasswordUseCase from "./usecases/reset.password.usecase.js";
 
+// ---------- Controllers ----------
 import AdminController from "../../api/v1/admin/admin.controller.js";
-import UserController from "../../api/v1/user/user.controller.js";
 import AuthController from "../../api/v1/common/auth/auth.controller.js";
-import redisService from "../../infrastructure/redis/redis.service.js";
+import UserController from "../../api/v1/user/user.controller.js";
 
 function buildAuthModule() {
-  const { userApplicationService, userDomainService } = buildUserModule();
-
   const transactionManager = new PgTransactionManager(pool);
-  const emailOrchestrationService = new EmailOrchestrationService(emailService);
 
-  const refreshTokenPgRepository = new RefreshTokenPgRepository(pool);
-  const tokenManagementApplicationService =
-    new TokenManagementApplicationService(
-      refreshTokenPgRepository,
-      redisService,
-    );
-
-  const emailVerificationPgRepository = new EmailVerificationPgRepository();
-  const emailVerificationApplicationService =
-    new EmailVerificationApplicationService(emailVerificationPgRepository);
-
-  const sessionManagementApplicationService =
-    new SessionManagementApplicationService(sessionService);
-
-  const passwordHistoryPgRepository = new PasswordHistoryPgRepository();
-  const passwordHistoryApplicationService =
-    new PasswordHistoryApplicationService(passwordHistoryPgRepository);
+  const userDomainService = new UserDomainService();
 
   const registerAdminUseCase = new RegisterAdminUseCase(
     userDomainService,

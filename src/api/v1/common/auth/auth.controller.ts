@@ -9,6 +9,8 @@ import {
 } from "../../../../infrastructure/config/cookie.config.js";
 import ResendVerificationUseCase from "../../../../application/auth/usecases/resend.verification.usecase.js";
 import RefreshTokenUseCase from "../../../../application/auth/usecases/refresh.token.usecase.js";
+import ForgetPasswordUseCase from "../../../../application/auth/usecases/forget.password.usecase.js";
+import ResetPasswordUseCase from "../../../../application/auth/usecases/reset.password.usecase.js";
 
 @BoundClass
 class AuthController {
@@ -18,6 +20,8 @@ class AuthController {
     private resendVerificationUseCase: ResendVerificationUseCase,
     private changePasswordUseCase: ChangePasswordUseCase,
     private refreshTokenUseCase: RefreshTokenUseCase,
+    private forgetPasswordUseCase: ForgetPasswordUseCase,
+    private resetPasswordUseCase: ResetPasswordUseCase,
   ) {}
 
   async login(req: Request, res: Response) {
@@ -54,6 +58,7 @@ class AuthController {
       success: true,
       message: "Verification code sent successfully",
       data: result.response,
+
       ...(result.warning && { warning: result.warning }),
     };
 
@@ -84,6 +89,29 @@ class AuthController {
     res.status(200).json({
       success: true,
       message: "Token refreshed successfully",
+    });
+  }
+
+  async forgetPassword(req: Request, res: Response) {
+    const warning = await this.forgetPasswordUseCase.execute(req.body);
+
+    res.status(200).json({
+      success: true,
+      message: "Verification code sent successfully",
+
+      ...(warning && { warning }),
+    });
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    await this.resetPasswordUseCase.execute(req.body);
+
+    res.clearCookie("accessToken", accessCookieOptions);
+    res.clearCookie("refreshToken", refreshCookieOptions);
+
+    res.status(200).json({
+      success: true,
+      message: "Your Password Reset successfully. Please Login Again",
     });
   }
 }

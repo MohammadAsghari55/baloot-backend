@@ -9,6 +9,7 @@ import {
   tokenService,
   sessionService,
   registerAdminService,
+  forgetPasswordService,
 } from "../../infrastructure/services/services.index.js";
 import EmailOrchestrationService from "./services/email.orchestration.service.js";
 import RefreshTokenPgRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
@@ -28,6 +29,8 @@ import RegisterUserUseCase from "./usecases/register.user.usecase.js";
 import ResendVerificationUseCase from "./usecases/resend.verification.usecase.js";
 import LogoutUseCase from "./usecases/logout.usecase.js";
 import ChangePasswordUseCase from "./usecases/change.password.usecase.js";
+import ForgetPasswordUseCase from "./usecases/forget.password.usecase.js";
+import ResetPasswordUseCase from "./usecases/reset.password.usecase.js";
 
 import AdminController from "../../api/v1/admin/admin.controller.js";
 import UserController from "../../api/v1/user/user.controller.js";
@@ -138,6 +141,24 @@ function buildAuthModule() {
     sessionService,
   );
 
+  const forgetPasswordUseCase = new ForgetPasswordUseCase(
+    userApplicationService,
+    bcryptService,
+    emailOrchestrationService,
+    forgetPasswordService,
+  );
+
+  const resetPasswordUseCase = new ResetPasswordUseCase(
+    transactionManager,
+    userApplicationService,
+    bcryptService,
+    emailOrchestrationService,
+    tokenManagementApplicationService,
+    passwordHistoryApplicationService,
+    sessionService,
+    forgetPasswordService,
+  );
+
   const adminController = new AdminController(
     registerAdminUseCase,
     verifyRegisterAdminUseCase,
@@ -152,6 +173,8 @@ function buildAuthModule() {
     resendVerificationUseCase,
     changePasswordUseCase,
     refreshTokenUseCase,
+    forgetPasswordUseCase,
+    resetPasswordUseCase,
   );
 
   return {

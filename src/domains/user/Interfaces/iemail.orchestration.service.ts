@@ -1,9 +1,16 @@
 interface IEmailOrchestrationService {
   generateVerificationCode(): string;
 
-  emailSender(email: string, code: string): Promise<void>;
+  sendVerificationEmail(email: string, code: string): Promise<void>;
 
-  notifEmailSender(email: string): Promise<void>;
+  sendVerificationEmailWithWarning(
+    email: string,
+    code: string,
+  ): Promise<string | undefined>;
+
+  sendNotificationEmail(email: string): Promise<void>;
+
+  sendNotificationEmailWithWarning(email: string): Promise<string | undefined>;
 }
 
 export default IEmailOrchestrationService;

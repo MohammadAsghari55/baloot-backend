@@ -112,23 +112,9 @@ class ResetPasswordUseCase {
       console.error("Redis version sync failed after password change:", error);
     }
 
-    try {
-      await this.emailOrchestrationService.notifEmailSender(user.email);
-    } catch (error) {
-      const appError = AppError.internalWithOptions("EMAIL_SEND_FAILED", {
-        publicMessage: "Failed to send Notification email.",
-        cause: error,
-      });
-
-      console.error(
-        JSON.stringify({
-          code: appError.code,
-          message: appError.message,
-          publicMessage: appError.publicMessage,
-          cause: appError.cause,
-        }),
-      );
-    }
+    await this.emailOrchestrationService.sendNotificationEmailWithWarning(
+      user.email,
+    );
 
     return response;
   }

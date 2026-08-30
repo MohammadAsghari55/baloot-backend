@@ -27,32 +27,11 @@ class ResendAdminVerificationUseCase {
       throw AppError.unauthorized("INVALID_CREDENTIALS");
     }
 
-    let warning: string | undefined;
-
-    try {
-      await this.emailOrchestrationService.emailSender(
+    const warning =
+      await this.emailOrchestrationService.sendVerificationEmailWithWarning(
         user.email,
         redisNewAdmin.code,
       );
-    } catch (error) {
-      warning =
-        "verification email could not be sent. Please request a new code.";
-
-      const appError = AppError.internalWithOptions("EMAIL_SEND_FAILED", {
-        publicMessage:
-          "Failed to send verification email. Please request a new code later.",
-        cause: error,
-      });
-
-      console.error(
-        JSON.stringify({
-          code: appError.code,
-          message: appError.message,
-          publicMessage: appError.publicMessage,
-          cause: appError.cause,
-        }),
-      );
-    }
 
     return warning;
   }

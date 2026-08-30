@@ -35,29 +35,11 @@ class ForgetPasswordUseCase {
 
     await this.forgetPasswordService.saveResetCode(userInfo.id, hashedCode);
 
-    let warning: string | undefined;
-
-    try {
-      await this.emailOrchestrationService.emailSender(userInfo.email, code);
-    } catch (error) {
-      warning =
-        "verification email could not be sent. Please request a new code.";
-
-      const appError = AppError.internalWithOptions("EMAIL_SEND_FAILED", {
-        publicMessage:
-          "Failed to send verification email. Please request a new code later.",
-        cause: error,
-      });
-
-      console.error(
-        JSON.stringify({
-          code: appError.code,
-          message: appError.message,
-          publicMessage: appError.publicMessage,
-          cause: appError.cause,
-        }),
+    const warning =
+      await this.emailOrchestrationService.sendVerificationEmailWithWarning(
+        userInfo.email,
+        code,
       );
-    }
 
     return warning;
   }

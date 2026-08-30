@@ -1,1 +1,1 @@
-export { IdentifierDto } from "../../../shared/validators/auth/Identifier.schema.js";
+export { IdentifierDto } from "../../../shared/validators/auth/identifier.schema.js";

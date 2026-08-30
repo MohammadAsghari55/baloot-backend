@@ -1,7 +1,7 @@
 import {
   tokenService,
   sessionService,
-} from "./infrastructure/services/services.index.js";
+} from "./infrastructure/services/infrastructure.services.index.js";
 
 import {
   tokenManagementApplicationService,

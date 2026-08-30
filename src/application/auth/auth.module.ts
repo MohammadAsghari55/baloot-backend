@@ -10,7 +10,7 @@ import {
   sessionService,
   registerAdminService,
   forgetPasswordService,
-} from "../../infrastructure/services/services.index.js";
+} from "../../infrastructure/services/infrastructure.services.index.js";
 import EmailOrchestrationService from "./services/email.orchestration.service.js";
 import RefreshTokenPgRepository from "../../infrastructure/repositories/refresh.token.pg.repository.js";
 import TokenManagementApplicationService from "./services/token.management.application.service.js";

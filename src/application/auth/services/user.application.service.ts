@@ -89,6 +89,20 @@ class UserApplicationService implements IUserApplicationService {
     );
   }
 
+  async updateUserProfile(
+    userId: string,
+    data: {
+      firstName: string;
+      lastName: string;
+      address: string;
+      phoneNumber: string;
+      birthDate?: Date | null;
+    },
+    client: IDatabaseClient,
+  ): Promise<number> {
+    return this.userRepository.updateUserProfile(userId, data, client);
+  }
+
   async increaseVersion(
     userId: string,
     client: IDatabaseClient,

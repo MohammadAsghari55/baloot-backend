@@ -223,6 +223,41 @@ class UserPgRepository implements IUserRepository {
     ]);
   }
 
+  async updateUserProfile(
+    userId: string,
+    data: {
+      firstName: string;
+      lastName: string;
+      address: string;
+      phoneNumber: string;
+      birthDate?: Date | null;
+    },
+    client: IDatabaseClient,
+  ): Promise<number> {
+    const query = `
+    UPDATE users 
+    SET 
+      first_name = $1,
+      last_name = $2,
+      address = $3,
+      phone_number = $4,
+      birth_date = $5,
+      is_profile_completed = true,
+      updated_at = NOW()
+    WHERE id = $6 AND is_profile_completed = false
+  `;
+    const result = await client.query(query, [
+      data.firstName,
+      data.lastName,
+      data.address,
+      data.phoneNumber,
+      data.birthDate ?? null,
+      userId,
+    ]);
+
+    return result.rowCount ?? 0;
+  }
+
   async increaseVersion(
     userId: string,
     client: IDatabaseClient,

@@ -45,6 +45,18 @@ interface IUserApplicationService {
     client: IDatabaseClient,
   ): Promise<void>;
 
+  updateUserProfile(
+    userId: string,
+    data: {
+      firstName: string;
+      lastName: string;
+      address: string;
+      phoneNumber: string;
+      birthDate?: Date | null;
+    },
+    client: IDatabaseClient,
+  ): Promise<number>;
+
   increaseVersion(userId: string, client: IDatabaseClient): Promise<number>;
 }
 

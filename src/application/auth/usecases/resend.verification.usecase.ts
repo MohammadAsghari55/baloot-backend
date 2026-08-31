@@ -7,7 +7,6 @@ import IEmailVerificationApplicationService from "../../../domains/user/Interfac
 import EmailVerification from "../../../domains/user/entities/email.verification.entity.js";
 import UserResponseDto from "../dtos/user.response.dto.js";
 import AppError from "../../../shared/errors/app.error.js";
-import config from "../../../infrastructure/config/env.index.js";
 
 class ResendVerificationUseCase {
   constructor(
@@ -16,6 +15,7 @@ class ResendVerificationUseCase {
     private bcryptService: IBcryptService,
     private emailOrchestrationService: IEmailOrchestrationService,
     private emailVerificationApplicationService: IEmailVerificationApplicationService,
+    private readonly expireTime: number,
   ) {}
 
   async execute(dto: IdentifierDto) {
@@ -42,7 +42,7 @@ class ResendVerificationUseCase {
         if (existEmail) {
           const timeSinceCreation = Date.now() - existEmail.createdAt.getTime();
 
-          if (timeSinceCreation < config.EXPIRE_TIME * 1000) {
+          if (timeSinceCreation < this.expireTime) {
             throw AppError.fromCode("TOO_MANY_REQUESTS");
           }
 

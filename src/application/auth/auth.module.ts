@@ -106,6 +106,7 @@ function buildAuthModule() {
     bcryptService,
     emailOrchestrationService,
     emailVerificationApplicationService,
+    config.EXPIRE_TIME * 1000,
   );
 
   const logoutUseCase = new LogoutUseCase(

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { loginSchema } from "../../../../shared/validators/auth/login.schema.js";
 import { identifierSchema } from "../../../../shared/validators/auth/identifier.schema.js";
 import { resetPasswordSchema } from "../../../../shared/validators/auth/reset.password.schema.js";
+import { completeProfileSchema } from "../../../../shared/validators/auth/complete.profile.schema.js";
 import { extractorMiddleware } from "../../../../middleware.container.index.js";
 import validateBodyMiddleware from "../../../../middlewares/validation.body.middleware.js";
 import { authController } from "../../../../container.js";
@@ -40,4 +41,10 @@ router.post(
   asyncHandler(authController.resetPassword),
 );
 
+router.post(
+  "/completeProfile",
+  extractorMiddleware,
+  validateBodyMiddleware(completeProfileSchema),
+  asyncHandler(authController.completeProfile),
+);
 export default router;

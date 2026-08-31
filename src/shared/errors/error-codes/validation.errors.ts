@@ -24,4 +24,14 @@ export const ValidationErrors = {
     message: "You cannot reuse one of your recent passwords.",
     status: 400,
   },
+  MISSING_REQUIRED_FIELDS: {
+    code: "MISSING_REQUIRED_FIELDS",
+    message: "All required fields must be provided.",
+    status: 400,
+  },
+  PROFILE_ALREADY_COMPLETED: {
+    code: "PROFILE_ALREADY_COMPLETED",
+    message: "Profile is already completed.",
+    status: 400,
+  },
 } as const;

@@ -11,6 +11,7 @@ import ResendVerificationUseCase from "../../../../application/auth/usecases/res
 import RefreshTokenUseCase from "../../../../application/auth/usecases/refresh.token.usecase.js";
 import ForgetPasswordUseCase from "../../../../application/auth/usecases/forget.password.usecase.js";
 import ResetPasswordUseCase from "../../../../application/auth/usecases/reset.password.usecase.js";
+import CompleteProfileUseCase from "../../../../application/auth/usecases/complete.profile.usecase.js";
 
 @BoundClass
 class AuthController {
@@ -22,6 +23,7 @@ class AuthController {
     private refreshTokenUseCase: RefreshTokenUseCase,
     private forgetPasswordUseCase: ForgetPasswordUseCase,
     private resetPasswordUseCase: ResetPasswordUseCase,
+    private completeProfileUseCase: CompleteProfileUseCase,
   ) {}
 
   async login(req: Request, res: Response) {
@@ -112,6 +114,18 @@ class AuthController {
     res.status(200).json({
       success: true,
       message: "Your Password Reset successfully. Please Login Again",
+    });
+  }
+
+  async completeProfile(req: Request, res: Response) {
+    await this.completeProfileUseCase.execute(req.body, req.userId!);
+
+    res.clearCookie("accessToken", accessCookieOptions);
+    res.clearCookie("refreshToken", refreshCookieOptions);
+
+    res.status(200).json({
+      success: true,
+      message: "Your Profile completed successfully. Please Login Again",
     });
   }
 }

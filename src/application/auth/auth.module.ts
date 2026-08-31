@@ -34,6 +34,7 @@ import LogoutUseCase from "./usecases/logout.usecase.js";
 import ChangePasswordUseCase from "./usecases/change.password.usecase.js";
 import ForgetPasswordUseCase from "./usecases/forget.password.usecase.js";
 import ResetPasswordUseCase from "./usecases/reset.password.usecase.js";
+import CompleteProfileUseCase from "./usecases/complete.profile.usecase.js";
 
 // ---------- Controllers ----------
 import AdminController from "../../api/v1/admin/admin.controller.js";
@@ -143,6 +144,13 @@ function buildAuthModule() {
     forgetPasswordService,
   );
 
+  const completeProfileUseCase = new CompleteProfileUseCase(
+    transactionManager,
+    userApplicationService,
+    tokenManagementApplicationService,
+    sessionService,
+  );
+
   const adminController = new AdminController(
     registerAdminUseCase,
     verifyRegisterAdminUseCase,
@@ -159,6 +167,7 @@ function buildAuthModule() {
     refreshTokenUseCase,
     forgetPasswordUseCase,
     resetPasswordUseCase,
+    completeProfileUseCase,
   );
 
   return {

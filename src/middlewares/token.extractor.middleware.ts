@@ -11,7 +11,7 @@ const tokenExtractorMiddleware = (tokenService: ITokenService) => {
       req.deviceId = null;
       req.role = null;
       req.tokenValidation = false;
-
+      req.accessType = null;
       return next();
     }
 
@@ -19,6 +19,7 @@ const tokenExtractorMiddleware = (tokenService: ITokenService) => {
       userId: string;
       deviceId: string;
       role: "user" | "admin" | "super_admin";
+      accessType: "full" | "limited";
     } | null = null;
 
     let isValid = false;
@@ -28,6 +29,7 @@ const tokenExtractorMiddleware = (tokenService: ITokenService) => {
         userId: string;
         deviceId: string;
         role: "user" | "admin" | "super_admin";
+        accessType: "full" | "limited";
       };
       isValid = true;
     } catch (error) {
@@ -36,6 +38,7 @@ const tokenExtractorMiddleware = (tokenService: ITokenService) => {
           userId: string;
           deviceId: string;
           role: "user" | "admin" | "super_admin";
+          accessType: "full" | "limited";
         } | null;
         isValid = false;
       } else {
@@ -48,6 +51,7 @@ const tokenExtractorMiddleware = (tokenService: ITokenService) => {
     req.deviceId = payload?.deviceId ?? null;
     req.role = payload?.role ?? null;
     req.tokenValidation = isValid;
+    req.accessType = payload?.accessType ?? null;
 
     next();
   };

@@ -8,6 +8,7 @@ declare global {
       deviceId?: string | null;
       role?: "user" | "admin" | "super_admin" | null;
       tokenValidation?: boolean | null;
+      accessType?: "full" | "limited" | null;
     }
   }
 }

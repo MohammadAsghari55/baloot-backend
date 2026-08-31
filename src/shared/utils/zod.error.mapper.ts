@@ -42,6 +42,28 @@ const errorMessages: Record<string, string> = {
   "Code must be exactly 6 characters":
     "Verification code must be exactly 6 characters",
   "Old password is required": "Old password is required",
+
+  // Complete Profile
+  "First name must be at least 3 characters":
+    "First name must be at least 3 characters",
+  "First name must be at most 70 characters":
+    "First name must be at most 70 characters",
+  "Last name must be at least 3 characters":
+    "Last name must be at least 3 characters",
+  "Last name must be at most 70 characters":
+    "Last name must be at most 70 characters",
+  "Address must be at least 10 characters":
+    "Address must be at least 10 characters",
+  "Address must be at most 255 characters":
+    "Address must be at most 255 characters",
+  "Phone number must be at least 8 characters":
+    "Phone number must be at least 8 characters",
+  "Phone number must be at most 40 characters":
+    "Phone number must be at most 40 characters",
+  "Phone number must contain only digits":
+    "Phone number must contain only digits",
+  "Invalid date format. Expected YYYY-MM-DD":
+    "Invalid date format. Expected YYYY-MM-DD",
 };
 
 function zodErrorMapper(

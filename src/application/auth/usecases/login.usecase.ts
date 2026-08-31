@@ -101,10 +101,13 @@ class LoginUseCase {
 
         const version = user.tokenVersion;
 
+        const accessType = user.isProfileCompleted ? "full" : "limited";
+
         const tokens = await this.tokenService.generateTokenPair(
           user.id,
           deviceId,
           user.role,
+          accessType,
         );
 
         await this.tokenManagementApplicationService.saveToken(

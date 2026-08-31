@@ -16,10 +16,19 @@ class TokenService implements ITokenService {
       .digest("hex");
   }
 
-  generateAccessToken(userId: string, deviceId: string, role: string): string {
-    return jwt.sign({ userId, deviceId, role }, config.JWT_ACCESS_SECRET, {
-      expiresIn: "15m",
-    });
+  generateAccessToken(
+    userId: string,
+    deviceId: string,
+    role: string,
+    accessType: "full" | "limited",
+  ): string {
+    return jwt.sign(
+      { userId, deviceId, role, accessType },
+      config.JWT_ACCESS_SECRET,
+      {
+        expiresIn: "15m",
+      },
+    );
   }
 
   generateRefreshToken(): string {
@@ -30,12 +39,18 @@ class TokenService implements ITokenService {
     userId: string,
     deviceId: string,
     role: string,
+    accessType: "full" | "limited",
   ): Promise<{
     accessToken: string;
     refreshToken: string;
     hashedRefreshToken: string;
   }> {
-    const accessToken = this.generateAccessToken(userId, deviceId, role);
+    const accessToken = this.generateAccessToken(
+      userId,
+      deviceId,
+      role,
+      accessType,
+    );
     const refreshToken = this.generateRefreshToken();
     const hashedRefreshToken = this.hashRefreshToken(refreshToken);
 
@@ -50,12 +65,14 @@ class TokenService implements ITokenService {
     userId: string;
     deviceId: string;
     role: string;
+    accessType: "full" | "limited";
   } {
     try {
       const decoded = jwt.verify(token, config.JWT_ACCESS_SECRET) as {
         userId: string;
         deviceId: string;
         role: string;
+        accessType: "full" | "limited";
       };
       return decoded;
     } catch (error) {
@@ -67,12 +84,14 @@ class TokenService implements ITokenService {
     userId: string;
     deviceId: string;
     role: string;
+    accessType: "full" | "limited";
   } | null {
     try {
       return jwt.decode(token) as {
         userId: string;
         deviceId: string;
         role: string;
+        accessType: "full" | "limited";
       };
     } catch {
       return null;

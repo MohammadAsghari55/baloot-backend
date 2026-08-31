@@ -30,10 +30,13 @@ class RefreshTokenUseCase {
       throw AppError.notFound("NOT_FOUND");
     }
 
+    const accessType = user.isProfileCompleted ? "full" : "limited";
+
     const tokens = await this.tokenService.generateTokenPair(
       userId,
       deviceId,
       user.role,
+      accessType,
     );
 
     const result = await this.transactionManager.runInTransaction(

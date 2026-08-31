@@ -60,4 +60,9 @@ export const AuthErrors = {
       "You already have a pending admin registration request. Please complete it or wait for it to expire.",
     status: 409,
   },
+  PROFILE_INCOMPLETE: {
+    code: "PROFILE_INCOMPLETE",
+    message: "Profile is not complete. Please complete your profile first.",
+    status: 403,
+  },
 } as const;

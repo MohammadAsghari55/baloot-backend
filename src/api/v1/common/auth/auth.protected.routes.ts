@@ -4,6 +4,7 @@ import {
   extractorMiddleware,
   AccessCheckerMiddleware,
 } from "../../../../middleware.container.index.js";
+import fullAccessGuardMiddleware from "../../../../middlewares/full.access.guard.middleware.js";
 import validateBodyMiddleware from "../../../../middlewares/validation.body.middleware.js";
 import { authController } from "../../../../container.js";
 import asyncHandler from "../../../../shared/utils/async.handler.js";
@@ -17,6 +18,7 @@ router.post("/logout", asyncHandler(authController.logout));
 
 router.post(
   "/changePassword",
+  fullAccessGuardMiddleware,
   validateBodyMiddleware(changePasswordSchema),
   asyncHandler(authController.changePassword),
 );

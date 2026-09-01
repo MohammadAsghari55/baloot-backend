@@ -73,7 +73,7 @@ class RefreshTokenUseCase {
           Buffer.from(storedToken.tokenHash),
         );
 
-        if (isEqual) {
+        if (!isEqual) {
           throw AppError.unauthorized("INVALID_REFRESH_TOKEN");
         }
 

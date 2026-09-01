@@ -23,6 +23,7 @@ class ResendVerificationUseCase {
       await this.transactionManager.runInTransaction(async (client) => {
         const user = await this.userApplicationService.findByIdentifier(
           dto.identifier,
+          client,
         );
 
         if (!user) {

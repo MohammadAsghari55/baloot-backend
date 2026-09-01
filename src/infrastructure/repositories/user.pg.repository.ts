@@ -31,22 +31,32 @@ class UserPgRepository implements IUserRepository {
   constructor(private readonly pool: Pool) {}
 
   async findByEmail(email: string): Promise<User | null> {
-    const result = await this.pool.query<UserRow>(
-      "SELECT * FROM users WHERE email = $1",
-      [email],
-    );
+    const query = `
+    SELECT * FROM users 
+    WHERE email = $1
+    `;
+
+    const result = await this.pool.query<UserRow>(query, [email]);
+
     if (result.rows.length === 0) return null;
+
     const row = result.rows[0];
+
     return User.fromDB(row);
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    const result = await this.pool.query<UserRow>(
-      "SELECT * FROM users WHERE username = $1",
-      [username],
-    );
+    const query = `
+    SELECT * FROM users 
+    WHERE username = $1
+    `;
+
+    const result = await this.pool.query<UserRow>(query, [username]);
+
     if (result.rows.length === 0) return null;
+
     const row = result.rows[0];
+
     return User.fromDB(row);
   }
 
@@ -73,11 +83,17 @@ class UserPgRepository implements IUserRepository {
     identifier: string,
   ): Promise<Pick<User, "id" | "email"> | null> {
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
-    const result = await this.pool.query<{ id: string; email: string }>(
-      `SELECT id, email FROM users WHERE ${isEmail ? "email" : "username"} = $1`,
-      [identifier],
-    );
+
+    const query = `
+    SELECT id, email FROM users 
+    WHERE ${isEmail ? "email" : "username"} = $1`;
+
+    const result = await this.pool.query<{ id: string; email: string }>(query, [
+      identifier,
+    ]);
+
     if (result.rows.length === 0) return null;
+
     return result.rows[0];
   }
 
@@ -85,22 +101,33 @@ class UserPgRepository implements IUserRepository {
     userId: string,
     client: IDatabaseClient,
   ): Promise<User | null> {
-    const result = await client.query<UserRow>(
-      "SELECT * FROM users WHERE id = $1 FOR UPDATE",
-      [userId],
-    );
+    const query = `
+    SELECT * FROM users 
+    WHERE id = $1 
+    FOR UPDATE
+    `;
+
+    const result = await client.query<UserRow>(query, [userId]);
+
     if (result.rows.length === 0) return null;
+
     const row = result.rows[0];
+
     return User.fromDB(row);
   }
 
   async readById(userId: string): Promise<User | null> {
-    const result = await this.pool.query<UserRow>(
-      "SELECT * FROM users WHERE id = $1",
-      [userId],
-    );
+    const query = `
+    SELECT * FROM users 
+    WHERE id = $1
+    `;
+
+    const result = await this.pool.query<UserRow>(query, [userId]);
+
     if (result.rows.length === 0) return null;
+
     const row = result.rows[0];
+
     return User.fromDB(row);
   }
 

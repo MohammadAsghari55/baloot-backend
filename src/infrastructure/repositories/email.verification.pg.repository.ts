@@ -16,12 +16,18 @@ class EmailVerificationPgRepository implements IEmailVerificationRepository {
     userId: string,
     client: IDatabaseClient,
   ): Promise<EmailVerification | null> {
-    const result = await client.query<EmailVerificationRow>(
-      "SELECT * FROM email_verifications WHERE user_id = $1 FOR UPDATE",
-      [userId],
-    );
+    const query = `
+    SELECT * FROM email_verifications 
+    WHERE user_id = $1 
+    FOR UPDATE
+    `;
+
+    const result = await client.query<EmailVerificationRow>(query, [userId]);
+
     if (result.rows.length === 0) return null;
+
     const row = result.rows[0];
+
     return EmailVerification.fromDB(row);
   }
 

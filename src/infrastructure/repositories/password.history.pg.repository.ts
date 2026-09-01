@@ -16,14 +16,17 @@ class PasswordHistoryPgRepository implements IPasswordHistoryRepository {
     limit: number,
     client: IDatabaseClient,
   ): Promise<PasswordHistory[]> {
-    const result = await client.query<PasswordHistoryRow>(
-      `SELECT * FROM password_history 
-     WHERE user_id = $1 
-     ORDER BY created_at DESC 
-     LIMIT $2
-     `,
-      [userId, limit],
-    );
+    const query = `
+    SELECT * FROM password_history 
+    WHERE user_id = $1 
+    ORDER BY created_at DESC 
+    LIMIT $2`;
+
+    const result = await client.query<PasswordHistoryRow>(query, [
+      userId,
+      limit,
+    ]);
+
     return result.rows.map((row) => PasswordHistory.fromDB(row));
   }
 

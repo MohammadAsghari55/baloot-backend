@@ -50,6 +50,25 @@ class UserPgRepository implements IUserRepository {
     return User.fromDB(row);
   }
 
+  async findByIdentifier(
+    identifier: string,
+    client: IDatabaseClient,
+  ): Promise<User | null> {
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+
+    const query = `
+    SELECT * FROM users 
+    WHERE ${isEmail ? "email" : "username"} = $1 
+    FOR UPDATE
+    `;
+
+    const result = await client.query<UserRow>(query, [identifier]);
+
+    if (result.rows.length === 0) return null;
+
+    return User.fromDB(result.rows[0]);
+  }
+
   async readByIdentifier(
     identifier: string,
   ): Promise<Pick<User, "id" | "email"> | null> {
@@ -273,6 +292,52 @@ class UserPgRepository implements IUserRepository {
     ]);
 
     return result.rows[0].token_version;
+  }
+
+  async incrementWrongPasswordNumber(
+    userId: string,
+    client: IDatabaseClient,
+  ): Promise<number> {
+    const query = `
+    UPDATE users 
+    SET wrong_password_number = wrong_password_number + 1 
+    WHERE id = $1 
+    RETURNING wrong_password_number
+    `;
+
+    const result = await client.query<{ wrong_password_number: number }>(
+      query,
+      [userId],
+    );
+
+    return result.rows[0].wrong_password_number;
+  }
+
+  async resetWrongPasswordNumber(
+    userId: string,
+    client: IDatabaseClient,
+  ): Promise<void> {
+    const query = `
+    UPDATE users 
+    SET wrong_password_number = 0 
+    WHERE id = $1
+    `;
+
+    await client.query(query, [userId]);
+  }
+
+  async setWrongPasswordUntil(
+    userId: string,
+    until: Date,
+    client: IDatabaseClient,
+  ): Promise<void> {
+    const query = `
+    UPDATE users 
+    SET wrong_password_until = $1 
+    WHERE id = $2
+    `;
+
+    await client.query(query, [until, userId]);
   }
 }
 

@@ -6,7 +6,10 @@ interface IUserApplicationService {
 
   findByUsername(username: string): Promise<User | null>;
 
-  findByIdentifier(identifier: string): Promise<User | null>;
+  findByIdentifier(
+    identifier: string,
+    client: IDatabaseClient,
+  ): Promise<User | null>;
 
   readByIdentifier(
     identifier: string,
@@ -58,6 +61,22 @@ interface IUserApplicationService {
   ): Promise<number>;
 
   increaseVersion(userId: string, client: IDatabaseClient): Promise<number>;
+
+  incrementWrongPasswordNumber(
+    userId: string,
+    client: IDatabaseClient,
+  ): Promise<number>;
+
+  resetWrongPasswordNumber(
+    userId: string,
+    client: IDatabaseClient,
+  ): Promise<void>;
+
+  setWrongPasswordUntil(
+    userId: string,
+    until: Date,
+    client: IDatabaseClient,
+  ): Promise<void>;
 }
 
 export default IUserApplicationService;

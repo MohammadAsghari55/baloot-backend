@@ -14,12 +14,11 @@ class UserApplicationService implements IUserApplicationService {
     return this.userRepository.findByUsername(username);
   }
 
-  async findByIdentifier(identifier: string): Promise<User | null> {
-    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
-    if (isEmail) {
-      return this.userRepository.findByEmail(identifier);
-    }
-    return this.userRepository.findByUsername(identifier);
+  async findByIdentifier(
+    identifier: string,
+    client: IDatabaseClient,
+  ): Promise<User | null> {
+    return this.userRepository.findByIdentifier(identifier, client);
   }
 
   async readByIdentifier(
@@ -108,6 +107,28 @@ class UserApplicationService implements IUserApplicationService {
     client: IDatabaseClient,
   ): Promise<number> {
     return this.userRepository.increaseVersion(userId, client);
+  }
+
+  async incrementWrongPasswordNumber(
+    userId: string,
+    client: IDatabaseClient,
+  ): Promise<number> {
+    return this.userRepository.incrementWrongPasswordNumber(userId, client);
+  }
+
+  async resetWrongPasswordNumber(
+    userId: string,
+    client: IDatabaseClient,
+  ): Promise<void> {
+    await this.userRepository.resetWrongPasswordNumber(userId, client);
+  }
+
+  async setWrongPasswordUntil(
+    userId: string,
+    until: Date,
+    client: IDatabaseClient,
+  ): Promise<void> {
+    await this.userRepository.setWrongPasswordUntil(userId, until, client);
   }
 }
 

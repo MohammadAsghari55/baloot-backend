@@ -7,8 +7,8 @@ import ITokenService from "../../../domains/user/Interfaces/itoken.service.js";
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
 import IEmailVerificationApplicationService from "../../../domains/user/Interfaces/iemail.verification.application.service.js";
 import ISessionService from "../../../domains/user/Interfaces/isession.service.js";
+import ErrorFactory from "../../../shared/errors/error.factory.js";
 import AppError from "../../../shared/errors/app.error.js";
-
 class LoginUseCase {
   constructor(
     private transactionManager: ITransactionManager,
@@ -25,8 +25,10 @@ class LoginUseCase {
 
     const result = await this.transactionManager.runInTransaction(
       async (client) => {
-        const user =
-          await this.userApplicationService.findByIdentifier(identifier);
+        const user = await this.userApplicationService.findByIdentifier(
+          identifier,
+          client,
+        );
 
         if (!user) {
           throw AppError.unauthorized("INVALID_CREDENTIALS");
@@ -34,6 +36,16 @@ class LoginUseCase {
 
         if (!user.isEmailVerified && !code) {
           throw AppError.badRequest("EMAIL_NOT_VERIFIED");
+        }
+
+        if (user.wrongPasswordUntil && user.wrongPasswordUntil > new Date()) {
+          const remainingSeconds = Math.floor(
+            (user.wrongPasswordUntil.getTime() - Date.now()) / 1000,
+          );
+
+          const remainingMinutes = Math.ceil(remainingSeconds / 60);
+
+          throw ErrorFactory.accountLocked(remainingMinutes);
         }
 
         const existingToken =
@@ -57,8 +69,34 @@ class LoginUseCase {
         );
 
         if (!passwordIsMatch) {
-          throw AppError.unauthorized("INVALID_CREDENTIALS");
+          const tryCounter =
+            await this.userApplicationService.incrementWrongPasswordNumber(
+              user.id,
+              client,
+            );
+
+          if (tryCounter < 3) {
+            throw ErrorFactory.invalidCredentials(3 - tryCounter);
+          }
+
+          await this.userApplicationService.resetWrongPasswordNumber(
+            user.id,
+            client,
+          );
+
+          await this.userApplicationService.setWrongPasswordUntil(
+            user.id,
+            new Date(Date.now() + 15 * 60 * 1000),
+            client,
+          );
+
+          throw ErrorFactory.accountLocked(15);
         }
+
+        await this.userApplicationService.resetWrongPasswordNumber(
+          user.id,
+          client,
+        );
 
         if (!user.isEmailVerified) {
           if (!code) {

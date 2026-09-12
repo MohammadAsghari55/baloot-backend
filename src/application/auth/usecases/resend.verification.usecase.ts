@@ -15,7 +15,7 @@ class ResendVerificationUseCase {
     private bcryptService: IBcryptService,
     private emailOrchestrationService: IEmailOrchestrationService,
     private emailVerificationApplicationService: IEmailVerificationApplicationService,
-    private readonly expireTime: number,
+    private readonly expireTimeMs: number,
   ) {}
 
   async execute(dto: IdentifierDto) {
@@ -43,7 +43,7 @@ class ResendVerificationUseCase {
         if (existEmail) {
           const timeSinceCreation = Date.now() - existEmail.createdAt.getTime();
 
-          if (timeSinceCreation < this.expireTime) {
+          if (timeSinceCreation < this.expireTimeMs) {
             throw AppError.fromCode("TOO_MANY_REQUESTS");
           }
 
@@ -61,6 +61,7 @@ class ResendVerificationUseCase {
         const emailVerification = EmailVerification.createNew(
           user.id,
           hashedNewCode,
+          new Date(Date.now() + this.expireTimeMs),
         );
 
         await this.emailVerificationApplicationService.save(

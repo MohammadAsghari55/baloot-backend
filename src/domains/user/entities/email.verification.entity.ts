@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import config from "../../../infrastructure/config/env.index.js";
+
 class EmailVerification {
   private constructor(
     private readonly _id: string,
@@ -25,13 +25,17 @@ class EmailVerification {
     return this._expiresAt;
   }
 
-  static createNew(userId: string, hashedCode: string): EmailVerification {
+  static createNew(
+    userId: string,
+    hashedCode: string,
+    expiresAt: Date,
+  ): EmailVerification {
     return new EmailVerification(
       randomUUID(),
       userId,
       hashedCode,
       new Date(),
-      new Date(Date.now() + config.EXPIRE_TIME * 1000),
+      expiresAt,
     );
   }
 

@@ -64,6 +64,7 @@ function buildAuthModule() {
     passwordHistoryApplicationService,
     registerAdminService,
     config.MAX_ADMINS,
+    config.EXPIRE_TIME * 1000,
   );
 
   const resendAdminVerificationUseCase = new ResendAdminVerificationUseCase(
@@ -80,6 +81,7 @@ function buildAuthModule() {
     emailOrchestrationService,
     emailVerificationApplicationService,
     passwordHistoryApplicationService,
+    config.EXPIRE_TIME * 1000,
   );
 
   const loginUseCase = new LoginUseCase(

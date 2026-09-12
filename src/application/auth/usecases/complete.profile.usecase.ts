@@ -4,6 +4,7 @@ import IUserApplicationService from "../../../domains/user/Interfaces/iuser.appl
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
 import ISessionService from "../../../domains/user/Interfaces/isession.service.js";
 import AppError from "../../../shared/errors/app.error.js";
+import { logger } from "../../../infrastructure/logger/winston.index.js";
 
 class CompleteProfileUseCase {
   constructor(
@@ -70,7 +71,7 @@ class CompleteProfileUseCase {
         7 * 24 * 60 * 60,
       );
     } catch (error) {
-      console.error(
+      logger.error(
         "Redis version sync failed after profile completion:",
         error,
       );

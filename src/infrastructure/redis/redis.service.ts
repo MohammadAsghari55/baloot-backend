@@ -2,6 +2,7 @@ import { createClient, RedisClientType } from "redis";
 import IRedisService from "../../shared/interfaces/iredis.service.js";
 import AppError from "../../shared/errors/app.error.js";
 import config from "../config/env.index.js";
+import { logger } from "../logger/winston.index.js";
 
 class RedisService implements IRedisService {
   private client: RedisClientType;
@@ -13,11 +14,11 @@ class RedisService implements IRedisService {
         port: config.REDIS_PORT,
         reconnectStrategy: (retries) => {
           if (retries > 10) {
-            console.error(
-              "❌ Redis reconnect failed after 10 attempts, giving up",
-            );
+            logger.error("Redis reconnect failed after 10 attempts, giving up");
+
             return new Error("Redis unreachable");
           }
+
           return Math.min(retries * 100, 3000);
         },
       },
@@ -26,15 +27,15 @@ class RedisService implements IRedisService {
     });
 
     this.client.on("error", (err) => {
-      console.error("❌ Redis Client Error:", err);
+      logger.error("Redis Client Error:", err);
     });
 
     this.client.on("connect", () => {
-      console.log("✅ Redis connected successfully");
+      logger.info("Redis connected successfully");
     });
 
     this.connect().catch((err) => {
-      console.error("❌ Initial Redis connection failed:", err.message);
+      logger.error("Initial Redis connection failed:", err.message);
     });
   }
 
@@ -42,8 +43,8 @@ class RedisService implements IRedisService {
     try {
       await this.client.connect();
     } catch (error) {
-      console.error(
-        "❌ Redis initial connect failed, will retry via reconnectStrategy:",
+      logger.error(
+        "Redis initial connect failed, will retry via reconnectStrategy:",
         error,
       );
     }
@@ -80,7 +81,8 @@ class RedisService implements IRedisService {
       });
       return result === "OK";
     } catch (error) {
-      console.error("Redis setIfNotExists failed:", error);
+      logger.error("Redis setIfNotExists failed:", error);
+
       throw new AppError(
         "Failed to set key in Redis",
         500,
@@ -161,7 +163,7 @@ class RedisService implements IRedisService {
     try {
       await this.client.quit();
     } catch (error) {
-      console.warn("Redis quit error:", error);
+      logger.warn("Redis quit error:", error);
     }
   }
 }

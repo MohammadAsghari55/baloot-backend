@@ -5,6 +5,7 @@ import ITokenManagementApplicationService from "../../../domains/user/Interfaces
 import ISessionService from "../../../domains/user/Interfaces/isession.service.js";
 import AppError from "../../../shared/errors/app.error.js";
 import crypto from "crypto";
+import { logger } from "../../../infrastructure/logger/winston.index.js";
 
 class RefreshTokenUseCase {
   constructor(
@@ -126,7 +127,7 @@ class RefreshTokenUseCase {
         7 * 24 * 60 * 60,
       );
     } catch (error) {
-      console.error("Redis sync failed after refresh:", error);
+      logger.error("Redis sync failed after refresh:", error);
     }
 
     return {

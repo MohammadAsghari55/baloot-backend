@@ -9,6 +9,8 @@ import IEmailVerificationApplicationService from "../../../domains/user/Interfac
 import ISessionService from "../../../domains/user/Interfaces/isession.service.js";
 import ErrorFactory from "../../../shared/errors/error.factory.js";
 import AppError from "../../../shared/errors/app.error.js";
+import { logger } from "../../../infrastructure/logger/winston.index.js";
+
 class LoginUseCase {
   constructor(
     private transactionManager: ITransactionManager,
@@ -182,7 +184,7 @@ class LoginUseCase {
         7 * 24 * 60 * 60,
       );
     } catch (error) {
-      console.error("Redis sync failed after login:", error);
+      logger.error("Redis sync failed after login:", error);
     }
 
     return {

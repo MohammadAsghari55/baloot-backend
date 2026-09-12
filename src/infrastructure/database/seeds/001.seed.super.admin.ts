@@ -2,6 +2,7 @@ import { PoolClient } from "pg";
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
 import config from "../../config/env.index.js";
+import { logger } from "../../logger/winston.index.js";
 
 export async function seed(client: PoolClient): Promise<void> {
   const adminUsername = config.ADMIN_USERNAME;
@@ -10,7 +11,7 @@ export async function seed(client: PoolClient): Promise<void> {
   const adminRole = "super_admin";
 
   if (!adminPassword) {
-    console.warn("⚠️ ADMIN_PASSWORD not set, skipping admin seed.");
+    logger.warn("ADMIN_PASSWORD not set, skipping admin seed.");
     return;
   }
 
@@ -20,7 +21,7 @@ export async function seed(client: PoolClient): Promise<void> {
   );
 
   if (checkResult.rows.length > 0) {
-    console.log("✅ Admin user already exists. Skipping seed.");
+    logger.info("Admin user already exists. Skipping seed.");
     return;
   }
 
@@ -52,5 +53,5 @@ export async function seed(client: PoolClient): Promise<void> {
     [randomUUID(), userId, hashedPassword, new Date()],
   );
 
-  console.log("✅ Admin user seeded successfully.");
+  logger.info("Admin user seeded successfully.");
 }

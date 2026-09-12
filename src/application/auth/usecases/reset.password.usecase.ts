@@ -8,6 +8,7 @@ import IPasswordHistoryApplicationService from "../../../domains/user/Interfaces
 import ISessionService from "../../../domains/user/Interfaces/isession.service.js";
 import IForgetPasswordService from "../../../domains/user/Interfaces/iforget.password.service.js";
 import AppError from "../../../shared/errors/app.error.js";
+import { logger } from "../../../infrastructure/logger/winston.index.js";
 
 class ResetPasswordUseCase {
   constructor(
@@ -109,7 +110,7 @@ class ResetPasswordUseCase {
         7 * 24 * 60 * 60,
       );
     } catch (error) {
-      console.error("Redis version sync failed after password change:", error);
+      logger.error("Redis version sync failed after password change:", error);
     }
 
     await this.emailOrchestrationService.sendNotificationEmailWithWarning(

@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import DatabaseError from "../../shared/errors/database.error.js";
 import AppError from "../../shared/errors/app.error.js";
+import { logger } from "../logger/winston.index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,7 +32,7 @@ async function runMigrations() {
       const alreadyExecuted = res.rowCount !== null && res.rowCount > 0;
 
       if (alreadyExecuted) {
-        console.log(`Skipping already executed: ${file}`);
+        logger.info(`Skipping already executed: ${file}`);
         continue;
       }
 
@@ -49,22 +50,22 @@ async function runMigrations() {
       }
       const upSql = upMatch[1].trim();
 
-      console.log(`Running: ${file}`);
+      logger.info(`Running: ${file}`);
       await pool.query(upSql);
       await pool.query(`INSERT INTO migration_history (name) VALUES ($1)`, [
         file,
       ]);
-      console.log(`${file} executed successfully.`);
+      logger.info(`${file} executed successfully.`);
     }
-    console.log("All migrations completed.");
+    logger.info("All migrations completed.");
   } catch (err) {
     if (err instanceof DatabaseError || err instanceof AppError) {
-      console.error(
+      logger.error(
         `${err.message}`,
         err.publicMessage ? ` (${err.publicMessage})` : "",
       );
     } else {
-      console.error("Unexpected error:", err);
+      logger.error("Unexpected error:", err);
     }
     process.exit(1);
   } finally {

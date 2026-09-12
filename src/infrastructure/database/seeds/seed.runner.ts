@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import config from "../../config/env.index.js";
+import { logger } from "../../logger/winston.index.js";
 
 const fileName = fileURLToPath(import.meta.url);
 const dirName = path.dirname(fileName);
@@ -22,21 +23,21 @@ async function runSeeders(): Promise<void> {
     .sort();
 
   if (files.length === 0) {
-    console.log("🌱 No seed files found.");
+    logger.info("No seed files found.");
     return;
   }
 
-  console.log(`🌱 Found ${files.length} seed files. Starting...`);
+  logger.info(`Found ${files.length} seed files. Starting...`);
 
   const client = await pool.connect();
 
   try {
     for (const file of files) {
       const filePath = path.join(seedsDir, file);
-      console.log(`📄 Running: ${file}`);
+      logger.info(`Running: ${file}`);
 
       if (file.startsWith("99-") && config.NODE_ENV !== "development") {
-        console.log(`⏭️ Skipping ${file} (NODE_ENV !== development)`);
+        logger.info(`Skipping ${file} (NODE_ENV !== development)`);
         continue;
       }
 
@@ -49,7 +50,7 @@ async function runSeeders(): Promise<void> {
         checkResult.rows.length > 0 &&
         checkResult.rows[0].status === "success"
       ) {
-        console.log(`⏭️ Skipping ${file} (already executed successfully)`);
+        logger.info(`Skipping ${file} (already executed successfully)`);
         continue;
       }
 
@@ -69,7 +70,7 @@ async function runSeeders(): Promise<void> {
         const module = (await import(`file://${filePath}`)) as SeederModule;
 
         if (!module.seed) {
-          console.warn(`⚠️ ${file} does not export a "seed" function.`);
+          logger.warn(`${file} does not export a "seed" function.`);
           await client.query(
             `UPDATE seed_history SET status = 'failed' WHERE name = $1`,
             [file],
@@ -86,10 +87,10 @@ async function runSeeders(): Promise<void> {
           [file],
         );
 
-        console.log(`✅ ${file} completed successfully.`);
+        logger.info(`${file} completed successfully.`);
       } catch (error) {
         await client.query("ROLLBACK");
-        console.error(`❌ ${file} failed:`, error);
+        logger.error(`${file} failed:`, error);
 
         await client.query(
           `UPDATE seed_history SET status = 'failed' WHERE name = $1`,
@@ -98,9 +99,9 @@ async function runSeeders(): Promise<void> {
       }
     }
 
-    console.log("✅ All seeders processed.");
+    logger.info("All seeders processed.");
   } catch (error) {
-    console.error("❌ Seeding process failed:", error);
+    logger.error("❌ Seeding process failed:", error);
     process.exit(1);
   } finally {
     client.release();

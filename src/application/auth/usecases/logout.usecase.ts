@@ -3,6 +3,7 @@ import IUserApplicationService from "../../../domains/user/Interfaces/iuser.appl
 import ITokenManagementApplicationService from "../../../domains/user/Interfaces/itoken.management.application.service.js";
 import ISessionManagementApplicationService from "../../../domains/user/Interfaces/isession.management.application.service.js";
 import ISessionService from "../../../domains/user/Interfaces/isession.service.js";
+import { logger } from "../../../infrastructure/logger/winston.index.js";
 
 class LogoutUseCase {
   constructor(
@@ -43,7 +44,7 @@ class LogoutUseCase {
         7 * 24 * 60 * 60,
       );
     } catch (error) {
-      console.error("Redis sync failed:", error);
+      logger.error("Redis sync failed:", error);
     }
   }
 
@@ -62,7 +63,7 @@ class LogoutUseCase {
         deviceId,
       );
     } catch (error) {
-      console.error("Redis sync failed:", error);
+      logger.error("Redis sync failed:", error);
     }
   }
 }

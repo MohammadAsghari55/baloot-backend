@@ -3,6 +3,7 @@ import IUserApplicationService from "../domains/user/Interfaces/iuser.applicatio
 import ITokenManagementApplicationService from "../domains/user/Interfaces/itoken.management.application.service.js";
 import ISessionService from "../domains/user/Interfaces/isession.service.js";
 import AppError from "../shared/errors/app.error.js";
+import { logger } from "../infrastructure/logger/winston.index.js";
 
 const accessCheckerMiddleware = (
   userApplicationService: IUserApplicationService,
@@ -25,7 +26,7 @@ const accessCheckerMiddleware = (
       session = await sessionService.getSession(req.userId, req.deviceId);
       redisVersion = await sessionService.getVersion(req.userId);
     } catch (error) {
-      console.error(
+      logger.error(
         "Redis read failed in accessCheckerMiddleware, falling back to Postgres:",
         error,
       );
@@ -70,7 +71,7 @@ const accessCheckerMiddleware = (
         7 * 24 * 60 * 60,
       );
     } catch (error) {
-      console.error(
+      logger.error(
         "Redis sync failed in accessCheckerMiddleware fallback:",
         error,
       );

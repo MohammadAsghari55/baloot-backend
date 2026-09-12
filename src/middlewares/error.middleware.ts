@@ -3,6 +3,7 @@ import AppError from "../shared/errors/app.error.js";
 import ZodValidationError from "../shared/errors/zod.validation.error.js";
 import zodErrorMapper from "../shared/utils/zod.error.mapper.js";
 import config from "../infrastructure/config/env.index.js";
+import { logger } from "../infrastructure/logger/winston.index.js";
 
 function errorMiddleware(
   err: unknown,
@@ -42,7 +43,11 @@ function errorMiddleware(
   }
 
   if (err instanceof Error) {
-    console.error("UNEXPECTED ERROR:", err);
+    logger.error("UNEXPECTED ERROR:", {
+      message: err.message,
+      stack: err.stack,
+    });
+
     return res.status(500).json({
       success: false,
       error: {
@@ -56,7 +61,7 @@ function errorMiddleware(
     });
   }
 
-  console.error("UNEXPECTED ERROR:", err);
+  logger.error("UNEXPECTED ERROR:", err);
 
   return res.status(500).json({
     success: false,

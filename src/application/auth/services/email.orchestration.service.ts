@@ -2,6 +2,7 @@ import IEmailOrchestrationService from "../../../domains/user/Interfaces/iemail.
 import IEmailService from "../../../domains/user/Interfaces/iemail.service.js";
 import AppError from "../../../shared/errors/app.error.js";
 import { randomInt } from "crypto";
+import { logger } from "../../../infrastructure/logger/winston.index.js";
 
 class EmailOrchestrationService implements IEmailOrchestrationService {
   constructor(private emailService: IEmailService) {}
@@ -34,14 +35,12 @@ class EmailOrchestrationService implements IEmailOrchestrationService {
           "Failed to send verification email. Please try again later.",
         cause: error,
       });
-      console.error(
-        JSON.stringify({
-          code: appError.code,
-          message: appError.message,
-          publicMessage: appError.publicMessage,
-          cause: appError.cause,
-        }),
-      );
+      logger.error("Failed to send verification email:", {
+        code: appError.code,
+        message: appError.message,
+        publicMessage: appError.publicMessage,
+        cause: appError.cause,
+      });
 
       return "Verification email could not be sent. Please request a new code.";
     }
@@ -72,14 +71,12 @@ class EmailOrchestrationService implements IEmailOrchestrationService {
         cause: error,
       });
 
-      console.error(
-        JSON.stringify({
-          code: appError.code,
-          message: appError.message,
-          publicMessage: appError.publicMessage,
-          cause: appError.cause,
-        }),
-      );
+      logger.error("Failed to send notification email:", {
+        code: appError.code,
+        message: appError.message,
+        publicMessage: appError.publicMessage,
+        cause: appError.cause,
+      });
 
       return "Notification email could not be sent.";
     }

@@ -2,37 +2,33 @@
 desktop.ini
 *.ico
 
-
-
-# dependencies
+# Dependencies
 node_modules/
 
-# build output
+# Build Output
 dist/
 
-# env files
+# Env Files
 .env
 .env.*
 
-# logs
-npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Logs
+logs/
+*.log
 
-# runtime data
+# Runtime Data
 pids
 *.pid
 *.seed
 *.pid.lock
 
-# coverage
+# Coverage
 coverage/
 
 # TypeScript
 *.tsbuildinfo
 
-# OS / editor
+# OS / Editor
 .DS_Store
 Thumbs.db
 
@@ -40,5 +36,3 @@ Thumbs.db
 .vscode/
 .idea/
 
-# misc
-*.log

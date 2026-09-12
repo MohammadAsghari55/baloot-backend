@@ -106,9 +106,9 @@ class RedisService implements IRedisService {
     }
   }
 
-  async del(key: string): Promise<void> {
+  async del(key: string): Promise<number> {
     try {
-      await this.client.del(key);
+      return await this.client.del(key);
     } catch (error) {
       throw new AppError(
         `Failed to delete key "${key}" from Redis`,

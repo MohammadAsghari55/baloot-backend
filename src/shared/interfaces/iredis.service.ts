@@ -7,7 +7,7 @@ interface IRedisService {
 
   get<T = unknown>(key: string): Promise<T | null>;
 
-  del(key: string): Promise<void>;
+  del(key: string): Promise<number>;
 
   incr(key: string): Promise<number>;
 

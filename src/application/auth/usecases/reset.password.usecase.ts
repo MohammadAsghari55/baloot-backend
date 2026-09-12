@@ -58,6 +58,14 @@ class ResetPasswordUseCase {
           throw AppError.notFound("NOT_FOUND");
         }
 
+        const deleted = await this.forgetPasswordService.deleteResetCode(
+          userInfo.id,
+        );
+
+        if (!deleted) {
+          throw AppError.unauthorized("INVALID_CREDENTIALS");
+        }
+
         const hashedPassword = await this.bcryptService.hash(dto.newPassword);
 
         await this.userApplicationService.updatePassword(
@@ -96,12 +104,6 @@ class ResetPasswordUseCase {
         };
       },
     );
-
-    await this.forgetPasswordService.deleteResetCode(user.id);
-
-    if (!response.success) {
-      throw AppError.unauthorized("INVALID_CREDENTIALS");
-    }
 
     try {
       await this.sessionService.setVersion(

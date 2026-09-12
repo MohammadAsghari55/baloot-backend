@@ -36,9 +36,10 @@ class ForgetPasswordService implements IForgetPasswordService {
     return JSON.parse(data) as ResetPasswordData;
   }
 
-  async deleteResetCode(userId: string): Promise<void> {
+  async deleteResetCode(userId: string): Promise<boolean> {
     const key = this.getKey(userId);
-    await this.redisService.del(key);
+    const deleted = await this.redisService.del(key);
+    return deleted > 0;
   }
 }
 

@@ -5,7 +5,7 @@ interface IForgetPasswordService {
 
   getResetCode(userId: string): Promise<ResetPasswordData | null>;
 
-  deleteResetCode(userId: string): Promise<void>;
+  deleteResetCode(userId: string): Promise<boolean>;
 }
 
 export default IForgetPasswordService;

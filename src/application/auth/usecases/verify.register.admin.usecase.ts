@@ -22,6 +22,7 @@ class VerifyRegisterAdminUseCase {
     private passwordHistoryApplicationService: IPasswordHistoryApplicationService,
     private registerAdminService: IRegisterAdminService,
     private readonly maxAdmins: number,
+    private readonly expireTimeMs: number,
   ) {}
 
   async execute(dto: VerifyRegisterDto, userId: string, userRole: string) {
@@ -66,6 +67,7 @@ class VerifyRegisterAdminUseCase {
         const emailVerification = EmailVerification.createNew(
           user.id,
           hashedCode,
+          new Date(Date.now() + this.expireTimeMs),
         );
 
         await this.emailVerificationApplicationService.save(

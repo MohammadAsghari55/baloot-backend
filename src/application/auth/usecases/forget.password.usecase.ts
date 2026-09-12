@@ -33,7 +33,14 @@ class ForgetPasswordUseCase {
 
     const hashedCode = await this.bcryptService.hash(code);
 
-    await this.forgetPasswordService.saveResetCode(userInfo.id, hashedCode);
+    const saveCode = await this.forgetPasswordService.saveResetCode(
+      userInfo.id,
+      hashedCode,
+    );
+
+    if (!saveCode) {
+      throw AppError.badRequest("TOO_MANY_REQUESTS");
+    }
 
     const warning =
       await this.emailOrchestrationService.sendVerificationEmailWithWarning(
